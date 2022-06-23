@@ -1,0 +1,21 @@
+.note {
+  &__date {
+  }
+
+  &__content {
+    position: relative;
+    background: rgb(87, 56, 56);
+
+    &::before {
+      content: "";
+      display: block;
+      height: 4rem;
+      width: 4px;
+      background-color: rgb(201, 193, 193);
+      position: absolute;
+      top: -100%;
+      left: 50%;
+      transform: translate(-50%, 100%);
+    }
+  }
+}
