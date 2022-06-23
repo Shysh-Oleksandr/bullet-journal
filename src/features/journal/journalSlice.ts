@@ -32,6 +32,29 @@ const initialState: journalState = {
       title: "Wood work",
       startDate: new Date("June 21, 2022"),
       endDate: new Date("June 21, 2022"),
+      image:
+        "https://media.istockphoto.com/photos/bed-construction-picture-id1225367171?k=20&m=1225367171&s=612x612&w=0&h=yAa57KszobVOqspjRQcyGoxiWvTXgfNCnul5S8UnYbc=",
+      description:
+        "Half a day I polish the wooden bed of my parents with my mom. I still didn't get it - why should I have done it?",
+      color: "#ef6ecd",
+      type: NoteTypes.EVENT,
+      id: uuidv4(),
+    },
+    {
+      title: "Ran 10 km",
+      startDate: new Date("May 14, 2022"),
+      endDate: new Date("May 14, 2022"),
+      description:
+        "Was going to run 8 km, but since I got strengh, ran 10 instead. Felt very bad after the running. But accomplished my goal",
+      color: "#ccaacb",
+      category: "Sport",
+      type: NoteTypes.EVENT,
+      id: uuidv4(),
+    },
+    {
+      title: "Wood work",
+      startDate: new Date("June 21, 2022"),
+      endDate: new Date("June 21, 2022"),
       description:
         "Half a day I polish the wooden bed of my parents with my mom. I still didn't get it - why should I have done it?",
       color: "#ef6ecd",

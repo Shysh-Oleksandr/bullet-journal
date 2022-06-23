@@ -1,21 +1,40 @@
 .note {
-  &__date {
+  &:first-child .note__date::before {
+    content: none;
   }
 
-  &__content {
+  &__date {
     position: relative;
-    background: rgb(87, 56, 56);
+    color: rgb(106, 170, 194);
 
-    &::before {
+    &::before,
+    &::after {
       content: "";
       display: block;
-      height: 4rem;
+      height: 2rem;
       width: 4px;
       background-color: rgb(201, 193, 193);
       position: absolute;
-      top: -100%;
-      left: 50%;
-      transform: translate(-50%, 100%);
+      left: 3rem;
+      // transform: translateX(-50%);
+      border-radius: 0.3rem;
     }
+    &::before {
+      top: -2rem;
+    }
+    &::after {
+      bottom: -2rem;
+      // transform: translateY(-100%);
+    }
+  }
+
+  &__image {
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+  &__content {
+    background: rgb(59, 87, 97);
   }
 }

@@ -5,7 +5,7 @@ import Notes from "./components/Notes";
 function App() {
   const dispatch = useAppDispatch();
   return (
-    <div className="app text-center w-full h-full pt-48 bg-slate-300">
+    <div className="app text-center w-full h-full pt-8 bg-slate-300">
       <Notes />
     </div>
   );
