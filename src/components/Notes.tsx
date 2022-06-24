@@ -10,11 +10,11 @@ import "../styles/note.scss";
 const Notes = () => {
   const { notes } = useAppSelector((store) => store.journal);
   return (
-    <div className="notes">
+    <div className="notes px-32 pt-12">
       {notes.map((note) => {
         return (
           <div
-            className="note mx-8 mb-8 text-left"
+            className="note mb-8 text-left"
             style={{ color: note.color }}
             key={note.id}
           >
