@@ -85,3 +85,7 @@ h6 {
   font-weight: 400;
 }
 /*--------------------*/
+
+.border-bottom {
+  @apply border-b-2 border-solid border-cyan-100;
+}
