@@ -1,8 +1,12 @@
 import React from 'react';
 
-const Loading = () => {
+interface ILoadingProps {
+    scaleSize?: number;
+}
+
+const Loading = ({ scaleSize }: ILoadingProps) => {
     return (
-        <div className="stage">
+        <div style={{ transform: `scale(${scaleSize || 1})` }} className="stage">
             <div className="dot-revolution"></div>
         </div>
     );

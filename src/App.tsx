@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import routes from './config/routes';
-import { useAppDispatch } from './app/hooks';
+import { useAppDispatch, useAppSelector } from './app/hooks';
 import { initialState as initialUserState, logout } from './features/user/userSlice';
 import Loading from './components/Loading';
 import AuthRoute from './components/AuthRoute';
@@ -11,6 +11,8 @@ import AuthRoute from './components/AuthRoute';
 function App() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const dispatch = useAppDispatch();
+    const { user } = useAppSelector((store) => store.user);
+    const isAuthorized = user._id !== '';
 
     const [authStage, setAuthStage] = useState('Checkign localstorage');
     useEffect(() => {
@@ -44,16 +46,19 @@ function App() {
             }, 1000);
         }
     }
-    console.log(authStage);
 
     if (isLoading) {
-        return <Loading />;
+        return (
+            <div className="flex justify-center items-center w-full h-full">
+                <Loading scaleSize={2} />
+            </div>
+        );
     }
 
     return (
         <Router>
             <div className="app text-center w-full h-full bg-slate-300">
-                <Navbar />
+                {isAuthorized && <Navbar />}
                 <Routes>
                     {routes.map((route, index) => {
                         if (route.auth) {
