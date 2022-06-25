@@ -1,13 +1,22 @@
-import React, { RefObject, useId, useRef } from "react";
+import React, { RefObject, useId, useRef, useState } from "react";
 import { BiCalendarAlt } from "react-icons/bi";
 import { BsDashLg } from "react-icons/bs";
 import { IoIosColorPalette } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { Editor, EditorState } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 const NoteForm = () => {
   const nameRef = useRef() as RefObject<HTMLInputElement>;
   const colorRef = useRef() as RefObject<HTMLLabelElement>;
   const navigate = useNavigate();
+  // const [editorState, setEditorState] = useState<EditorState>(
+  //   EditorState.createEmpty()
+  // );
+
+  // const onEditorStateChange = (editorState: EditorState) => {
+  //   setEditorState(editorState);
+  // };
 
   const saveNote = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -102,6 +111,14 @@ const NoteForm = () => {
             Color
           </label>
         </div>
+      </div>
+      <div>
+        {/* <Editor
+          editorState={editorState}
+          toolbarClassName="toolbarClassName"
+          wrapperClassName="wrapperClassName"
+          editorClassName="editorClassName"
+        /> */}
       </div>
     </form>
   );
