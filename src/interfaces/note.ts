@@ -1,11 +1,9 @@
-import IUser from './../../backend/src/interfaces/user';
-
 export default interface INote {
     title: string;
     // author: string | IUser;
     startDate: number;
     endDate: number;
-    description?: string;
+    content?: string;
     color: string;
     image?: string;
     type: string | NoteTypes;

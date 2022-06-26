@@ -8,7 +8,7 @@ import INote from '../interfaces/note';
 import logging from '../config/logging';
 import Loading from './Loading';
 import NotePreview from './NotePreview';
-import ErrorText from './ErrorText';
+import InfoMessage from './InfoMessage';
 
 const Notes = () => {
     const { notes } = useAppSelector((store) => store.journal);
@@ -53,7 +53,7 @@ const Notes = () => {
             {notes.map((note) => {
                 return <NotePreview note={note} />;
             })}
-            <ErrorText error={error} />
+            <InfoMessage message={error} isError={true} />
         </div>
     );
 };

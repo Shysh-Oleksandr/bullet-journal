@@ -17,7 +17,7 @@ const NotePreview = ({ note }: INotePreviewProps) => {
                     <Link to={`/notes/${note._id}`} className="text-3xl font-bold mb-2">
                         {note.title}
                     </Link>
-                    <p className="text-xl">{note.description}</p>
+                    <p className="text-xl">{note.content}</p>
                     <h4 className="mt-2 text-xl">{note.type}</h4>
                 </div>
                 {note.image && <div className="w-64 h-24 note__image rounded-md ml-4" style={{ backgroundImage: `url(${note.image})` }}></div>}

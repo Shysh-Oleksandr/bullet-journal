@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
 import { Authenticate, SignInWithSocialMedia as SocialMediaPopup } from './../modules/auth';
 import logging from './../config/logging';
-import ErrorText from '../components/ErrorText';
+import InfoMessage from '../components/InfoMessage';
 import { BsGoogle } from 'react-icons/bs';
 import { Providers } from './../config/firebase';
 import Loading from '../components/Loading';
@@ -75,7 +75,7 @@ const LoginPage = (props: IPageProps) => {
                 <div className="bg-white px-12 py-8 lg:w-[33vw] md:w-[50vw] sm:w-[65vw] w-[80vw] rounded-lg shadow-xl">
                     <div className="text-5xl font-semibold text-center my-4">{isLogin ? 'Login' : 'Sign Up'}</div>
                     <div className="text-center">
-                        <ErrorText error={error} />
+                        <InfoMessage message={error} isError={true} />
                         <button
                             disabled={authenticating}
                             onClick={() => SignInWithSocialMedia(Providers.google)}
