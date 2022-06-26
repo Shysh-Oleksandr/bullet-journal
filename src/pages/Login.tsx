@@ -3,19 +3,23 @@ import IPageProps from './../interfaces/page';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
-import { SignInWithSocialMedia as SocialMediaPopup } from './../modules/auth';
+import { Authenticate, SignInWithSocialMedia as SocialMediaPopup } from './../modules/auth';
 import logging from './../config/logging';
 import ErrorText from '../components/ErrorText';
 import { BsGoogle } from 'react-icons/bs';
 import { Providers } from './../config/firebase';
 import Loading from '../components/Loading';
 import CenterPiece from './../components/CenterPiece';
+import { useAppDispatch } from '../app/hooks';
+import { login } from '../features/user/userSlice';
 
 const LoginPage = (props: IPageProps) => {
     const [authenticating, setAuthenticating] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
 
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+
     const isLogin = window.location.pathname.includes('login');
 
     const SignInWithSocialMedia = (provider: firebase.auth.AuthProvider) => {
@@ -36,7 +40,15 @@ const LoginPage = (props: IPageProps) => {
                         try {
                             let fire_token = await user.getIdToken();
 
-                            // If good, auth with backend
+                            Authenticate(uid, name, fire_token, (error, _user) => {
+                                if (error) {
+                                    setError(error);
+                                    setAuthenticating(false);
+                                } else if (_user) {
+                                    dispatch(login({ user: _user, fire_token }));
+                                    navigate('/');
+                                }
+                            });
                         } catch (error) {
                             setError('Invalid token.');
                             logging.error(error);

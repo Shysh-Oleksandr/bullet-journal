@@ -1,28 +1,59 @@
-import React from 'react';
-import { useAppSelector } from '../app/hooks';
+import React, { useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 import '../styles/note.scss';
+import axios from 'axios';
+import config from '../config/config';
+import { setNotes } from '../features/journal/journalSlice';
+import INote from '../interfaces/note';
+import logging from '../config/logging';
+import Loading from './Loading';
+import NotePreview from './NotePreview';
+import ErrorText from './ErrorText';
 
 const Notes = () => {
     const { notes } = useAppSelector((store) => store.journal);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>('');
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        GetAllNotes();
+    }, []);
+
+    const GetAllNotes = async () => {
+        try {
+            const response = await axios({
+                method: 'GET',
+                url: `${config.server.url}/notes`
+            });
+
+            if (response.status === 200 || response.status === 304) {
+                let notes = response.data.notes as INote[];
+                notes.sort((x, y) => x.startDate - y.startDate);
+                dispatch(setNotes(notes));
+            }
+        } catch (error) {
+            logging.error(error);
+            setError('Unable to retreive notes.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center w-full h-full mt-20">
+                <Loading scaleSize={2} />
+            </div>
+        );
+    }
+
     return (
         <div className="notes px-32 pt-12">
             {notes.map((note) => {
-                return (
-                    <div className="note mb-8 text-left" style={{ color: note.color }} key={note.id}>
-                        <div className="note__date text-xl">
-                            <h4>{new Date(note.startDate).toDateString()}</h4>
-                        </div>
-                        <div className="note__content rounded-md shadow-md mt-8 py-4 px-8 flex justify-between items-center">
-                            <div>
-                                <h2 className="text-3xl font-bold mb-2">{note.title}</h2>
-                                <p className="text-xl">{note.description}</p>
-                                <h4 className="mt-2 text-xl">{note.type}</h4>
-                            </div>
-                            {note.image && <div className="w-64 h-24 note__image rounded-md ml-4" style={{ backgroundImage: `url(${note.image})` }}></div>}
-                        </div>
-                    </div>
-                );
+                return <NotePreview note={note} />;
             })}
+            <ErrorText error={error} />
         </div>
     );
 };

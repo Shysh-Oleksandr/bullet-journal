@@ -3,9 +3,11 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import routes from './config/routes';
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import { initialState as initialUserState, logout } from './features/user/userSlice';
+import { initialState as initialUserState, login, logout } from './features/user/userSlice';
 import Loading from './components/Loading';
 import AuthRoute from './components/AuthRoute';
+import { Validate } from './modules/auth';
+import logging from './config/logging';
 //  "homepage": "http://shysh-oleksandr.github.io/bullet-journal",
 
 function App() {
@@ -14,7 +16,6 @@ function App() {
     const { user } = useAppSelector((store) => store.user);
     const isAuthorized = user._id !== '';
 
-    const [authStage, setAuthStage] = useState('Checkign localstorage');
     useEffect(() => {
         setTimeout(() => {
             checkLocalStorageForCredentials();
@@ -27,23 +28,28 @@ function App() {
      * If not, we are logged out initially.
      */
     function checkLocalStorageForCredentials() {
-        setAuthStage('Checking credentionals');
-
         const fire_token = localStorage.getItem('fire_token');
 
         if (fire_token === null) {
             dispatch(logout(initialUserState));
-            setAuthStage('No crede found.');
             setTimeout(() => {
                 setIsLoading(false);
             }, 1000);
         } else {
-            // Validate with backedn
-            setAuthStage('crede found.');
-
-            setTimeout(() => {
-                setIsLoading(false);
-            }, 1000);
+            return Validate(fire_token, (error, user) => {
+                if (error) {
+                    logging.error(error);
+                    dispatch(logout(initialUserState));
+                    setTimeout(() => {
+                        setIsLoading(false);
+                    }, 1000);
+                } else if (user) {
+                    dispatch(login({ user, fire_token }));
+                    setTimeout(() => {
+                        setIsLoading(false);
+                    }, 1000);
+                }
+            });
         }
     }
 

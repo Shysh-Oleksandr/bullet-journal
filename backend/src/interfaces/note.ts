@@ -1,19 +1,17 @@
-import IUser from './../../backend/src/interfaces/user';
+import { Document } from 'mongoose';
+import IUser from './user';
 
-export default interface INote {
+export default interface INote extends Document {
     title: string;
-    // author: string | IUser;
+    author: IUser;
     startDate: number;
     endDate: number;
-    description?: string;
+    content?: string;
     color: string;
     image?: string;
-    type: string | NoteTypes;
+    type: string; // NoteTypes
     category?: string;
     rating: number;
-    _id: string;
-    createdAt: string;
-    updatedAt: string;
     // milestones: IMilestone[];
 }
 

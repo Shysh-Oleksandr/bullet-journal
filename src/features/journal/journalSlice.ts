@@ -16,7 +16,11 @@ const initialState: IJournalState = {
             description: "Half a day I polish the wooden bed of my parents with my mom. I still didn't get it - why should I have done it?",
             color: '#ef6ecd',
             type: NoteTypes.EVENT,
-            id: uuidv4()
+            // author: 'me',
+            createdAt: new Date('June 21, 2022').getTime().toString(),
+            updatedAt: new Date('June 21, 2022').getTime().toString(),
+            rating: 8,
+            _id: uuidv4()
         },
         {
             title: 'Ran 10 km',
@@ -26,7 +30,11 @@ const initialState: IJournalState = {
             color: '#ccaacb',
             category: 'Sport',
             type: NoteTypes.EVENT,
-            id: uuidv4()
+            // author: 'me',
+            createdAt: new Date('June 21, 2022').getTime().toString(),
+            updatedAt: new Date('June 21, 2022').getTime().toString(),
+            rating: 8,
+            _id: uuidv4()
         },
         {
             title: 'Wood work',
@@ -35,7 +43,11 @@ const initialState: IJournalState = {
             description: "Half a day I polish the wooden bed of my parents with my mom. I still didn't get it - why should I have done it?",
             color: '#ef6ecd',
             type: NoteTypes.EVENT,
-            id: uuidv4()
+            // author: 'me',
+            createdAt: new Date('June 21, 2022').getTime().toString(),
+            updatedAt: new Date('June 21, 2022').getTime().toString(),
+            rating: 8,
+            _id: uuidv4()
         },
         {
             title: 'Ran 10 km',
@@ -44,8 +56,12 @@ const initialState: IJournalState = {
             description: 'Was going to run 8 km, but since I got strengh, ran 10 instead. Felt very bad after the running. But accomplished my goal',
             color: '#ccaacb',
             category: 'Sport',
+            // author: 'me',
+            createdAt: new Date('June 21, 2022').getTime().toString(),
+            updatedAt: new Date('June 21, 2022').getTime().toString(),
+            rating: 8,
             type: NoteTypes.EVENT,
-            id: uuidv4()
+            _id: uuidv4()
         }
     ]
 };
@@ -55,10 +71,12 @@ export const journalSlice = createSlice({
     initialState,
     // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-        increment: (state, { payload }: PayloadAction<number>) => {}
+        setNotes: (state, { payload }: PayloadAction<INote[]>) => {
+            state.notes = payload;
+        }
     }
 });
 
-export const { increment } = journalSlice.actions;
+export const { setNotes } = journalSlice.actions;
 
 export default journalSlice.reducer;
