@@ -30,7 +30,7 @@ const Navbar = () => {
                     </div>
                 ) : (
                     <div className="flex items-center">
-                        <Link to={'/edit'} className="text-3xl cursor-pointer transition-all hover:rotate-180 hover:opacity-80 duration-500">
+                        <Link to={'/edit'} className="text-3xl cursor-pointer transition-all hover:rotate-90 hover:opacity-80 duration-500">
                             <BsPlusLg />
                         </Link>
                         <span className="mx-4 text-4xl">|</span>

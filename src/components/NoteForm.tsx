@@ -3,8 +3,9 @@ import { BiCalendarAlt } from 'react-icons/bi';
 import { BsDashLg } from 'react-icons/bs';
 import { AiFillStar } from 'react-icons/ai';
 import { IoIosColorPalette } from 'react-icons/io';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Editor, EditorState, ContentState, convertToRaw } from 'draft-js';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { EditorState, ContentState, convertToRaw } from 'draft-js';
+import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { NoteTypes } from '../interfaces/note';
 import { useAppSelector } from '../app/hooks';
@@ -184,86 +185,127 @@ const NoteForm = () => {
         );
     }
     return (
-        <form className="px-10 py-3 bg-white rounded-sm shadow-2xl mx-32 my-12">
-            <div className="flex justify-between items-center">
-                <input tabIndex={0} type="text" placeholder="Title" ref={nameRef} className="border-bottom py-4 text-3xl w-full" required={true} />
-            </div>
-            <div className="flex items-center justify-between border-bottom mb-3">
-                <div className="flex items-center h-11">
-                    <div className="relative ">
-                        <div className="flex items-center">
-                            <label htmlFor="startDateInput" className="cursor-pointer text-2xl">
-                                <BiCalendarAlt />
-                            </label>
-                            <input type="date" id="startDateInput" className="pl-2 py-3 cursor-pointer" defaultValue={new Date().toLocaleDateString('en-CA')} />
-                        </div>
-                        <label htmlFor="startDateInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
-                            Start
-                        </label>
-                    </div>
-                    <span className="mx-8 text-xl">
-                        <BsDashLg />
-                    </span>
-                    <div className="relative">
-                        <div className="flex items-center">
-                            <label htmlFor="endDateInput" className="cursor-pointer text-2xl">
-                                <BiCalendarAlt />
-                            </label>
-                            <input type="date" id="endDateInput" className="pl-2 py-3 cursor-pointer" defaultValue={new Date().toLocaleDateString('en-CA')} />
-                        </div>
-                        <label htmlFor="endDateInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
-                            End
-                        </label>
-                    </div>
+        <div>
+            <form className="px-10 pt-3 pb-4 bg-white rounded-sm shadow-2xl mx-32 my-12">
+                <div className="flex justify-between items-center">
+                    <input disabled={saving} tabIndex={0} type="text" placeholder="Title" ref={nameRef} className="border-bottom py-4 text-3xl w-full" required={true} />
                 </div>
-                <div className="flex items-center">
-                    <div className="relative flex items-center mr-3 h-11">
-                        <input
-                            type="number"
-                            min={1}
-                            max={10}
-                            id="noteRatingInput"
-                            className="w-16 text-xl bg-slate-300 px-2 py-1 rounded-sm"
-                            defaultValue={rating}
-                            onChange={(e) => setRating(Number(e.target.value))}
-                        />
-                        <label ref={colorRef} htmlFor="noteRatingInput" className="cursor-pointer text-3xl px-1 text-[#6aaac2] py-2">
-                            /10
-                        </label>
+                <div className="flex items-center justify-between border-bottom mb-3">
+                    <div className="flex items-center h-11">
+                        <div className="relative ">
+                            <div className="flex items-center">
+                                <label htmlFor="startDateInput" className="cursor-pointer text-2xl">
+                                    <BiCalendarAlt />
+                                </label>
+                                <input type="date" id="startDateInput" className="pl-2 py-3 cursor-pointer" defaultValue={new Date().toLocaleDateString('en-CA')} />
+                            </div>
+                            <label htmlFor="startDateInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
+                                Start
+                            </label>
+                        </div>
+                        <span className="mx-8 text-xl">
+                            <BsDashLg />
+                        </span>
+                        <div className="relative">
+                            <div className="flex items-center">
+                                <label htmlFor="endDateInput" className="cursor-pointer text-2xl">
+                                    <BiCalendarAlt />
+                                </label>
+                                <input type="date" id="endDateInput" className="pl-2 py-3 cursor-pointer" defaultValue={new Date().toLocaleDateString('en-CA')} />
+                            </div>
+                            <label htmlFor="endDateInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
+                                End
+                            </label>
+                        </div>
+                    </div>
+                    <div className="flex items-center">
+                        <div className="relative flex items-center mr-3 h-11">
+                            <input
+                                type="number"
+                                min={1}
+                                max={10}
+                                id="noteRatingInput"
+                                className="w-16 text-xl bg-slate-300 px-2 py-1 rounded-sm"
+                                defaultValue={rating}
+                                onChange={(e) => setRating(Number(e.target.value))}
+                            />
+                            <label ref={colorRef} htmlFor="noteRatingInput" className="cursor-pointer text-3xl px-1 text-[#6aaac2] py-2">
+                                /10
+                            </label>
 
-                        <label htmlFor="noteRatingInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
-                            Importance
-                        </label>
-                    </div>
-                    <div className="relative flex items-center h-11">
-                        <label ref={colorRef} htmlFor="noteColorInput" className="cursor-pointer text-3xl px-4 text-[#6aaac2] py-2">
-                            <IoIosColorPalette />
-                        </label>
-                        <input
-                            type="color"
-                            id="noteColorInput"
-                            className="hidden"
-                            defaultValue={'#6aaac2'}
-                            onChange={(e) => {
-                                colorRef.current!.style.color = e.target.value;
-                            }}
-                        />
-                        <label htmlFor="noteColorInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
-                            Color
-                        </label>
+                            <label htmlFor="noteRatingInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
+                                Importance
+                            </label>
+                        </div>
+                        <div className="relative flex items-center h-11">
+                            <label ref={colorRef} htmlFor="noteColorInput" className="cursor-pointer text-3xl px-4 text-[#6aaac2] py-2">
+                                <IoIosColorPalette />
+                            </label>
+                            <input
+                                type="color"
+                                id="noteColorInput"
+                                className="hidden"
+                                defaultValue={'#6aaac2'}
+                                onChange={(e) => {
+                                    colorRef.current!.style.color = e.target.value;
+                                }}
+                            />
+                            <label htmlFor="noteColorInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
+                                Color
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div>
-                {/* <Editor
-          editorState={editorState}
-          toolbarClassName="toolbarClassName"
-          wrapperClassName="wrapperClassName"
-          editorClassName="editorClassName"
-        /> */}
-            </div>
-            <Alert message={error} isError={false} />
-        </form>
+                <div>
+                    <Editor
+                        placeholder="Write your note here..."
+                        editorState={editorState}
+                        toolbarClassName="toolbarClassName"
+                        wrapperClassName="mt-8"
+                        editorClassName="h-[60vh] cursor-text"
+                        onEditorStateChange={(newState) => {
+                            setEditorState(newState);
+                            setContent(draftToHtml(convertToRaw(newState.getCurrentContent())));
+                        }}
+                        toolbar={{
+                            options: ['inline', 'blockType', 'fontSize', 'list', 'textAlign', 'history', 'embedded', 'emoji', 'image'],
+                            inline: { inDropdown: true },
+                            list: { inDropdown: true },
+                            textAlign: { inDropdown: true },
+                            link: { inDropdown: true },
+                            history: { inDropdown: true }
+                        }}
+                    />
+                </div>
+                <div>
+                    <button
+                        type="submit"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            _id !== '' ? editNote() : createNote();
+                        }}
+                        disabled={saving}
+                        className="text-2xl font-bold px-8 py-3 rounded-md bg-cyan-600 text-white cursor-pointer transition-all hover:bg-cyan-700 hover:shadow-md w-full mt-4"
+                    >
+                        {_id !== '' ? 'Update' : 'Create'}
+                    </button>
+                    {_id !== '' && (
+                        <Link
+                            to={`/notes/${_id}`}
+                            className="text-2xl font-bold px-8 py-3 rounded-md bg-cyan-900 text-white cursor-pointer transition-all hover:bg-cyan-800 hover:shadow-md w-full mt-2 block"
+                        >
+                            View this note
+                        </Link>
+                    )}
+                </div>
+                <div className="text-left mt-4">
+                    <h4 className="text-2xl">Preview</h4>
+                    <div dangerouslySetInnerHTML={{ __html: content }}></div>
+                </div>
+            </form>
+            <Alert message={error} isError={true} />
+            <Alert message={success} isError={false} />
+        </div>
     );
 };
 

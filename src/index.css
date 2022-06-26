@@ -163,3 +163,10 @@ h6 {
     opacity: 0;
     transition: all 250ms linear 2s;
 }
+
+/* Text Editor */
+.DraftEditor-editorContainer,
+.DraftEditor-root,
+.public-DraftEditor-content {
+    height: auto;
+}

@@ -15,8 +15,13 @@ const Alert = ({ message, isError }: AlertProps) => {
     }, [message]);
 
     return (
-        <div className={`fixed bottom-12 left-1/2 -translate-x-1/2 z-40 ${isShowingAlert ? 'alert-shown' : 'alert-hidden'}`} onTransitionEnd={() => setShowingAlert(false)}>
-            <div className={`text-xl bg-white px-8 py-4 rounded-md flex items-center ${isError ? 'text-red-500' : 'text-green-500'} shadow-md`}>
+        <div
+            className={`fixed bottom-12 left-1/2 -translate-x-1/2 z-40 ${message === '' ? 'hidden' : ''} ${isShowingAlert ? 'alert-shown' : 'alert-hidden'}`}
+            onTransitionEnd={() => {
+                setShowingAlert(false);
+            }}
+        >
+            <div className={`text-xl bg-white px-8 py-4 rounded-md flex items-center ${isError ? 'text-red-500' : 'text-green-500'} shadow-lg`}>
                 <span className="mr-4 text-4xl">{isError ? <BiError /> : <IoIosCheckmarkCircle />}</span>
                 <h4>{message}</h4>
             </div>
