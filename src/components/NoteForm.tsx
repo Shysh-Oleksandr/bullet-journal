@@ -81,7 +81,7 @@ const NoteForm = () => {
                     setEditorState(_editorState);
                 }
             } else {
-                setError('Unable to retrieve note' + id);
+                setError('Unable to retrieve note ' + id);
                 setId('');
             }
         } catch (error: any) {

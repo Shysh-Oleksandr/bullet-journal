@@ -82,8 +82,6 @@ function App() {
                         }
                         return <Route key={index} path={route.path} element={<route.component {...route.props} />} />;
                     })}
-
-                    {/* <Route path="*" element={<HomePage />} />  */}
                 </Routes>
             </div>
         </Router>

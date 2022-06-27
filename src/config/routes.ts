@@ -32,7 +32,7 @@ const noteRoutes: IRoute[] = [
         component: EditPage
     },
     {
-        path: '/edit/:noteID',
+        path: '/notes/:noteID',
         name: 'Note',
         auth: true,
         component: NotePage
