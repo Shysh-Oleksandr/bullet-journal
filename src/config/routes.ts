@@ -3,6 +3,7 @@ import LoginPage from './../pages/Login';
 import EditPage from './../pages/EditPage';
 import NotePage from './../pages/NotePage';
 import HomePage from './../pages/HomePage';
+import NoteForm from './../components/NoteForm';
 
 const authRoutes: IRoute[] = [
     {
@@ -23,19 +24,13 @@ const noteRoutes: IRoute[] = [
         path: '/edit',
         name: 'Edit',
         auth: true,
-        component: EditPage
+        component: NoteForm
     },
     {
         path: '/edit/:noteID',
         name: 'Edit',
         auth: true,
         component: EditPage
-    },
-    {
-        path: '/notes/:noteID',
-        name: 'Note',
-        auth: true,
-        component: NotePage
     }
 ];
 const mainRoutes: IRoute[] = [

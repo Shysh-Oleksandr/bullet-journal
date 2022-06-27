@@ -19,7 +19,7 @@ function App() {
     useEffect(() => {
         setTimeout(() => {
             checkLocalStorageForCredentials();
-        }, 1000);
+        }, 100);
     }, []);
 
     /**
@@ -34,7 +34,7 @@ function App() {
             dispatch(logout(initialUserState));
             setTimeout(() => {
                 setIsLoading(false);
-            }, 1000);
+            }, 100);
         } else {
             return Validate(fire_token, (error, user) => {
                 if (error) {
@@ -42,12 +42,12 @@ function App() {
                     dispatch(logout(initialUserState));
                     setTimeout(() => {
                         setIsLoading(false);
-                    }, 1000);
+                    }, 100);
                 } else if (user) {
                     dispatch(login({ user, fire_token }));
                     setTimeout(() => {
                         setIsLoading(false);
-                    }, 1000);
+                    }, 100);
                 }
             });
         }

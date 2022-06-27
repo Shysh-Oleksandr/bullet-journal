@@ -2,21 +2,21 @@ import axios from 'axios';
 import { ContentState, convertToRaw, EditorState } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import htmlToDraft from 'html-to-draftjs';
-import React, { RefObject, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { BiCalendarAlt } from 'react-icons/bi';
 import { BsDashLg } from 'react-icons/bs';
 import { IoIosColorPalette } from 'react-icons/io';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
 import config from '../config/config';
 import { NoteTypes } from '../interfaces/note';
 import logging from './../config/logging';
 import INote from './../interfaces/note';
+import { getDifferentColor } from './../utils/functions';
 import Alert from './Alert';
 import Loading from './Loading';
-import { getDifferentColor } from './../utils/functions';
 
 const NoteForm = () => {
     const [_id, setId] = useState<string>('');
@@ -38,8 +38,6 @@ const NoteForm = () => {
     const { user } = useAppSelector((store) => store.user);
     const params = useParams();
 
-    const colorRef = useRef() as RefObject<HTMLLabelElement>;
-
     useEffect(() => {
         let noteID = params.noteID;
 
@@ -55,7 +53,7 @@ const NoteForm = () => {
         try {
             const response = await axios({
                 method: 'GET',
-                url: `${config.server.url}/notes/read${id}`
+                url: `${config.server.url}/notes/${id}`
             });
 
             if (response.status === 200 || response.status === 304) {
@@ -179,10 +177,10 @@ const NoteForm = () => {
         );
     }
     return (
-        <div className="padding-x">
-            <form className="px-10 pt-3 pb-4 bg-white rounded-sm shadow-2xl my-12">
+        <div className="padding-x mb-12">
+            <form className="px-10 pt-3 pb-6 bg-white rounded-sm shadow-xl mt-12">
                 <div className="flex justify-between items-center">
-                    <input disabled={saving} type="text" placeholder="Title" onChange={(e) => setTitle(e.target.value)} className="border-bottom py-4 text-3xl w-full" required={true} />
+                    <input disabled={saving} type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} className="border-bottom py-4 text-3xl w-full" required={true} />
                 </div>
                 <div className="flex items-center justify-between border-bottom mb-3">
                     <div className="flex items-center h-11">
@@ -232,7 +230,7 @@ const NoteForm = () => {
                                 max={10}
                                 id="noteRatingInput"
                                 className="w-16 text-xl bg-[#ebf5fe] transition-all hover:bg-[#e1f1ff] focus-within:bg-[#e1f1ff] px-2 py-1 rounded-sm text-[#6aaac2]"
-                                defaultValue={rating}
+                                value={rating}
                                 onChange={(e) => setRating(Number(e.target.value))}
                             />
                             <label htmlFor="noteRatingInput" className="cursor-pointer text-3xl px-1 text-[#6aaac2] py-2">
@@ -244,16 +242,15 @@ const NoteForm = () => {
                             </label>
                         </div>
                         <div className="relative flex items-center h-11">
-                            <label ref={colorRef} htmlFor="noteColorInput" className="cursor-pointer text-3xl px-4 text-[#6aaac2] py-2">
+                            <label style={{ color: color }} htmlFor="noteColorInput" className="cursor-pointer text-3xl px-4 text-[#6aaac2] py-2">
                                 <IoIosColorPalette />
                             </label>
                             <input
                                 type="color"
                                 id="noteColorInput"
                                 className="hidden"
-                                defaultValue={'#6aaac2'}
+                                value={color}
                                 onChange={(e) => {
-                                    colorRef.current!.style.color = e.target.value;
                                     setColor(e.target.value);
                                 }}
                             />
@@ -295,23 +292,15 @@ const NoteForm = () => {
                     >
                         {_id !== '' ? 'Update' : 'Create'}
                     </button>
-                    {_id !== '' && (
-                        <Link
-                            to={`/notes/${_id}`}
-                            className="text-2xl font-bold px-8 py-3 rounded-md shadow-md bg-cyan-900 text-white cursor-pointer transition-all hover:bg-cyan-800 hover:shadow-lg w-full mt-2 block"
-                        >
-                            View this note
-                        </Link>
-                    )}
-                </div>
-                <div className="text-left mt-4">
-                    <h4 className="text-2xl mb-1">Preview</h4>
-                    <div style={{ backgroundColor: color, color: getDifferentColor(color, 185) }} className="rounded-md px-4 py-3 shadow-md">
-                        <h2 className="text-3xl font-bold mb-2 break-words">{title}</h2>
-                        <div dangerouslySetInnerHTML={{ __html: content }} className="px-2 !leading-6 break-words overflow-y-auto max-h-[60vh]"></div>
-                    </div>
                 </div>
             </form>
+            <div className="text-left mt-4">
+                <h4 className="text-2xl mb-1">Preview</h4>
+                <div style={{ backgroundColor: color, color: getDifferentColor(color, 185) }} className="rounded-md px-4 py-3 shadow-lg">
+                    <h2 className="text-3xl font-bold mb-2 break-words">{title}</h2>
+                    <div dangerouslySetInnerHTML={{ __html: content }} className="px-2 !leading-6 break-words overflow-y-auto max-h-[60vh]"></div>
+                </div>
+            </div>
             <Alert message={error} isError={true} />
             <Alert message={success} isError={false} />
         </div>
