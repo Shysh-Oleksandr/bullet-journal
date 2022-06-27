@@ -153,6 +153,10 @@ h6 {
     }
 }
 
+.padding-x {
+    @apply px-[15vw];
+}
+
 /* Alert */
 .alert-shown {
     opacity: 1;

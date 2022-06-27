@@ -49,9 +49,9 @@ const Notes = () => {
     }
 
     return (
-        <div className="notes px-32 pt-12">
+        <div className="notes padding-x pt-12">
             {notes.map((note) => {
-                return <NotePreview note={note} />;
+                return <NotePreview note={note} key={note._id} />;
             })}
             <InfoMessage message={error} isError={true} />
         </div>

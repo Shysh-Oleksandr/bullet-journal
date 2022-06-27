@@ -13,7 +13,7 @@ const Navbar = () => {
     };
 
     return (
-        <div className="flex items-center justify-between px-32 py-4 text-white bg-cyan-700">
+        <div className="flex items-center justify-between padding-x py-4 text-white bg-cyan-700">
             <Link to={'/'} className="text-3xl font-bold cursor-pointer">
                 Bullet Journal
             </Link>
