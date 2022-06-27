@@ -29,7 +29,7 @@ const Notes = () => {
 
             if (response.status === 200 || response.status === 304) {
                 let notes = response.data.notes as INote[];
-                notes.sort((x, y) => x.startDate - y.startDate);
+                notes.sort((x, y) => y.startDate - x.startDate);
                 dispatch(setNotes(notes));
             }
         } catch (error) {

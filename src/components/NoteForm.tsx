@@ -308,7 +308,7 @@ const NoteForm = () => {
                     <h4 className="text-2xl mb-1">Preview</h4>
                     <div style={{ backgroundColor: color }} className="text-white rounded-md px-4 py-3 shadow-md">
                         <h2 className="text-3xl font-bold mb-2 break-words">{title}</h2>
-                        <div dangerouslySetInnerHTML={{ __html: content }} className="px-2 break-words overflow-y-auto max-h-[60vh]"></div>
+                        <div dangerouslySetInnerHTML={{ __html: content }} className="px-2 !leading-6 break-words overflow-y-auto max-h-[60vh]"></div>
                     </div>
                 </div>
             </form>
