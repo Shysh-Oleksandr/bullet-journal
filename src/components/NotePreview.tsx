@@ -1,27 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import INote from '../interfaces/note';
-import { sanitizedData, shadeColor } from '../utils/functions';
-import tinycolor from 'tinycolor2';
+import { getDifferentColor, sanitizedData } from '../utils/functions';
 
 interface INotePreviewProps {
     note: INote;
 }
 
 const NotePreview = ({ note }: INotePreviewProps) => {
-    const getDifferentColor = (color: string = note.color, amount: number = 20) => {
-        const tinyColor = tinycolor(color);
-        console.log(tinyColor.isLight());
-
-        return tinyColor.isLight() ? shadeColor(color, amount * -1) : shadeColor(color, amount);
-    };
-
     return (
         <div className="note mb-8 text-left text-white" key={note._id}>
             <div className="note__date text-xl">
                 <h4>{new Date(note.startDate).toDateString()}</h4>
             </div>
-            <div className="rounded-lg shadow-md mt-8 py-4 px-8 flex justify-between items-center" style={{ backgroundColor: note.color }}>
+            <div className="rounded-lg shadow-md mt-8 py-4 px-8 flex justify-between items-center" style={{ backgroundColor: note.color, color: getDifferentColor(note.color, 185) }}>
                 <div className="w-full">
                     <Link to={`/notes/${note._id}`} className="text-3xl font-bold mb-1 block">
                         {note.title}
