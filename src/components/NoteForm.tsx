@@ -298,8 +298,15 @@ const NoteForm = () => {
                         wrapperClassName="mt-8"
                         editorClassName="h-[60vh] cursor-text border-cyan-100 border-2 rounded-sm border-solid px-3"
                         onEditorStateChange={(newState) => {
+                            const newContent = draftToHtml(convertToRaw(newState.getCurrentContent()));
                             setEditorState(newState);
-                            setContent(draftToHtml(convertToRaw(newState.getCurrentContent())));
+                            setContent(newContent);
+
+                            const regex = /(?<=src=")(.*)(?=" alt)/g;
+                            const images = newContent.match(regex);
+                            console.log(image);
+
+                            images && setImage(images[0]);
                         }}
                         toolbar={{
                             inline: { inDropdown: true },
