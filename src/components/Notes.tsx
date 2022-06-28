@@ -1,14 +1,15 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import '../styles/note.scss';
-import axios from 'axios';
 import config from '../config/config';
+import logging from '../config/logging';
 import { setNotes } from '../features/journal/journalSlice';
 import INote from '../interfaces/note';
-import logging from '../config/logging';
+import '../styles/note.scss';
+import { getInitialNote } from '../utils/functions';
+import InfoMessage from './InfoMessage';
 import Loading from './Loading';
 import NotePreview from './NotePreview';
-import InfoMessage from './InfoMessage';
 
 const Notes = () => {
     const { notes } = useAppSelector((store) => store.journal);
@@ -31,6 +32,7 @@ const Notes = () => {
 
             if (response.status === 200 || response.status === 304) {
                 let notes = response.data.notes as INote[];
+                notes.push(getInitialNote(user));
                 notes.sort((x, y) => y.startDate - x.startDate);
                 dispatch(setNotes(notes));
             }

@@ -34,7 +34,7 @@ const Navbar = () => {
                             <BsPlusLg />
                         </Link>
                         <span className="mx-4 text-4xl">|</span>
-                        <button onClick={() => Logout()} className="text-2xl cursor-pointer transition-all bg-red-500 px-4 py-1 rounded-lg hover:bg-red-600 hover:shadow-sm">
+                        <button onClick={() => Logout()} className="text-2xl cursor-pointer transition-all bg-cyan-500 px-4 py-1 rounded-md hover:bg-cyan-600 hover:shadow-sm">
                             Logout
                         </button>
                     </div>

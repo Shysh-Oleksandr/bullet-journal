@@ -28,7 +28,7 @@ const NoteForm = () => {
     const [endDate, setEndDate] = useState<number>(new Date().getTime());
     const [content, setContent] = useState<string>('');
     const [image, setImage] = useState<string>('');
-    const [color, setColor] = useState<string>('#6aaac2');
+    const [color, setColor] = useState<string>('#04a9c6');
     const [rating, setRating] = useState<number>(1);
     const [type, setType] = useState<string | NoteTypes>(NoteTypes.NOTE);
     const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
@@ -340,7 +340,7 @@ const NoteForm = () => {
                     <div dangerouslySetInnerHTML={{ __html: content }} className="px-2 !leading-6 break-words overflow-y-auto max-h-[60vh]"></div>
                 </div>
             </div>
-            {_id !== '' && modal && <DeleteModal deleteNote={deleteNote} deleting={deleting} error={'Unable to delete note ' + _id} modal={modal} setModal={setModal} />}
+            {_id !== '' && modal && <DeleteModal deleteNote={deleteNote} deleting={deleting} error={error} modal={modal} setModal={setModal} />}
             <Alert message={error} isError={true} />
             <Alert message={success} isError={false} />
         </div>
