@@ -1,5 +1,4 @@
 import React from 'react';
-import Navbar from '../components/Navbar';
 import Notes from '../components/Notes';
 import IPageProps from './../interfaces/page';
 

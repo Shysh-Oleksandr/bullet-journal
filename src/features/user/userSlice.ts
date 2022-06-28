@@ -25,15 +25,14 @@ export const userSlice = createSlice({
 
             return { user, fire_token };
         },
-        logout: (state, { payload }: PayloadAction<IUserState>) => {
+        logout: (state) => {
             localStorage.removeItem('fire_token');
 
             return initialState;
-        },
-        authenticate: (state, { payload }: PayloadAction<IUserState>) => {}
+        }
     }
 });
 
-export const { login, logout, authenticate } = userSlice.actions;
+export const { login, logout } = userSlice.actions;
 
 export default userSlice.reducer;

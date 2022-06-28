@@ -2,14 +2,14 @@ import React from 'react';
 import { BsPlusLg } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { initialState as initialUserState, logout } from '../features/user/userSlice';
+import { logout } from '../features/user/userSlice';
 
 const Navbar = () => {
     const { user } = useAppSelector((store) => store.user);
     const dispatch = useAppDispatch();
 
     const Logout = () => {
-        dispatch(logout(initialUserState));
+        dispatch(logout());
     };
 
     return (

@@ -1,7 +1,6 @@
 import IRoute from './../interfaces/route';
 import LoginPage from './../pages/Login';
 import EditPage from './../pages/EditPage';
-import NotePage from './../pages/NotePage';
 import HomePage from './../pages/HomePage';
 import NoteForm from './../components/NoteForm';
 

@@ -1,4 +1,4 @@
-import e, { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import logging from '../config/logging';
 import User from '../models/user';

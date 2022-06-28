@@ -55,9 +55,11 @@ const read = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const readAll = (req: Request, res: Response, next: NextFunction) => {
+    const author_id = req.params.authorID;
+
     logging.info(`Incoming read all...`);
 
-    return Note.find()
+    return Note.find({ author: author_id })
         .populate('author')
         .exec()
         .then((notes) => {

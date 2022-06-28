@@ -14,10 +14,10 @@ const NoteSchema: Schema = new Schema(
         category: { type: String },
         rating: { type: Number },
         id: { type: String, unique: true }
-    },
-    {
-        timestamps: true
     }
+    // {
+    //     timestamps: true
+    // }
 );
 
 export default mongoose.model<INote>('Note', NoteSchema);

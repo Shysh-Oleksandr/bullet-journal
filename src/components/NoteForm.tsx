@@ -7,8 +7,10 @@ import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { BiCalendarAlt } from 'react-icons/bi';
 import { BsDashLg } from 'react-icons/bs';
+import { RiSave3Fill } from 'react-icons/ri';
+import { MdDelete } from 'react-icons/md';
 import { IoIosColorPalette } from 'react-icons/io';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
 import config from '../config/config';
 import { NoteTypes } from '../interfaces/note';
@@ -17,6 +19,7 @@ import INote from './../interfaces/note';
 import { getDifferentColor } from './../utils/functions';
 import Alert from './Alert';
 import Loading from './Loading';
+import DeleteModal from './UI/DeleteModal.';
 
 const NoteForm = () => {
     const [_id, setId] = useState<string>('');
@@ -30,13 +33,16 @@ const NoteForm = () => {
     const [type, setType] = useState<string | NoteTypes>(NoteTypes.NOTE);
     const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
 
+    const [modal, setModal] = useState<boolean>(false);
     const [saving, setSaving] = useState<boolean>(false);
+    const [deleting, setDeleting] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [success, setSuccess] = useState<string>('');
     const [error, setError] = useState<string>('');
 
     const { user } = useAppSelector((store) => store.user);
     const params = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         let noteID = params.noteID;
@@ -53,7 +59,7 @@ const NoteForm = () => {
         try {
             const response = await axios({
                 method: 'GET',
-                url: `${config.server.url}/notes/${id}`
+                url: `${config.server.url}/notes/read/${id}`
             });
 
             if (response.status === 200 || response.status === 304) {
@@ -166,6 +172,30 @@ const NoteForm = () => {
             setError(error.message);
         } finally {
             setSaving(false);
+        }
+    };
+
+    const deleteNote = async () => {
+        setDeleting(true);
+        try {
+            const response = await axios({
+                method: 'DELETE',
+                url: `${config.server.url}/notes/${_id}`
+            });
+
+            if (response.status === 200) {
+                setTimeout(() => {
+                    navigate('/');
+                }, 500);
+            } else {
+                setError('Unable to delete note ' + _id);
+            }
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setTimeout(() => {
+                setDeleting(false);
+            }, 500);
         }
     };
 
@@ -288,10 +318,19 @@ const NoteForm = () => {
                             _id !== '' ? editNote() : createNote();
                         }}
                         disabled={saving}
-                        className="text-2xl font-bold px-8 py-3 rounded-md bg-cyan-600 text-white cursor-pointer shadow-md transition-all hover:bg-cyan-700 hover:shadow-lg w-full mt-4"
+                        className="text-2xl flex items-center justify-center font-bold px-8 py-3 rounded-md bg-cyan-600 text-white cursor-pointer shadow-md transition-all hover:bg-cyan-700 hover:shadow-lg w-full mt-4"
                     >
-                        {_id !== '' ? 'Update' : 'Create'}
+                        <RiSave3Fill className="mr-2" /> {_id !== '' ? 'Update' : 'Create'}
                     </button>
+                    {_id !== '' && (
+                        <button
+                            type="button"
+                            onClick={() => setModal(true)}
+                            className="text-2xl flex items-center justify-center font-bold px-8 py-3 rounded-md bg-red-600 text-white cursor-pointer shadow-md transition-all hover:bg-red-700 hover:shadow-lg w-full mt-2"
+                        >
+                            <MdDelete className="mr-2" /> Delete
+                        </button>
+                    )}
                 </div>
             </form>
             <div className="text-left mt-4">
@@ -301,6 +340,7 @@ const NoteForm = () => {
                     <div dangerouslySetInnerHTML={{ __html: content }} className="px-2 !leading-6 break-words overflow-y-auto max-h-[60vh]"></div>
                 </div>
             </div>
+            {_id !== '' && modal && <DeleteModal deleteNote={deleteNote} deleting={deleting} error={'Unable to delete note ' + _id} modal={modal} setModal={setModal} />}
             <Alert message={error} isError={true} />
             <Alert message={success} isError={false} />
         </div>

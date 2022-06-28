@@ -1,6 +1,8 @@
+import IUser from './user';
+
 export default interface INote {
     title: string;
-    // author: string | IUser;
+    author: string | IUser;
     startDate: number;
     endDate: number;
     content?: string;
@@ -10,8 +12,8 @@ export default interface INote {
     category?: string;
     rating: number;
     _id: string;
-    createdAt: string;
-    updatedAt: string;
+    // createdAt: string;
+    // updatedAt: string;
     // milestones: IMilestone[];
 }
 

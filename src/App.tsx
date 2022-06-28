@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import routes from './config/routes';
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import { initialState as initialUserState, login, logout } from './features/user/userSlice';
-import Loading from './components/Loading';
 import AuthRoute from './components/AuthRoute';
-import { Validate } from './modules/auth';
+import Loading from './components/Loading';
+import Navbar from './components/Navbar';
 import logging from './config/logging';
+import routes from './config/routes';
+import { login, logout } from './features/user/userSlice';
+import { Validate } from './modules/auth';
 //  "homepage": "http://shysh-oleksandr.github.io/bullet-journal",
 
 function App() {
@@ -31,7 +31,7 @@ function App() {
         const fire_token = localStorage.getItem('fire_token');
 
         if (fire_token === null) {
-            dispatch(logout(initialUserState));
+            dispatch(logout());
             setTimeout(() => {
                 setIsLoading(false);
             }, 100);
@@ -39,7 +39,7 @@ function App() {
             return Validate(fire_token, (error, user) => {
                 if (error) {
                     logging.error(error);
-                    dispatch(logout(initialUserState));
+                    dispatch(logout());
                     setTimeout(() => {
                         setIsLoading(false);
                     }, 100);

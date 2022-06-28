@@ -16,15 +16,17 @@ const Notes = () => {
     const [error, setError] = useState<string>('');
     const dispatch = useAppDispatch();
 
+    const { user } = useAppSelector((store) => store.user);
+
     useEffect(() => {
-        GetAllNotes();
+        getAllNotes();
     }, []);
 
-    const GetAllNotes = async () => {
+    const getAllNotes = async () => {
         try {
             const response = await axios({
                 method: 'GET',
-                url: `${config.server.url}/notes`
+                url: `${config.server.url}/notes/${user._id}`
             });
 
             if (response.status === 200 || response.status === 304) {

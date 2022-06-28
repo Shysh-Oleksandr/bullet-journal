@@ -84,7 +84,7 @@ const LoginPage = (props: IPageProps) => {
                             <span className="mr-4">
                                 <BsGoogle />
                             </span>
-                            <span>Sign {isLogin ? 'In' : 'Up'}</span>
+                            <span>Sign {isLogin ? 'In' : 'Up'} with Google</span>
                         </button>
                         {authenticating && <Loading />}
                     </div>
