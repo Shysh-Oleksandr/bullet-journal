@@ -1,11 +1,10 @@
 .note {
-    &:first-child .note__date::before {
+    &:last-child .note__body::after {
         content: none;
     }
 
-    &__date {
+    &__body {
         position: relative;
-        color: #267491;
 
         &::before,
         &::after {

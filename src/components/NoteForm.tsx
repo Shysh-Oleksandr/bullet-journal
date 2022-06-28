@@ -304,16 +304,8 @@ const NoteForm = () => {
 
                             const regex = /(?<=src=")(.*)(?=" alt)/g;
                             const images = newContent.match(regex);
-                            console.log(image);
 
                             images && setImage(images[0]);
-                        }}
-                        toolbar={{
-                            inline: { inDropdown: true },
-                            list: { inDropdown: true },
-                            textAlign: { inDropdown: true },
-                            link: { inDropdown: true },
-                            history: { inDropdown: true }
                         }}
                     />
                 </div>

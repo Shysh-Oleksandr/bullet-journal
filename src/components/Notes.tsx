@@ -54,8 +54,8 @@ const Notes = () => {
 
     return (
         <div className="notes padding-x pt-12">
-            {notes.map((note) => {
-                return <NotePreview note={note} key={note._id} />;
+            {notes.map((note, index) => {
+                return <NotePreview note={note} key={note._id} previousNote={index === 0 ? null : notes[index - 1]} />;
             })}
             <InfoMessage message={error} isError={true} />
         </div>

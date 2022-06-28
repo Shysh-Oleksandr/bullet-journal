@@ -5,21 +5,26 @@ import { getDifferentColor, sanitizedData } from '../utils/functions';
 
 interface INotePreviewProps {
     note: INote;
+    previousNote: INote | null;
 }
 
-const NotePreview = ({ note }: INotePreviewProps) => {
+const NotePreview = ({ note, previousNote }: INotePreviewProps) => {
     const [hover, setHover] = useState<boolean>(false);
     const navigate = useNavigate();
 
-    const isInitialNote = note._id === '111';
+    const isInitialNote: boolean = note._id === '111';
+
+    const isTheSameDate: boolean = new Date(note.startDate).toDateString() === new Date(previousNote?.startDate || 1).toDateString();
 
     return (
         <div className="note mb-8 text-left text-white" key={note._id}>
-            <div className="note__date text-xl">
-                <h4>{new Date(note.startDate).toDateString()}</h4>
-            </div>
+            {!isTheSameDate && (
+                <div className="text-[#267491] text-xl">
+                    <h4>{new Date(note.startDate).toDateString()}</h4>
+                </div>
+            )}
             <div
-                className={`rounded-lg shadow-md mt-8 py-4 px-8 transition-colors flex justify-between items-center ${isInitialNote ? 'cursor-auto' : 'cursor-pointer'}`}
+                className={`note__body rounded-lg shadow-md mt-8 py-4 px-8 transition-colors flex justify-between items-center ${isInitialNote ? 'cursor-auto' : 'cursor-pointer'}`}
                 onMouseEnter={() => setHover(true)}
                 onMouseLeave={() => setHover(false)}
                 onClick={() => !isInitialNote && navigate(`/edit/${note._id}`)}
@@ -30,11 +35,11 @@ const NotePreview = ({ note }: INotePreviewProps) => {
 
                     {note.content && <div dangerouslySetInnerHTML={{ __html: sanitizedData(note.content) }} className="px-2 break-words overflow-y-auto  max-h-[75px] !leading-6 h-auto"></div>}
                     <div className="mt-2 text-lg ">
+                        <h4 className="mr-2 px-2 py-1 inline-block rounded-md tracking-widest" style={{ backgroundColor: getDifferentColor(note.color, 20) }}>
+                            {note.rating}/10
+                        </h4>
                         <h4 className="px-2 py-1 inline-block rounded-md" style={{ backgroundColor: getDifferentColor(note.color, 20) }}>
                             {note.type}
-                        </h4>
-                        <h4 className="ml-2 px-2 py-1 inline-block rounded-md tracking-widest" style={{ backgroundColor: getDifferentColor(note.color, 20) }}>
-                            {note.rating}/10
                         </h4>
                     </div>
                 </div>
