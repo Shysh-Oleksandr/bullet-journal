@@ -8,7 +8,7 @@
         "node": "16.14.0"
     },
     "scripts": {
-        "start": "node src/server.js",
+        "start": "node build/server.js",
         "build": "rm -rf build && prettier --write src/ && tsc",
         "heroku-postbuild": "cd frontend && npm install && npm run build"
     },
