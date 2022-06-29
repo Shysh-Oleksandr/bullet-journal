@@ -17,28 +17,14 @@ const Navbar = () => {
             <Link to={'/'} className="text-3xl font-bold cursor-pointer">
                 Bullet Journal
             </Link>
-            <div>
-                {user._id === '' ? (
-                    <div>
-                        <Link to={'/login'} className="text-3xl cursor-pointer transition-all hover:rotate-180 hover:opacity-80 duration-500">
-                            Login
-                        </Link>
-                        <span className="mx-2 text-3xl">|</span>
-                        <Link to={'/register'} className="text-3xl cursor-pointer transition-all hover:rotate-180 hover:opacity-80 duration-500">
-                            Sign Up
-                        </Link>
-                    </div>
-                ) : (
-                    <div className="flex items-center">
-                        <Link to={'/edit'} className="text-3xl cursor-pointer transition-all hover:rotate-90 hover:opacity-80 duration-500">
-                            <BsPlusLg />
-                        </Link>
-                        <span className="mx-4 text-4xl">|</span>
-                        <button onClick={() => Logout()} className="text-2xl cursor-pointer transition-all bg-cyan-500 px-4 py-1 rounded-md hover:bg-cyan-600 hover:shadow-sm">
-                            Logout
-                        </button>
-                    </div>
-                )}
+            <div className="flex items-center">
+                <Link to={'/edit'} className="text-3xl cursor-pointer transition-all hover:rotate-90 hover:opacity-80 duration-500">
+                    <BsPlusLg />
+                </Link>
+                <span className="mx-4 text-4xl">|</span>
+                <button onClick={() => Logout()} className="text-2xl cursor-pointer transition-all bg-cyan-500 px-4 py-1 rounded-md hover:bg-cyan-600 hover:shadow-sm">
+                    Logout
+                </button>
             </div>
         </div>
     );

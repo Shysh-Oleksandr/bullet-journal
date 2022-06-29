@@ -15,9 +15,11 @@ export const getDifferentColor = (color: string, amount: number = 20) => {
     return tinyColor.isLight() ? shadeColor(color, amount * -1) : shadeColor(color, amount);
 };
 
+export const INITIAL_NOTE_ID = '111';
+
 export const getInitialNote = (author: IUser): INote => {
     return {
-        _id: '111',
+        _id: INITIAL_NOTE_ID,
         title: 'Started using Bullet Journal',
         author: author,
         startDate: new Date(author.createdAt || new Date()).getTime(),

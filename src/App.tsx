@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import AuthRoute from './components/AuthRoute';
-import Loading from './components/Loading';
+import Loading from './components/UI/Loading';
 import Navbar from './components/Navbar';
 import logging from './config/logging';
 import routes from './config/routes';

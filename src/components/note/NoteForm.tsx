@@ -5,21 +5,21 @@ import htmlToDraft from 'html-to-draftjs';
 import React, { useEffect, useState } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { BiCalendarAlt } from 'react-icons/bi';
 import { BsDashLg } from 'react-icons/bs';
-import { RiSave3Fill } from 'react-icons/ri';
-import { MdDelete } from 'react-icons/md';
 import { IoIosColorPalette } from 'react-icons/io';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useAppSelector } from '../app/hooks';
-import config from '../config/config';
-import { NoteTypes } from '../interfaces/note';
-import logging from './../config/logging';
-import INote from './../interfaces/note';
-import { getDifferentColor } from './../utils/functions';
-import Alert from './Alert';
-import Loading from './Loading';
-import DeleteModal from './UI/DeleteModal.';
+import { MdDelete } from 'react-icons/md';
+import { RiSave3Fill } from 'react-icons/ri';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAppSelector } from '../../app/hooks';
+import config from '../../config/config';
+import logging from '../../config/logging';
+import INote, { NoteTypes } from '../../interfaces/note';
+import Alert from '../UI/Alert';
+import DeleteModal from '../UI/DeleteModal.';
+import Loading from '../UI/Loading';
+import NoteBody from './NoteBody';
+import NoteDate from './NoteDate';
+import SaveButton from './SaveButton';
 
 const NoteForm = () => {
     const [_id, setId] = useState<string>('');
@@ -47,10 +47,13 @@ const NoteForm = () => {
     useEffect(() => {
         let noteID = params.noteID;
 
+        // If it's edit page, get note by id.
         if (noteID) {
             setId(noteID);
             getNote(noteID);
-        } else {
+        }
+        // Otherwise, have the blank form.
+        else {
             setIsLoading(false);
         }
     }, []);
@@ -95,7 +98,7 @@ const NoteForm = () => {
         }
     };
 
-    const createNote = async () => {
+    const saveNote = async (method: string, url: string, isCreating: boolean) => {
         if (title === '' || type === '' || color === '' || !startDate || !endDate) {
             setError('Please fill out all required fields.');
             setSuccess('');
@@ -108,8 +111,8 @@ const NoteForm = () => {
 
         try {
             const response = await axios({
-                method: 'POST',
-                url: `${config.server.url}/notes/create`,
+                method: method,
+                url: url,
                 data: {
                     title,
                     startDate,
@@ -125,7 +128,7 @@ const NoteForm = () => {
 
             if (response.status === 201) {
                 setId(response.data.note._id);
-                setSuccess('Note added.');
+                setSuccess(`Note ${isCreating ? 'added' : 'updated'}.`);
             } else {
                 setError('Unable to save note.');
             }
@@ -135,45 +138,9 @@ const NoteForm = () => {
             setSaving(false);
         }
     };
-    const editNote = async () => {
-        if (title === '' || type === '' || color === '' || !startDate || !endDate) {
-            setError('Please fill out all required fields.');
-            setSuccess('');
-            return null;
-        }
 
-        setError('');
-        setSuccess('');
-        setSaving(true);
-
-        try {
-            const response = await axios({
-                method: 'PATCH',
-                url: `${config.server.url}/notes/update/${_id}`,
-                data: {
-                    title,
-                    startDate,
-                    endDate,
-                    image,
-                    color,
-                    rating,
-                    content,
-                    type,
-                    author: user._id
-                }
-            });
-
-            if (response.status === 201) {
-                setSuccess('Note updated.');
-            } else {
-                setError('Unable to save note.');
-            }
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setSaving(false);
-        }
-    };
+    const createNote = async () => await saveNote('POST', `${config.server.url}/notes/create`, true);
+    const editNote = async () => await saveNote('PATCH', `${config.server.url}/notes/update/${_id}`, false);
 
     const deleteNote = async () => {
         setDeleting(true);
@@ -200,60 +167,23 @@ const NoteForm = () => {
     };
 
     if (isLoading) {
-        return (
-            <div className="flex justify-center items-center w-full h-full mt-20">
-                <Loading scaleSize={2} />
-            </div>
-        );
+        return <Loading scaleSize={2} className="mt-20" />;
     }
+
     return (
         <div className="padding-x mb-12">
             <form className="px-10 pt-3 pb-6 bg-white rounded-sm shadow-xl mt-12">
-                <div className="flex justify-between items-center">
+                <div className="flex-between">
                     <input disabled={saving} type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} className="border-bottom py-4 text-3xl w-full" required={true} />
                 </div>
-                <div className="flex items-center justify-between border-bottom mb-3">
-                    <div className="flex items-center h-11">
-                        <div className="relative ">
-                            <div className="flex items-center">
-                                <label htmlFor="startDateInput" className="cursor-pointer text-2xl">
-                                    <BiCalendarAlt />
-                                </label>
-                                <input
-                                    type="date"
-                                    id="startDateInput"
-                                    onChange={(e) => setStartDate(new Date(e.target.value).getTime())}
-                                    className="pl-2 py-3 cursor-pointer"
-                                    value={new Date(startDate!).toLocaleDateString('en-CA')}
-                                />
-                            </div>
-                            <label htmlFor="startDateInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
-                                Start
-                            </label>
-                        </div>
-                        <span className="mx-8 text-xl">
-                            <BsDashLg />
-                        </span>
-                        <div className="relative">
-                            <div className="flex items-center">
-                                <label htmlFor="endDateInput" className="cursor-pointer text-2xl">
-                                    <BiCalendarAlt />
-                                </label>
-                                <input
-                                    type="date"
-                                    id="endDateInput"
-                                    onChange={(e) => setEndDate(new Date(e.target.value).getTime())}
-                                    className="pl-2 py-3 cursor-pointer"
-                                    value={new Date(endDate!).toLocaleDateString('en-CA')}
-                                />
-                            </div>
-                            <label htmlFor="endDateInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
-                                End
-                            </label>
-                        </div>
+                <div className="flex-between border-bottom mb-3">
+                    <div className="fl h-11">
+                        <NoteDate date={startDate} isStartDate={true} setDate={setStartDate} />
+                        <BsDashLg className="mx-6 text-xl" />
+                        <NoteDate date={endDate} isStartDate={false} setDate={setEndDate} />
                     </div>
-                    <div className="flex items-center">
-                        <div className="relative flex items-center mr-3 h-11">
+                    <div className="fl">
+                        <div className="relative fl mr-3 h-11">
                             <input
                                 type="number"
                                 min={1}
@@ -271,7 +201,7 @@ const NoteForm = () => {
                                 Importance
                             </label>
                         </div>
-                        <div className="relative flex items-center h-11">
+                        <div className="relative fl h-11">
                             <label style={{ color: color }} htmlFor="noteColorInput" className="cursor-pointer text-3xl px-4 text-[#6aaac2] py-2">
                                 <IoIosColorPalette />
                             </label>
@@ -296,7 +226,7 @@ const NoteForm = () => {
                         editorState={editorState}
                         toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm"
                         wrapperClassName="mt-8"
-                        editorClassName="h-[60vh] cursor-text border-cyan-100 border-2 rounded-sm border-solid px-3"
+                        editorClassName="h-[60vh] cursor-text border-cyan-100 transition-all border-2 rounded-sm border-solid focus-within:border-[3px] focus-within:border-cyan-200 px-3"
                         onEditorStateChange={(newState) => {
                             const newContent = draftToHtml(convertToRaw(newState.getCurrentContent()));
                             setEditorState(newState);
@@ -310,34 +240,25 @@ const NoteForm = () => {
                     />
                 </div>
                 <div>
-                    <button
-                        type="submit"
-                        onClick={(e) => {
+                    <SaveButton
+                        className="bg-cyan-600 hover:bg-cyan-700 mt-4"
+                        onclick={(e) => {
                             e.preventDefault();
                             _id !== '' ? editNote() : createNote();
                         }}
                         disabled={saving}
-                        className="text-2xl flex items-center justify-center font-bold px-8 py-3 rounded-md bg-cyan-600 text-white cursor-pointer shadow-md transition-all hover:bg-cyan-700 hover:shadow-lg w-full mt-4"
-                    >
-                        <RiSave3Fill className="mr-2" /> {_id !== '' ? 'Update' : 'Create'}
-                    </button>
+                        type="submit"
+                        icon={<RiSave3Fill className="mr-2" />}
+                        text={_id !== '' ? 'Update' : 'Create'}
+                    />
                     {_id !== '' && (
-                        <button
-                            type="button"
-                            onClick={() => setModal(true)}
-                            className="text-2xl flex items-center justify-center font-bold px-8 py-3 rounded-md bg-red-600 text-white cursor-pointer shadow-md transition-all hover:bg-red-700 hover:shadow-lg w-full mt-2"
-                        >
-                            <MdDelete className="mr-2" /> Delete
-                        </button>
+                        <SaveButton className="bg-red-600 hover:bg-red-700 mt-2" onclick={() => setModal(true)} disabled={false} type="button" icon={<MdDelete className="mr-2" />} text="Delete" />
                     )}
                 </div>
             </form>
             <div className="text-left mt-4">
                 <h4 className="text-2xl mb-1">Preview</h4>
-                <div style={{ backgroundColor: color, color: getDifferentColor(color, 185) }} className="rounded-md px-4 py-3 shadow-lg">
-                    <h2 className="text-3xl font-bold mb-2 break-words">{title}</h2>
-                    <div dangerouslySetInnerHTML={{ __html: content }} className="px-2 !leading-6 break-words overflow-y-auto max-h-[60vh]"></div>
-                </div>
+                <NoteBody note={{ _id, title, startDate, endDate, content, image, color, rating, type, author: '' }} />
             </div>
             {_id !== '' && modal && <DeleteModal deleteNote={deleteNote} deleting={deleting} error={error} modal={modal} setModal={setModal} />}
             <Alert message={error} isError={true} />

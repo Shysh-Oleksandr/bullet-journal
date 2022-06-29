@@ -1,8 +1,7 @@
 import React from 'react';
-import NoteForm from '../components/NoteForm';
-import IPageProps from '../interfaces/page';
+import NoteForm from '../components/note/NoteForm';
 
-const EditPage = (props: IPageProps) => {
+const EditPage = () => {
     return (
         <div>
             <NoteForm />

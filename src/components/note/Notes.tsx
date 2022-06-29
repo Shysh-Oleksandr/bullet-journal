@@ -1,15 +1,16 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import config from '../config/config';
-import logging from '../config/logging';
-import { setNotes } from '../features/journal/journalSlice';
-import INote from '../interfaces/note';
-import '../styles/note.scss';
-import { getInitialNote } from '../utils/functions';
-import InfoMessage from './InfoMessage';
-import Loading from './Loading';
+import { useAppSelector } from '../../app/hooks';
+import '../../styles/note.scss';
 import NotePreview from './NotePreview';
+import { useAppDispatch } from './../../app/hooks';
+import Loading from './../UI/Loading';
+import InfoMessage from './../UI/InfoMessage';
+import config from './../../config/config';
+import INote from './../../interfaces/note';
+import { getInitialNote } from './../../utils/functions';
+import { setNotes } from '../../features/journal/journalSlice';
+import logging from './../../config/logging';
 
 const Notes = () => {
     const { notes } = useAppSelector((store) => store.journal);
@@ -45,11 +46,7 @@ const Notes = () => {
     };
 
     if (isLoading) {
-        return (
-            <div className="flex justify-center items-center w-full h-full mt-20">
-                <Loading scaleSize={2} />
-            </div>
-        );
+        return <Loading scaleSize={2} className="mt-20" />;
     }
 
     return (

@@ -1,19 +1,18 @@
 import React from 'react';
-import IPageProps from './../interfaces/page';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
 import { Authenticate, SignInWithSocialMedia as SocialMediaPopup } from './../modules/auth';
 import logging from './../config/logging';
-import InfoMessage from '../components/InfoMessage';
+import InfoMessage from '../components/UI/InfoMessage';
 import { BsGoogle } from 'react-icons/bs';
 import { Providers } from './../config/firebase';
-import Loading from '../components/Loading';
+import Loading from '../components/UI/Loading';
 import CenterPiece from './../components/CenterPiece';
 import { useAppDispatch } from '../app/hooks';
 import { login } from '../features/user/userSlice';
 
-const LoginPage = (props: IPageProps) => {
+const LoginPage = () => {
     const [authenticating, setAuthenticating] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
 

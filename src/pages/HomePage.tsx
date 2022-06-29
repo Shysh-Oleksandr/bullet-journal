@@ -1,8 +1,7 @@
 import React from 'react';
-import Notes from '../components/Notes';
-import IPageProps from './../interfaces/page';
+import Notes from './../components/note/Notes';
 
-const HomePage = (props: IPageProps) => {
+const HomePage = () => {
     return (
         <div>
             <Notes />
