@@ -10,11 +10,7 @@
     "scripts": {
         "start": "node src/server.js",
         "build": "rm -rf build && prettier --write src/ && tsc",
-        "heroku-postbuild": "cd frontend && npm install && npm run build",
-        "postinstall": "tsc",
-        "watch-node": "nodemon dist/index.js",
-        "watch-ts": "tsc -w",
-        "deploy": "git add . && git commit -m Heroku && git push heroku master"
+        "heroku-postbuild": "cd frontend && npm install && npm run build"
     },
     "keywords": [],
     "author": "",
