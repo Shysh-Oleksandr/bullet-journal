@@ -3,9 +3,18 @@
     "version": "1.0.0",
     "description": "",
     "main": "src/server.ts",
+    "type": "module",
+    "engines": {
+        "node": "16.14.0"
+    },
     "scripts": {
+        "start": "node src/server.js",
         "build": "rm -rf build && prettier --write src/ && tsc",
-        "heroku-postbuild": "cd frontend && npm install && npm run build"
+        "heroku-postbuild": "cd frontend && npm install && npm run build",
+        "postinstall": "tsc",
+        "watch-node": "nodemon dist/index.js",
+        "watch-ts": "tsc -w",
+        "deploy": "git add . && git commit -m Heroku && git push heroku master"
     },
     "keywords": [],
     "author": "",
