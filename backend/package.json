@@ -10,8 +10,8 @@
     "scripts": {
         "start": "node build/server.js",
         "build": "rm -rf build && prettier --write src/ && tsc",
-        "postinstall": "npm run tsc",
-        "tsc": "tsc"
+        "tsc": "./node_modules/typescript/bin/tsc",
+        "postinstall": "npm run tsc"
     },
     "keywords": [],
     "author": "",
