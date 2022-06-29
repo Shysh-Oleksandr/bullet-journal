@@ -72,6 +72,8 @@ router.use((req, res, next) => {
     });
 });
 
+// "heroku-postbuild": "cd frontend && npm install && npm run build"
+
 // Deployment Middleware
 router.use(express.static(path.join(__dirname, '../frontend/build')));
 
