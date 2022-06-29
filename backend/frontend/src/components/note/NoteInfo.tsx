@@ -1,5 +1,5 @@
 import React from 'react';
-import { getDifferentColor } from './../../utils/functions';
+import { getDifferentColor } from '../../utils/functions';
 
 interface NoteInfoProps {
     text: string;

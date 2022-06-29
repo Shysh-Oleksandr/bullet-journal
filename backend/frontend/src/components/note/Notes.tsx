@@ -3,14 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '../../app/hooks';
 import '../../styles/note.scss';
 import NotePreview from './NotePreview';
-import { useAppDispatch } from './../../app/hooks';
-import Loading from './../UI/Loading';
-import InfoMessage from './../UI/InfoMessage';
-import config from './../../config/config';
-import INote from './../../interfaces/note';
-import { getInitialNote } from './../../utils/functions';
+import { useAppDispatch } from '../../app/hooks';
+import Loading from '../UI/Loading';
+import InfoMessage from '../UI/InfoMessage';
+import config from '../../config/config';
+import INote from '../../interfaces/note';
+import { getInitialNote } from '../../utils/functions';
 import { setNotes } from '../../features/journal/journalSlice';
-import logging from './../../config/logging';
+import logging from '../../config/logging';
 
 const Notes = () => {
     const { notes } = useAppSelector((store) => store.journal);

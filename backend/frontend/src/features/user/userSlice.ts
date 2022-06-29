@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import IUser, { DEFAULT_USER } from '../../interfaces/user';
-import { DEFAULT_FIRE_TOKEN } from './../../interfaces/user';
+import { DEFAULT_FIRE_TOKEN } from '../../interfaces/user';
 
 export interface IUserState {
     user: IUser;

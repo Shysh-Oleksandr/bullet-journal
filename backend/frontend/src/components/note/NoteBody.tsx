@@ -1,6 +1,6 @@
 import React from 'react';
-import INote from './../../interfaces/note';
-import { getDifferentColor, sanitizedData } from './../../utils/functions';
+import INote from '../../interfaces/note';
+import { getDifferentColor, sanitizedData } from '../../utils/functions';
 import NoteInfo from './NoteInfo';
 
 interface NoteBodyProps {

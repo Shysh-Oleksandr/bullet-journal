@@ -7,6 +7,7 @@ import firebaseAdmin from 'firebase-admin';
 
 import userRoutes from './routes/user';
 import noteRoutes from './routes/note';
+import path from 'path';
 
 const router = express();
 
@@ -69,6 +70,13 @@ router.use((req, res, next) => {
     res.status(404).json({
         message: error.message
     });
+});
+
+// Deployment Middleware
+router.use(express.static(path.join(__dirname, '../frontend/build')));
+
+router.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
 /** Listen */

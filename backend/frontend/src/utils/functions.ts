@@ -1,7 +1,7 @@
 import DOMPurify from 'dompurify';
 import tinycolor from 'tinycolor2';
-import IUser from './../interfaces/user';
-import INote from './../interfaces/note';
+import IUser from '../interfaces/user';
+import INote from '../interfaces/note';
 
 export function shadeColor(color: string, amount: number) {
     return '#' + color.replace(/^#/, '').replace(/../g, (color) => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
