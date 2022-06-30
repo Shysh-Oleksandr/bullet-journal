@@ -68,14 +68,18 @@ router.use((req, res, next) => {
     });
 });
 
+router.get('/', (req, res) => {
+    res.send('Hello from Express!');
+});
+
 // "heroku-postbuild": "cd frontend && npm install && npm run build"
 
 // Deployment Middleware
-router.use(express.static(path.join(__dirname, '/frontend/build')));
+// router.use(express.static(path.join(__dirname, '/frontend/build')));
 
-router.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '/frontend/build', 'index.html'));
-});
+// router.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, '/frontend/build', 'index.html'));
+// });
 
 /** Listen */
 router.listen(config.server.port, () => logging.info(`Server is running ${config.server.host}:${config.server.port}`));
