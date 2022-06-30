@@ -8,9 +8,9 @@
         "node": "16.14.0"
     },
     "scripts": {
-        "start": "node build/server.js",
+        "start": "node dist/server.js",
         "build": "rm -rf build && prettier --write src/ && tsc",
-        "tsc": "./node_modules/typescript/bin/tsc",
+        "tsc": "tsc",
         "postinstall": "npm run tsc"
     },
     "keywords": [],
