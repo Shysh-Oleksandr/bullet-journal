@@ -1,21 +1,17 @@
-import http from 'http';
 import express from 'express';
 import logging from './config/logging';
 import config from './config/config';
 import mongoose from 'mongoose';
 import firebaseAdmin from 'firebase-admin';
-
+import serviceAccountJson from './config/serviceAccountKey.json';
 import userRoutes from './routes/user';
 import noteRoutes from './routes/note';
 import path from 'path';
 
 const router = express();
 
-/** Server Handling */
-const httpServer = http.createServer(router);
-
 /** Connect to Firebase */
-let serviceAccount = require('./config/serviceAccountKey.json');
+let serviceAccount: any = serviceAccountJson;
 
 firebaseAdmin.initializeApp({
     credential: firebaseAdmin.credential.cert(serviceAccount)
@@ -75,11 +71,11 @@ router.use((req, res, next) => {
 // "heroku-postbuild": "cd frontend && npm install && npm run build"
 
 // Deployment Middleware
-router.use(express.static(path.join(__dirname, '../frontend/build')));
+router.use(express.static(path.join(__dirname, '/frontend/build')));
 
 router.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '/frontend/build', 'index.html'));
 });
 
 /** Listen */
-httpServer.listen(config.server.port, () => logging.info(`Server is running ${config.server.host}:${config.server.port}`));
+router.listen(config.server.port, () => logging.info(`Server is running ${config.server.host}:${config.server.port}`));

@@ -2,16 +2,14 @@
     "name": "backend",
     "version": "1.0.0",
     "description": "",
-    "main": "src/server.ts",
-    "type": "module",
+    "main": "server.ts",
     "engines": {
-        "node": "16.14.0"
+        "node": "16.14.0",
+        "npm": "8.3.1"
     },
     "scripts": {
-        "start": "node dist/server.js",
-        "build": "rm -rf build && prettier --write src/ && tsc",
-        "tsc": "tsc",
-        "postinstall": "npm run tsc"
+        "start": "node server.js",
+        "build": "rm -rf build && tsc"
     },
     "keywords": [],
     "author": "",
