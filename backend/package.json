@@ -9,9 +9,7 @@
     },
     "scripts": {
         "start": "node server.js",
-        "build": "tsc --build",
-        "tsc": "tsc",
-        "postinstall": "npm run tsc"
+        "build": "tsc --build"
     },
     "keywords": [],
     "author": "",
