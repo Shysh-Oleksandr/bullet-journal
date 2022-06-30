@@ -4,12 +4,11 @@
     "description": "",
     "main": "server.ts",
     "engines": {
-        "node": "16.14.0",
+        "node": "14.x",
         "npm": "8.3.1"
     },
     "scripts": {
-        "start": "node server.js",
-        "postinstall": "tsc"
+        "start": "node server.js"
     },
     "keywords": [],
     "author": "",
