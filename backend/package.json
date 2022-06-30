@@ -9,7 +9,7 @@
     },
     "scripts": {
         "start": "node server.js",
-        "build": "rm -rf build && tsc"
+        "postinstall": "tsc"
     },
     "keywords": [],
     "author": "",
@@ -22,7 +22,6 @@
         "firebase": "^9.8.4",
         "firebase-admin": "^11.0.0",
         "http": "^0.0.1-security",
-        "mongoose": "^6.4.0",
-        "tsc": "^2.0.4"
+        "mongoose": "^6.4.0"
     }
 }
