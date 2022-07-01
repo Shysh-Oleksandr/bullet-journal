@@ -20,7 +20,7 @@ import Loading from '../UI/Loading';
 import InputLabel from './InputLabel';
 import NoteBody from './NoteBody';
 import NoteDate from './NoteDate';
-import NoteTypeInput from './NoteTypeInput';
+import NoteLabelInput from './NoteLabelInput';
 import SaveButton from './SaveButton';
 
 const NoteForm = () => {
@@ -33,6 +33,7 @@ const NoteForm = () => {
     const [color, setColor] = useState<string>('#04a9c6');
     const [rating, setRating] = useState<number>(1);
     const [type, setType] = useState<string>('Note');
+    const [category, setCategory] = useState<string>('');
     const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
 
     const [modal, setModal] = useState<boolean>(false);
@@ -82,6 +83,7 @@ const NoteForm = () => {
                     setColor(note.color);
                     setRating(note.rating);
                     setType(note.type);
+                    setCategory(note.category || '');
 
                     const contentBlock = htmlToDraft(note.content || '');
                     const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
@@ -226,10 +228,14 @@ const NoteForm = () => {
                         </div>
                     </div>
                 </div>
-                <div className="fl border-bottom my-3">
-                    <div className="relative fl h-11">
-                        <NoteTypeInput type={type} setType={setType} />
+                <div className="flex-between border-bottom my-3">
+                    <div className="relative mr-4">
+                        <NoteLabelInput label={type} setLabel={setType} isCustomTypes={true} />
                         <InputLabel htmlFor="noteTypeInput" text="Type" />
+                    </div>
+                    <div className="relative basis-3/4">
+                        <NoteLabelInput label={category} setLabel={setCategory} isCustomTypes={false} />
+                        <InputLabel htmlFor="noteCategoryInput" text="Categories" />
                     </div>
                 </div>
                 <div>
