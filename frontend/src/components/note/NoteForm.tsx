@@ -176,7 +176,15 @@ const NoteForm = () => {
         <div className="padding-x mb-12">
             <form className="px-10 pt-3 pb-6 bg-white rounded-sm shadow-xl mt-12">
                 <div className="flex-between">
-                    <input disabled={saving} type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} className="border-bottom py-4 text-3xl w-full" required={true} />
+                    <input
+                        disabled={saving}
+                        type="text"
+                        placeholder="Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="border-bottom font-medium py-4 text-3xl w-full"
+                        required={true}
+                    />
                 </div>
                 <div className="flex-between border-bottom mb-6">
                     <div className="fl h-11">
@@ -191,7 +199,7 @@ const NoteForm = () => {
                                 min={1}
                                 max={10}
                                 id="noteRatingInput"
-                                className="w-16 text-xl bg-[#ebf5fe] transition-all hover:bg-[#e1f1ff] focus-within:bg-[#e1f1ff] px-2 py-1 rounded-sm text-[#6aaac2]"
+                                className="w-16 text-xl font-medium bg-[#ebf5fe] transition-all hover:bg-[#e1f1ff] focus-within:bg-[#e1f1ff] px-2 py-1 rounded-sm text-[#6aaac2]"
                                 value={rating}
                                 onChange={(e) => setRating(Number(e.target.value))}
                             />

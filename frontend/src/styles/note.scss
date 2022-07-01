@@ -37,8 +37,34 @@
 .category-input:focus + .categories-list,
 .categories-form:hover .categories-list,
 .categories-form:active .categories-list {
-    max-height: 18rem;
+    max-height: 22rem;
     opacity: 1;
+}
+
+.categories-list {
+    scrollbar-width: thin;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: lightcyan;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #04a9c6;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background: #048096;
+    }
 }
 
 .btn {

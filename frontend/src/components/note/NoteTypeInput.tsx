@@ -18,9 +18,10 @@ function getCustomTypes(customTypes: string | undefined): string[] {
 
 const NoteTypeInput = ({ type, setType }: NoteTypeInputProps) => {
     const [focused, setFocused] = useState<boolean>(false);
-    const categoryInputRef = useRef<HTMLInputElement>(null);
+    const typeInputRef = useRef<HTMLInputElement>(null);
     const [success, setSuccess] = useState<string>('');
     const [error, setError] = useState<string>('');
+    const [previousType, setPreviousType] = useState(type);
 
     const { user } = useAppSelector((store) => store.user);
     const [userCustomNoteTypes, setUserCustomNoteTypes] = useState<string>(user.customNoteTypes || '');
@@ -29,9 +30,11 @@ const NoteTypeInput = ({ type, setType }: NoteTypeInputProps) => {
     const onFocus = () => {
         setFocused(true);
         setType('');
+        setPreviousType(type);
     };
     const onBlur = () => {
         setFocused(false);
+        typeInputRef.current?.value.trim() === '' && setType(previousType);
     };
 
     const updateUserData = async (newCustomNoteTypes: string, isAdding: boolean, changedType: string) => {
@@ -68,7 +71,7 @@ const NoteTypeInput = ({ type, setType }: NoteTypeInputProps) => {
     };
 
     const addNewCategory = () => {
-        let newType = categoryInputRef.current!.value;
+        let newType = typeInputRef.current!.value;
         const isNew: boolean = !availableTypes.includes(newType);
 
         if (newType.trim() === '') {
@@ -90,33 +93,37 @@ const NoteTypeInput = ({ type, setType }: NoteTypeInputProps) => {
     };
 
     return (
-        <div className="relative md:ml-8 md:mt-0 sm:mt-4 mt-0 categories-form">
+        <div className="relative categories-form">
             <input
                 type="text"
                 id="noteTypeInput"
                 onFocus={onFocus}
                 onBlur={onBlur}
-                className="term-input category-input w-64 !text-xl mb-3"
-                placeholder="Enter a new category..."
-                ref={categoryInputRef}
+                className="term-input category-input font-medium w-full text-xl bg-[#ebf5fe] transition-all hover:bg-[#e1f1ff] focus-within:bg-[#e1f1ff] px-3 py-1 h-11 rounded-t-sm text-[#6aaac2]"
+                placeholder="Enter a new type..."
+                ref={typeInputRef}
                 value={type}
                 required={true}
                 onChange={(e) => setType(e.target.value)}
             />
             <ul
-                className={`categories-list rounded-xl rounded-tl-none overflow-y-auto h-auto max-h-0 opacity-0 left-1/2 overflow-hidden -translate-x-1/2 w-full transition-all absolute bg-cyan-800 bottom-3 translate-y-full z-20 text-white`}
+                className={`categories-list rounded-b-xl overflow-y-auto h-auto max-h-0 opacity-0 left-1/2 overflow-hidden -translate-x-1/2 w-full transition-all duration-300 absolute bg-cyan-600 bottom-0 translate-y-full z-20 text-white`}
             >
                 {availableTypes.map((availableType) => {
                     if (availableType.trim() === '') return null;
 
                     return (
-                        <li className={`mb-[1px] relative block px-4 text-lg tracking-wide cursor-pointer hover:bg-cyan-600 transition-all`} key={availableType} onClick={() => setType(availableType)}>
+                        <li
+                            className={`relative block px-4 py-2 text-lg tracking-wide transition-all cursor-pointer ${availableType === type ? 'bg-cyan-500 font-semibold' : ''} hover:bg-cyan-700`}
+                            key={availableType}
+                            onClick={() => setType(availableType)}
+                        >
                             {availableType}
                             {!defaultNoteTypes.includes(availableType) && (
                                 <button
                                     type="button"
                                     onClick={() => deleteCategory(availableType)}
-                                    className="absolute right-2 top-1/2 rounded-md -translate-y-1/2 text-xl p-[5px] transition-colors bg-cyan-700 hover:bg-cyan-800"
+                                    className="absolute right-2 top-1/2 rounded-md -translate-y-1/2 text-xl p-[5px] transition-colors bg-cyan-800 hover:bg-cyan-900"
                                 >
                                     <BsPlusLg className="rotate-45" />
                                 </button>
@@ -125,11 +132,9 @@ const NoteTypeInput = ({ type, setType }: NoteTypeInputProps) => {
                     );
                 })}
             </ul>
-            {true && (
-                <button type="button" className="absolute right-0 top-1/2 -translate-y-[65%] text-2xl hover:text-orange-500 text-orange-400 transition-colors" onClick={(e) => {addNewCategory();}}>
-                    <AiOutlineArrowRight />
-                </button>
-            )}
+            <button type="button" className="absolute right-0 top-1/2 py-2 px-2 -translate-y-1/2 text-2xl hover:text-cyan-500 text-cyan-400 transition-colors" onClick={addNewCategory}>
+                <AiOutlineArrowRight />
+            </button>
             <Alert message={error} isError={true} />
             <Alert message={success} isError={false} />
         </div>

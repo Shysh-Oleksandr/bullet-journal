@@ -3,7 +3,7 @@ import NoteForm from '../components/note/NoteForm';
 
 const EditPage = () => {
     return (
-        <div>
+        <div className="mb-12">
             <NoteForm />
         </div>
     );
