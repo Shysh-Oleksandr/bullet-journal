@@ -6,19 +6,18 @@ import { useAppSelector } from '../../app/hooks';
 import config from '../../config/config';
 import { defaultNoteTypes, SEPARATOR } from '../../utils/data';
 import { getCustomLabels } from '../../utils/functions';
-import Alert from '../UI/Alert';
 
 interface NoteLabelInputProps {
     setLabel: React.Dispatch<React.SetStateAction<string>>;
     label: string;
     isCustomTypes: boolean;
+    setError: React.Dispatch<React.SetStateAction<string>>;
+    setSuccess: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps) => {
+const NoteLabelInput = ({ label, setLabel, isCustomTypes, setError, setSuccess }: NoteLabelInputProps) => {
     const [focused, setFocused] = useState(false);
     const labelInputRef = useRef<HTMLInputElement>(null);
-    const [success, setSuccess] = useState<string>('');
-    const [error, setError] = useState<string>('');
 
     const { user } = useAppSelector((store) => store.user);
     const [userCustomNoteLabels, setUserCustomNoteLabels] = useState<string>(isCustomTypes ? user.customNoteTypes || '' : user.customNoteCategories || '');
@@ -32,13 +31,11 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
     }, []);
 
     const onFocus = () => {
-        console.log('focus');
         setFocused(true);
         setLabel('');
         setPreviousLabel(label);
     };
     const onBlur = () => {
-        console.log('blur');
         setFocused(false);
         if (labelInputRef.current?.value.trim() === '' || !availableLabels.includes(labelInputRef.current?.value!)) {
             setLabel(previousLabel);
@@ -186,8 +183,6 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
                     <AiOutlineArrowRight />
                 </button>
             )}
-            <Alert message={error} isError={true} />
-            <Alert message={success} isError={false} />
         </div>
     );
 };

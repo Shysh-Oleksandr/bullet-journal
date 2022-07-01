@@ -231,11 +231,11 @@ const NoteForm = () => {
                 </div>
                 <div className="flex-between border-bottom my-3">
                     <div className="relative mr-4">
-                        <NoteLabelInput label={type} setLabel={setType} isCustomTypes={true} />
+                        <NoteLabelInput setSuccess={setSuccess} setError={setError} label={type} setLabel={setType} isCustomTypes={true} />
                         <InputLabel htmlFor="noteTypeInput" text="Type" />
                     </div>
                     <div className="relative basis-3/4">
-                        <NoteLabelInput label={category} setLabel={setCategory} isCustomTypes={false} />
+                        <NoteLabelInput setSuccess={setSuccess} setError={setError} label={category} setLabel={setCategory} isCustomTypes={false} />
                         <InputLabel htmlFor="noteCategoryInput" text="Categories" />
                     </div>
                 </div>
@@ -277,7 +277,7 @@ const NoteForm = () => {
             </form>
             <div className="text-left mt-4">
                 <h4 className="text-2xl mb-1">Preview</h4>
-                <NoteBody note={{ _id, title, startDate, endDate, content, image, color, rating, type, author: '' }} />
+                <NoteBody note={{ _id, title, startDate, endDate, content, image, color, rating, category, type, author: '' }} />
             </div>
             {_id !== '' && modal && <DeleteModal deleteNote={deleteNote} deleting={deleting} error={error} modal={modal} setModal={setModal} />}
             <Alert message={error} isError={true} />
