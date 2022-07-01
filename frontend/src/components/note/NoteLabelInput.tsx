@@ -24,18 +24,24 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
     const [userCustomNoteLabels, setUserCustomNoteLabels] = useState<string>(isCustomTypes ? user.customNoteTypes || '' : user.customNoteCategories || '');
     const [availableLabels, setAvailableLabels] = useState<string[]>(isCustomTypes ? [...defaultNoteTypes, ...getCustomLabels(userCustomNoteLabels)] : getCustomLabels(userCustomNoteLabels));
 
+    const labelName = isCustomTypes ? 'type' : 'category';
+
     const onFocus = () => {
+        console.log('focus');
+
         setLabel('');
         setPreviousLabel(label);
     };
     const onBlur = () => {
-        labelInputRef.current?.value.trim() === '' && setLabel(previousLabel);
+        console.log('blur');
+
+        if (labelInputRef.current?.value.trim() === '' || !availableLabels.includes(labelInputRef.current?.value!)) {
+            setLabel(previousLabel);
+        }
     };
 
-    const labelName = isCustomTypes ? 'type' : 'category';
-
     const updateUserData = async (newCustomNoteLabels: string, isAdding: boolean, changedLabel: string) => {
-        if (label.trim() === '') {
+        if (isAdding && label.trim() === '') {
             setError(`Please enter ${labelName} name.`);
             setSuccess('');
             return null;
@@ -80,22 +86,44 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
         let newLabel = labelInputRef.current!.value;
         const isNew: boolean = !availableLabels.includes(newLabel);
 
+        console.log(previousLabel);
+        console.log(newLabel);
         if (newLabel.trim() === '') {
             setError(`Note ${labelName} cannot be empty.`);
         } else if (!isNew) {
             setError(`Note ${labelName} "${newLabel}" already exist.`);
         } else {
-            setLabel(newLabel);
+            setLabel(isCustomTypes ? newLabel : `${previousLabel}${SEPARATOR}${newLabel}`);
             const newCustomNoteLabels = `${userCustomNoteLabels || ''}${SEPARATOR}${newLabel}`;
+            console.log(newCustomNoteLabels);
+
             updateUserData(newCustomNoteLabels, true, newLabel);
         }
     };
 
     const deleteLabel = (labelToDelete: string) => {
         label === labelToDelete && setLabel(isCustomTypes ? defaultNoteTypes[0] : '');
+        !isCustomTypes && label.split(SEPARATOR).includes(labelToDelete) && setLabel((prevLabel) => prevLabel.replace(`${SEPARATOR}${labelToDelete}`, ''));
         const newCustomNoteLabels = userCustomNoteLabels.replace(`${SEPARATOR}${labelToDelete}`, '');
 
         updateUserData(newCustomNoteLabels, false, labelToDelete);
+    };
+
+    const chooseLabel = (chosenLabel: string) => {
+        if (isCustomTypes) {
+            setLabel(chosenLabel);
+        } else {
+            // Check if we should choose or remove category.
+            const isChoosing = !label.split(SEPARATOR).includes(chosenLabel);
+            // Adding category.
+            if (isChoosing) {
+                setLabel((prevLabel) => `${prevLabel}${SEPARATOR}${chosenLabel}`);
+            }
+            // Removing category.
+            else {
+                setLabel((prevLabel) => prevLabel.replace(`${SEPARATOR}${chosenLabel}`, ''));
+            }
+        }
     };
 
     return (
@@ -108,9 +136,9 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
                 className="term-input category-input font-medium w-full text-xl bg-[#ebf5fe] transition-all hover:bg-[#e1f1ff] focus-within:bg-[#e1f1ff] px-3 py-1 h-11 rounded-t-sm text-[#6aaac2]"
                 placeholder={`Enter a new ${labelName}...`}
                 ref={labelInputRef}
-                value={label}
+                value={isCustomTypes ? label : label.replace(SEPARATOR, '').replaceAll(SEPARATOR, ', ')}
                 required={true}
-                onChange={(e) => setLabel(e.target.value)}
+                onChange={(e) => setLabel(e.target.value)} // !
             />
             <ul
                 className={`categories-list rounded-b-xl overflow-y-auto h-auto max-h-0 opacity-0 left-1/2 overflow-hidden -translate-x-1/2 w-full transition-all duration-300 absolute bg-cyan-600 bottom-0 translate-y-full z-20 text-white`}
@@ -120,9 +148,11 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
 
                     return (
                         <li
-                            className={`relative block px-4 py-2 text-lg tracking-wide transition-all cursor-pointer ${availableLabel === label ? 'bg-cyan-500 font-semibold' : ''} hover:bg-cyan-700`}
+                            className={`relative block px-4 py-2 text-lg tracking-wide transition-all cursor-pointer ${
+                                (isCustomTypes ? availableLabel === label : label.split(SEPARATOR).includes(availableLabel)) ? 'bg-cyan-500 font-semibold' : ''
+                            } hover:bg-cyan-700`}
                             key={availableLabel}
-                            onClick={() => setLabel(availableLabel)}
+                            onClick={() => chooseLabel(availableLabel)}
                         >
                             {availableLabel}
                             {!defaultNoteTypes.includes(availableLabel) && (
@@ -141,7 +171,12 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
                     );
                 })}
             </ul>
-            <button type="button" className="absolute right-0 top-1/2 py-2 px-2 -translate-y-1/2 text-2xl hover:text-cyan-500 text-cyan-400 transition-colors" onClick={addNewLabel}>
+            <button
+                onMouseDown={(e) => e.preventDefault()}
+                type="button"
+                className="absolute right-0 top-1/2 py-2 px-2 -translate-y-1/2 text-2xl hover:text-cyan-500 text-cyan-400 transition-colors"
+                onClick={addNewLabel}
+            >
                 <AiOutlineArrowRight />
             </button>
             <Alert message={error} isError={true} />

@@ -126,6 +126,7 @@ const NoteForm = () => {
                     rating,
                     content,
                     type,
+                    category,
                     author: user._id
                 }
             });
