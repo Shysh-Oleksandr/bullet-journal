@@ -9,15 +9,13 @@ export default interface INote extends Document {
     content?: string;
     color: string;
     image?: string;
-    type: string; // NoteTypes
+    type: string;
     category?: string;
     rating: number;
     // milestones: IMilestone[];
 }
 
-export enum NoteTypes {
-    NOTE = 'Note',
-    EVENT = 'Event',
-    GOAL = 'Goal',
-    DIARY = 'Diary'
+export interface INoteType {
+    name: string;
+    color?: string;
 }

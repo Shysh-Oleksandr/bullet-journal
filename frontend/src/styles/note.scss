@@ -34,6 +34,13 @@
     }
 }
 
+.category-input:focus + .categories-list,
+.categories-form:hover .categories-list,
+.categories-form:active .categories-list {
+    max-height: 18rem;
+    opacity: 1;
+}
+
 .btn {
     padding: 0.25rem 2rem;
     background-color: rgb(45 212 191) !important;

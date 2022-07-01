@@ -4,6 +4,8 @@ export default interface IUser {
     name: string;
     createdAt: string;
     updatedAt: string;
+    customNoteTypes?: string;
+    customNoteCategories?: string;
 }
 
 export const DEFAULT_USER: IUser = {

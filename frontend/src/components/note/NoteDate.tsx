@@ -1,5 +1,6 @@
 import React from 'react';
 import { BiCalendarAlt } from 'react-icons/bi';
+import InputLabel from './InputLabel';
 
 interface NoteDateProps {
     date: number;
@@ -22,9 +23,8 @@ const NoteDate = ({ date, setDate, isStartDate }: NoteDateProps) => {
                     value={new Date(date).toLocaleDateString('en-CA')}
                 />
             </div>
-            <label htmlFor={`${isStartDate ? 'start' : 'end'}DateInput`} className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
-                {isStartDate ? 'Start' : 'End'}
-            </label>
+
+            <InputLabel htmlFor={`${isStartDate ? 'start' : 'end'}DateInput`} text={isStartDate ? 'Start' : 'End'} />
         </div>
     );
 };

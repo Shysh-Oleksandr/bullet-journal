@@ -13,12 +13,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import config from '../../config/config';
 import logging from '../../config/logging';
-import INote, { NoteTypes } from '../../interfaces/note';
+import INote from '../../interfaces/note';
 import Alert from '../UI/Alert';
 import DeleteModal from '../UI/DeleteModal.';
 import Loading from '../UI/Loading';
+import InputLabel from './InputLabel';
 import NoteBody from './NoteBody';
 import NoteDate from './NoteDate';
+import NoteTypeInput from './NoteTypeInput';
 import SaveButton from './SaveButton';
 
 const NoteForm = () => {
@@ -30,7 +32,7 @@ const NoteForm = () => {
     const [image, setImage] = useState<string>('');
     const [color, setColor] = useState<string>('#04a9c6');
     const [rating, setRating] = useState<number>(1);
-    const [type, setType] = useState<string | NoteTypes>(NoteTypes.NOTE);
+    const [type, setType] = useState<string>('Note');
     const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
 
     const [modal, setModal] = useState<boolean>(false);
@@ -176,7 +178,7 @@ const NoteForm = () => {
                 <div className="flex-between">
                     <input disabled={saving} type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} className="border-bottom py-4 text-3xl w-full" required={true} />
                 </div>
-                <div className="flex-between border-bottom mb-3">
+                <div className="flex-between border-bottom mb-6">
                     <div className="fl h-11">
                         <NoteDate date={startDate} isStartDate={true} setDate={setStartDate} />
                         <BsDashLg className="mx-6 text-xl" />
@@ -197,9 +199,7 @@ const NoteForm = () => {
                                 /10
                             </label>
 
-                            <label htmlFor="noteRatingInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
-                                Importance
-                            </label>
+                            <InputLabel htmlFor="noteRatingInput" text="Importance" />
                         </div>
                         <div className="relative fl h-11">
                             <label style={{ color: color }} htmlFor="noteColorInput" className="cursor-pointer text-3xl px-4 text-[#6aaac2] py-2">
@@ -214,10 +214,14 @@ const NoteForm = () => {
                                     setColor(e.target.value);
                                 }}
                             />
-                            <label htmlFor="noteColorInput" className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
-                                Color
-                            </label>
+                            <InputLabel htmlFor="noteColorInput" text="Color" />
                         </div>
+                    </div>
+                </div>
+                <div className="fl border-bottom my-3">
+                    <div className="relative fl h-11">
+                        <NoteTypeInput type={type} setType={setType} />
+                        <InputLabel htmlFor="noteTypeInput" text="Type" />
                     </div>
                 </div>
                 <div>
