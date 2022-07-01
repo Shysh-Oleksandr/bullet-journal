@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
 import { useAppSelector } from '../../app/hooks';
@@ -15,26 +15,31 @@ interface NoteLabelInputProps {
 }
 
 const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps) => {
+    const [focused, setFocused] = useState(false);
     const labelInputRef = useRef<HTMLInputElement>(null);
     const [success, setSuccess] = useState<string>('');
     const [error, setError] = useState<string>('');
-    const [previousLabel, setPreviousLabel] = useState(label);
 
     const { user } = useAppSelector((store) => store.user);
     const [userCustomNoteLabels, setUserCustomNoteLabels] = useState<string>(isCustomTypes ? user.customNoteTypes || '' : user.customNoteCategories || '');
     const [availableLabels, setAvailableLabels] = useState<string[]>(isCustomTypes ? [...defaultNoteTypes, ...getCustomLabels(userCustomNoteLabels)] : getCustomLabels(userCustomNoteLabels));
-
+    const [removedLabels, setRemovedLabels] = useState(label.split(SEPARATOR).filter((category) => !availableLabels.includes(category) && category !== ''));
+    const [previousLabel, setPreviousLabel] = useState(label);
     const labelName = isCustomTypes ? 'type' : 'category';
+
+    useEffect(() => {
+        setAvailableLabels([...availableLabels, ...removedLabels]);
+    }, []);
 
     const onFocus = () => {
         console.log('focus');
-
+        setFocused(true);
         setLabel('');
         setPreviousLabel(label);
     };
     const onBlur = () => {
         console.log('blur');
-
+        setFocused(false);
         if (labelInputRef.current?.value.trim() === '' || !availableLabels.includes(labelInputRef.current?.value!)) {
             setLabel(previousLabel);
         }
@@ -72,7 +77,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
             if (response.status === 201) {
                 setUserCustomNoteLabels(newCustomNoteLabels);
 
-                setAvailableLabels(isCustomTypes ? [...defaultNoteTypes, ...getCustomLabels(newCustomNoteLabels)] : getCustomLabels(newCustomNoteLabels));
+                setAvailableLabels(isCustomTypes ? [...defaultNoteTypes, ...removedLabels, ...getCustomLabels(newCustomNoteLabels)] : [...getCustomLabels(newCustomNoteLabels), ...removedLabels]);
                 setSuccess(isAdding ? `New ${labelName} "${changedLabel}" added.` : `The ${labelName} "${changedLabel}" has been removed.`);
             } else {
                 setError(`Unable to ${isAdding ? 'add' : 'delete'} note ${labelName}.`);
@@ -86,16 +91,16 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
         let newLabel = labelInputRef.current!.value;
         const isNew: boolean = !availableLabels.includes(newLabel);
 
-        console.log(previousLabel);
-        console.log(newLabel);
         if (newLabel.trim() === '') {
             setError(`Note ${labelName} cannot be empty.`);
         } else if (!isNew) {
             setError(`Note ${labelName} "${newLabel}" already exist.`);
         } else {
-            setLabel(isCustomTypes ? newLabel : `${previousLabel}${SEPARATOR}${newLabel}`);
+            labelInputRef.current?.blur();
+            setLabel((prevLabel) => {
+                return isCustomTypes ? newLabel : `${prevLabel}${SEPARATOR}${newLabel}`;
+            });
             const newCustomNoteLabels = `${userCustomNoteLabels || ''}${SEPARATOR}${newLabel}`;
-            console.log(newCustomNoteLabels);
 
             updateUserData(newCustomNoteLabels, true, newLabel);
         }
@@ -171,14 +176,16 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
                     );
                 })}
             </ul>
-            <button
-                onMouseDown={(e) => e.preventDefault()}
-                type="button"
-                className="absolute right-0 top-1/2 py-2 px-2 -translate-y-1/2 text-2xl hover:text-cyan-500 text-cyan-400 transition-colors"
-                onClick={addNewLabel}
-            >
-                <AiOutlineArrowRight />
-            </button>
+            {focused && (
+                <button
+                    onMouseDown={(e) => e.preventDefault()}
+                    type="button"
+                    className="absolute right-0 top-1/2 py-2 px-2 -translate-y-1/2 text-2xl hover:text-cyan-500 text-cyan-400 transition-colors"
+                    onClick={addNewLabel}
+                >
+                    <AiOutlineArrowRight />
+                </button>
+            )}
             <Alert message={error} isError={true} />
             <Alert message={success} isError={false} />
         </div>
