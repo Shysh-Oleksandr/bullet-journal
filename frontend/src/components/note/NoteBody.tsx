@@ -21,7 +21,7 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
 
     return (
         <div
-            className={`rounded-lg shadow-md py-4 px-8 transition-colors flex-between ${className}`}
+            className={`note__preview rounded-lg shadow-md py-4 px-8 transition-colors flex-between ${className}`}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
             onClick={onClick}
@@ -31,7 +31,10 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
                 <h3 className={`text-3xl font-bold mb-1 cursor-auto ${titleClassName}`}>{note.title}</h3>
 
                 {note.content && (
-                    <div dangerouslySetInnerHTML={{ __html: sanitizedData(note.content) }} className={`px-2 break-words overflow-y-auto !leading-6 max-h-32 h-auto ${contentClassName}`}></div>
+                    <div
+                        dangerouslySetInnerHTML={{ __html: sanitizedData(note.content) }}
+                        className={`px-2 break-words text-[1.25rem] overflow-y-auto !leading-6 max-h-32 h-auto ${contentClassName}`}
+                    ></div>
                 )}
                 <div className="mt-2 text-lg ">
                     <NoteInfo text={`${note.rating}/10`} color={note.color} className="tracking-widest" />

@@ -18,7 +18,7 @@ const Notes = () => {
     const { notes } = useAppSelector((store) => store.journal);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
-    const [showFullAddForm, setShowFullAddForm] = useState<boolean>(true);
+    const [showFullAddForm, setShowFullAddForm] = useState<boolean>(false);
     const dispatch = useAppDispatch();
 
     const { user } = useAppSelector((store) => store.user);
@@ -54,11 +54,12 @@ const Notes = () => {
 
     return (
         <div className="notes padding-x pt-12 relative">
+            <h5 className="text-2xl text-left mb-2 text-slate-500 font-semibold">Add a quick note</h5>
             <button
                 onClick={() => setShowFullAddForm(!showFullAddForm)}
                 className={`${
                     showFullAddForm ? 'rotate-45 bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
-                }  text-white p-2 transition-all shadow-md duration-300 text-xl rounded-full absolute top-7 left-1/2 -translate-x-1/2`}
+                }  text-white p-2 transition-all shadow-md duration-300 z-30 text-xl rounded-full absolute top-[4.3rem] left-1/2 -translate-x-1/2`}
             >
                 <BsPlusLg />
             </button>

@@ -129,6 +129,9 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
             setError('Please fill out all required fields.');
             setSuccess('');
             return null;
+        } else if (startDate > endDate) {
+            setError('End date cannot be earlier than start date.');
+            return null;
         }
 
         setError('');
@@ -203,7 +206,7 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
     }
 
     return (
-        <div className={`transition-all duration-500 ${isShort ? '' : 'padding-x mb-12'} ${isShort && !showFullAddForm ? 'max-h-16 overflow-hidden mb-4' : 'max-h-[100rem]'}`}>
+        <div className={`transition-all duration-500 ${isShort ? '' : 'padding-x pb-12'} ${isShort && !showFullAddForm ? 'max-h-16 overflow-hidden mb-4' : 'max-h-[300rem]'}`}>
             <form onClick={() => setShowFullAddForm && setShowFullAddForm(true)} className={`bg-white rounded-sm shadow-xl ${isShort ? 'pb-4 pt-2 px-8' : 'pt-3 pb-6 mt-12 px-10'}`}>
                 <TextareaAutosize
                     spellCheck={false}
@@ -269,11 +272,11 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
                     <Editor
                         placeholder="Write your note here..."
                         editorState={editorState}
-                        toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm z-10"
+                        toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm z-10 sticky top-0 left-0"
                         wrapperClassName="mt-8"
                         editorClassName={`${
                             isShort ? 'min-h-[10vh]' : 'min-h-[40vh]'
-                        } h-auto  cursor-text border-cyan-100 transition-all border-2 rounded-sm border-solid focus-within:border-[3px] focus-within:border-cyan-200 px-3`}
+                        } h-auto  cursor-text border-cyan-100 transition-all border-2 rounded-sm border-solid focus-within:border-[3px] focus-within:border-cyan-200 px-3 text-[1.25rem] !leading-[100%]`}
                         toolbar={
                             isShort
                                 ? {

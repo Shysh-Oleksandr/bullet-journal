@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { getDifferentColor, INITIAL_NOTE_ID, sanitizedData } from '../../utils/functions';
+import { useNavigate } from 'react-router-dom';
 import INote from '../../interfaces/note';
+import { getDifferentColor, INITIAL_NOTE_ID } from '../../utils/functions';
 import NoteBody from './NoteBody';
-import NoteInfo from './NoteInfo';
 
 interface INotePreviewProps {
     note: INote;

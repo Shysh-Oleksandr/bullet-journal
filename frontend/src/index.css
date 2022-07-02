@@ -71,9 +71,23 @@ a:visited {
 a:hover {
     text-decoration: none;
 }
-ul li {
-    list-style: none;
+.note__preview ul,
+.note__preview li {
+    list-style: inside !important;
 }
+
+.note__preview ol li {
+    list-style: numbers inside !important;
+}
+
+.note__preview a {
+    text-decoration: underline;
+}
+
+.note__preview a:hover {
+    text-decoration: none;
+}
+
 img {
     vertical-align: top;
 }
@@ -181,4 +195,8 @@ h6 {
 .DraftEditor-root,
 .public-DraftEditor-content {
     height: auto;
+}
+
+.public-DraftStyleDefault-block {
+    margin: 0.5rem 0;
 }
