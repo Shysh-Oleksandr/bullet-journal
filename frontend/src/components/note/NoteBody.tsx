@@ -30,7 +30,9 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
             <div className="w-full">
                 <h3 className={`text-3xl font-bold mb-1 cursor-auto ${titleClassName}`}>{note.title}</h3>
 
-                {note.content && <div dangerouslySetInnerHTML={{ __html: sanitizedData(note.content) }} className={`px-2 break-words overflow-y-auto !leading-6 h-auto ${contentClassName}`}></div>}
+                {note.content && (
+                    <div dangerouslySetInnerHTML={{ __html: sanitizedData(note.content) }} className={`px-2 break-words overflow-y-auto !leading-6 max-h-32 h-auto ${contentClassName}`}></div>
+                )}
                 <div className="mt-2 text-lg ">
                     <NoteInfo text={`${note.rating}/10`} color={note.color} className="tracking-widest" />
                     <NoteInfo text={note.type} color={note.color} />

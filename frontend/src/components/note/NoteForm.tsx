@@ -22,6 +22,7 @@ import NoteBody from './NoteBody';
 import NoteDate from './NoteDate';
 import NoteLabelInput from './NoteLabelInput';
 import SaveButton from './SaveButton';
+import TextareaAutosize from 'react-textarea-autosize';
 
 const NoteForm = () => {
     const [_id, setId] = useState<string>('');
@@ -179,15 +180,23 @@ const NoteForm = () => {
         <div className="padding-x mb-12">
             <form className="px-10 pt-3 pb-6 bg-white rounded-sm shadow-xl mt-12">
                 <div className="flex-between">
-                    <input
+                    <TextareaAutosize
+                        maxRows={5}
                         disabled={saving}
-                        type="text"
                         placeholder="Title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="border-bottom font-medium py-4 text-3xl w-full"
+                        className="border-bottom font-medium py-4 text-3xl w-full resize-none overflow-hidden"
                         required={true}
                     />
+                    {/* <textarea
+                        disabled={saving}
+                        placeholder="Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="border-bottom h-auto font-medium py-4 text-3xl w-full resize-none"
+                        required={true}
+                    /> */}
                 </div>
                 <div className="flex-between border-bottom mb-6">
                     <div className="fl h-11">
@@ -245,7 +254,7 @@ const NoteForm = () => {
                         editorState={editorState}
                         toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm"
                         wrapperClassName="mt-8"
-                        editorClassName="h-[60vh] cursor-text border-cyan-100 transition-all border-2 rounded-sm border-solid focus-within:border-[3px] focus-within:border-cyan-200 px-3"
+                        editorClassName="h-auto min-h-[40vh] cursor-text border-cyan-100 transition-all border-2 rounded-sm border-solid focus-within:border-[3px] focus-within:border-cyan-200 px-3"
                         onEditorStateChange={(newState) => {
                             const newContent = draftToHtml(convertToRaw(newState.getCurrentContent()));
                             setEditorState(newState);
