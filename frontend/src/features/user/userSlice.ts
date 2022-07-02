@@ -29,10 +29,13 @@ export const userSlice = createSlice({
             localStorage.removeItem('fire_token');
 
             return initialState;
+        },
+        updateUser: (state, { payload }: PayloadAction<IUser>) => {
+            state.user = payload;
         }
     }
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout, updateUser } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -4,8 +4,11 @@ import { AiOutlineArrowRight } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
 import { useAppSelector } from '../../app/hooks';
 import config from '../../config/config';
+import { updateUser } from '../../features/user/userSlice';
+import IUser from '../../interfaces/user';
 import { defaultNoteTypes, SEPARATOR } from '../../utils/data';
 import { getCustomLabels } from '../../utils/functions';
+import { useAppDispatch } from './../../app/hooks';
 
 interface NoteLabelInputProps {
     setLabel: React.Dispatch<React.SetStateAction<string>>;
@@ -25,10 +28,33 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setError, setSuccess }
     const [removedLabels, setRemovedLabels] = useState(label.split(SEPARATOR).filter((category) => !availableLabels.includes(category) && category !== ''));
     const [previousLabel, setPreviousLabel] = useState(label);
     const labelName = isCustomTypes ? 'type' : 'category';
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         setAvailableLabels([...availableLabels, ...removedLabels]);
     }, []);
+
+    useEffect(() => {
+        getUser(user._id);
+    }, [userCustomNoteLabels]);
+
+    const getUser = async (id: string) => {
+        try {
+            const response = await axios({
+                method: 'GET',
+                url: `${config.server.url}/users/read/${id}`
+            });
+
+            if (response.status === 200 || response.status === 304) {
+                let user = response.data.user as IUser;
+                dispatch(updateUser(user));
+            } else {
+                setError('Unable to retrieve user ' + id);
+            }
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
 
     const onFocus = () => {
         setFocused(true);
