@@ -88,6 +88,10 @@ a:hover {
     text-decoration: none;
 }
 
+.note__preview p {
+    min-height: 1rem;
+}
+
 img {
     vertical-align: top;
 }

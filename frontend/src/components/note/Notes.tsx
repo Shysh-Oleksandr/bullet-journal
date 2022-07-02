@@ -13,6 +13,7 @@ import { setNotes } from '../../features/journal/journalSlice';
 import logging from '../../config/logging';
 import NoteForm from './NoteForm';
 import { BsPlusLg } from 'react-icons/bs';
+import { dateDiffInDays } from './../../utils/functions';
 
 const Notes = () => {
     const { notes } = useAppSelector((store) => store.journal);
@@ -36,6 +37,17 @@ const Notes = () => {
 
             if (response.status === 200 || response.status === 304) {
                 let notes = response.data.notes as INote[];
+                const endNotes: INote[] = notes
+                    .filter((note) => dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 >= 2)
+                    .map((note) => {
+                        const copyNote = JSON.parse(JSON.stringify(note));
+                        copyNote.isEndNote = true;
+                        const startDate = copyNote.startDate;
+                        copyNote.startDate = copyNote.endDate;
+                        copyNote.endDate = startDate;
+                        return copyNote;
+                    });
+                notes = [...notes, ...endNotes].filter((note) => note.startDate <= new Date().getTime());
                 notes.push(getInitialNote(user));
                 notes.sort((x, y) => y.startDate - x.startDate);
                 dispatch(setNotes(notes));
@@ -65,7 +77,7 @@ const Notes = () => {
             </button>
             <NoteForm showFullAddForm={showFullAddForm} setShowFullAddForm={setShowFullAddForm} isShort={true} getAllNotes={getAllNotes} />{' '}
             {notes.map((note, index) => {
-                return <NotePreview note={note} key={note._id} previousNote={index === 0 ? null : notes[index - 1]} />;
+                return <NotePreview note={note} key={`${note._id}${note.isEndNote && 'endNote'}`} previousNote={index === 0 ? null : notes[index - 1]} />;
             })}
             <InfoMessage message={error} isError={true} />
         </div>

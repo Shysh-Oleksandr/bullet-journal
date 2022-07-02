@@ -12,6 +12,7 @@ export default interface INote extends Document {
     type: string;
     category?: string;
     rating: number;
+    isEndNote?: boolean;
     // milestones: IMilestone[];
 }
 

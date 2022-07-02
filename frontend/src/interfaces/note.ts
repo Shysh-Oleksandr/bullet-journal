@@ -11,8 +11,7 @@ export default interface INote {
     type: string;
     category?: string;
     rating: number;
+    isEndNote?: boolean;
     _id: string;
-    // createdAt: string;
-    // updatedAt: string;
     // milestones: IMilestone[];
 }
