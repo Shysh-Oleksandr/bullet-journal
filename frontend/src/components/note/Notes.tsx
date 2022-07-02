@@ -11,11 +11,14 @@ import INote from '../../interfaces/note';
 import { getInitialNote } from '../../utils/functions';
 import { setNotes } from '../../features/journal/journalSlice';
 import logging from '../../config/logging';
+import NoteForm from './NoteForm';
+import { BsPlusLg } from 'react-icons/bs';
 
 const Notes = () => {
     const { notes } = useAppSelector((store) => store.journal);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
+    const [showFullAddForm, setShowFullAddForm] = useState<boolean>(true);
     const dispatch = useAppDispatch();
 
     const { user } = useAppSelector((store) => store.user);
@@ -50,7 +53,16 @@ const Notes = () => {
     }
 
     return (
-        <div className="notes padding-x pt-12">
+        <div className="notes padding-x pt-12 relative">
+            <button
+                onClick={() => setShowFullAddForm(!showFullAddForm)}
+                className={`${
+                    showFullAddForm ? 'rotate-45 bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
+                }  text-white p-2 transition-all duration-300 text-xl rounded-full absolute top-7 left-1/2 -translate-x-1/2`}
+            >
+                <BsPlusLg />
+            </button>
+            <NoteForm showFullAddForm={showFullAddForm} isShort={true} getAllNotes={getAllNotes} />{' '}
             {notes.map((note, index) => {
                 return <NotePreview note={note} key={note._id} previousNote={index === 0 ? null : notes[index - 1]} />;
             })}

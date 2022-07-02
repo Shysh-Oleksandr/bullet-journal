@@ -169,7 +169,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setError, setSuccess }
                 onChange={(e) => setLabel(e.target.value)} // !
             />
             <ul
-                className={`categories-list rounded-b-xl overflow-y-auto h-auto max-h-0 opacity-0 left-1/2 overflow-hidden -translate-x-1/2 w-full transition-all duration-300 absolute bg-cyan-600 bottom-0 translate-y-full z-20 text-white`}
+                className={`categories-list rounded-b-xl overflow-y-auto h-auto max-h-0 opacity-0 left-1/2 overflow-hidden -translate-x-1/2 w-full transition-all duration-300 absolute bg-cyan-600 bottom-0 translate-y-full z-[200] text-white`}
             >
                 {availableLabels.map((availableLabel) => {
                     if (availableLabel.trim() === '') return null;

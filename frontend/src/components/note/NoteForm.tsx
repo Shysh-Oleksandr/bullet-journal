@@ -24,7 +24,13 @@ import NoteLabelInput from './NoteLabelInput';
 import SaveButton from './SaveButton';
 import TextareaAutosize from 'react-textarea-autosize';
 
-const NoteForm = () => {
+interface NoteFormProps {
+    isShort?: boolean;
+    showFullAddForm?: boolean;
+    getAllNotes?: () => Promise<void>;
+}
+
+const NoteForm = ({ isShort, showFullAddForm, getAllNotes }: NoteFormProps) => {
     const [_id, setId] = useState<string>('');
     const [title, setTitle] = useState<string>('');
     const [startDate, setStartDate] = useState<number>(new Date().getTime());
@@ -61,6 +67,20 @@ const NoteForm = () => {
             setIsLoading(false);
         }
     }, []);
+
+    const resetState = () => {
+        setId('');
+        setTitle('');
+        setStartDate(new Date().getTime());
+        setEndDate(new Date().getTime());
+        setContent('');
+        setImage('');
+        setColor('#04a9c6');
+        setRating(1);
+        setType('Note');
+        setCategory('');
+        setEditorState(EditorState.createEmpty());
+    };
 
     const getNote = async (id: string) => {
         try {
@@ -133,7 +153,12 @@ const NoteForm = () => {
             });
 
             if (response.status === 201) {
-                setId(response.data.note._id);
+                if (isShort) {
+                    getAllNotes && getAllNotes();
+                    resetState();
+                } else {
+                    setId(response.data.note._id);
+                }
                 setSuccess(`Note ${isCreating ? 'added' : 'updated'}.`);
             } else {
                 setError('Unable to save note.');
@@ -177,27 +202,18 @@ const NoteForm = () => {
     }
 
     return (
-        <div className="padding-x mb-12">
-            <form className="px-10 pt-3 pb-6 bg-white rounded-sm shadow-xl mt-12">
-                <div className="flex-between">
-                    <TextareaAutosize
-                        maxRows={5}
-                        disabled={saving}
-                        placeholder="Title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="border-bottom font-medium py-4 text-3xl w-full resize-none overflow-hidden"
-                        required={true}
-                    />
-                    {/* <textarea
-                        disabled={saving}
-                        placeholder="Title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="border-bottom h-auto font-medium py-4 text-3xl w-full resize-none"
-                        required={true}
-                    /> */}
-                </div>
+        <div className={`${isShort ? '' : 'padding-x mb-12'} ${isShort && !showFullAddForm ? 'max-h-16 overflow-hidden mb-4' : ''}`}>
+            <form className={`bg-white rounded-sm shadow-xl ${isShort ? 'pb-4 pt-2 px-8' : 'pt-3 pb-6 mt-12 px-10'}`}>
+                <TextareaAutosize
+                    spellCheck={false}
+                    maxRows={5}
+                    disabled={saving}
+                    placeholder="Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className={`border-bottom font-medium w-full resize-none overflow-hidden ${isShort ? 'py-2 text-2xl' : 'py-4 text-3xl'}`}
+                    required={true}
+                />
                 <div className="flex-between border-bottom mb-6">
                     <div className="fl h-11">
                         <NoteDate date={startDate} isStartDate={true} setDate={setStartDate} />
@@ -252,9 +268,22 @@ const NoteForm = () => {
                     <Editor
                         placeholder="Write your note here..."
                         editorState={editorState}
-                        toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm"
+                        toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm z-10"
                         wrapperClassName="mt-8"
-                        editorClassName="h-auto min-h-[40vh] cursor-text border-cyan-100 transition-all border-2 rounded-sm border-solid focus-within:border-[3px] focus-within:border-cyan-200 px-3"
+                        editorClassName={`${
+                            isShort ? 'min-h-[10vh]' : 'min-h-[40vh]'
+                        } h-auto  cursor-text border-cyan-100 transition-all border-2 rounded-sm border-solid focus-within:border-[3px] focus-within:border-cyan-200 px-3`}
+                        toolbar={
+                            isShort
+                                ? {
+                                      options: ['inline', 'fontSize', 'textAlign', 'history', 'embedded', 'emoji', 'image'],
+                                      inline: { inDropdown: true },
+                                      textAlign: { inDropdown: true },
+                                      link: { inDropdown: true },
+                                      history: { inDropdown: true }
+                                  }
+                                : {}
+                        }
                         onEditorStateChange={(newState) => {
                             const newContent = draftToHtml(convertToRaw(newState.getCurrentContent()));
                             setEditorState(newState);
@@ -269,7 +298,7 @@ const NoteForm = () => {
                 </div>
                 <div>
                     <SaveButton
-                        className="bg-cyan-600 hover:bg-cyan-700 mt-4"
+                        className={`bg-cyan-600 hover:bg-cyan-700 ${isShort ? 'mt-2 py-2' : 'mt-4'}`}
                         onclick={(e) => {
                             e.preventDefault();
                             _id !== '' ? editNote() : createNote();
@@ -286,7 +315,12 @@ const NoteForm = () => {
             </form>
             <div className="text-left mt-4">
                 <h4 className="text-2xl mb-1">Preview</h4>
-                <NoteBody note={{ _id, title, startDate, endDate, content, image, color, rating, category, type, author: '' }} />
+                {isShort && (
+                    <div className="text-[#267491] text-xl">
+                        <h4>{new Date(startDate).toDateString()}</h4>
+                    </div>
+                )}
+                <NoteBody className={isShort ? 'note__body my-8' : ''} note={{ _id, title, startDate, endDate, content, image, color, rating, category, type, author: '' }} />
             </div>
             {_id !== '' && modal && <DeleteModal deleteNote={deleteNote} deleting={deleting} error={error} modal={modal} setModal={setModal} />}
             <Alert message={error} isError={true} />
