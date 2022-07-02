@@ -28,9 +28,10 @@ interface NoteFormProps {
     isShort?: boolean;
     showFullAddForm?: boolean;
     getAllNotes?: () => Promise<void>;
+    setShowFullAddForm?: (value: React.SetStateAction<boolean>) => void;
 }
 
-const NoteForm = ({ isShort, showFullAddForm, getAllNotes }: NoteFormProps) => {
+const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }: NoteFormProps) => {
     const [_id, setId] = useState<string>('');
     const [title, setTitle] = useState<string>('');
     const [startDate, setStartDate] = useState<number>(new Date().getTime());
@@ -202,8 +203,8 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes }: NoteFormProps) => {
     }
 
     return (
-        <div className={`${isShort ? '' : 'padding-x mb-12'} ${isShort && !showFullAddForm ? 'max-h-16 overflow-hidden mb-4' : ''}`}>
-            <form className={`bg-white rounded-sm shadow-xl ${isShort ? 'pb-4 pt-2 px-8' : 'pt-3 pb-6 mt-12 px-10'}`}>
+        <div className={`transition-all duration-500 ${isShort ? '' : 'padding-x mb-12'} ${isShort && !showFullAddForm ? 'max-h-16 overflow-hidden mb-4' : 'max-h-[100rem]'}`}>
+            <form onClick={() => setShowFullAddForm && setShowFullAddForm(true)} className={`bg-white rounded-sm shadow-xl ${isShort ? 'pb-4 pt-2 px-8' : 'pt-3 pb-6 mt-12 px-10'}`}>
                 <TextareaAutosize
                     spellCheck={false}
                     maxRows={5}

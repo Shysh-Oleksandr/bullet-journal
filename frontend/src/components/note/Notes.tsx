@@ -58,11 +58,11 @@ const Notes = () => {
                 onClick={() => setShowFullAddForm(!showFullAddForm)}
                 className={`${
                     showFullAddForm ? 'rotate-45 bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
-                }  text-white p-2 transition-all duration-300 text-xl rounded-full absolute top-7 left-1/2 -translate-x-1/2`}
+                }  text-white p-2 transition-all shadow-md duration-300 text-xl rounded-full absolute top-7 left-1/2 -translate-x-1/2`}
             >
                 <BsPlusLg />
             </button>
-            <NoteForm showFullAddForm={showFullAddForm} isShort={true} getAllNotes={getAllNotes} />{' '}
+            <NoteForm showFullAddForm={showFullAddForm} setShowFullAddForm={setShowFullAddForm} isShort={true} getAllNotes={getAllNotes} />{' '}
             {notes.map((note, index) => {
                 return <NotePreview note={note} key={note._id} previousNote={index === 0 ? null : notes[index - 1]} />;
             })}
