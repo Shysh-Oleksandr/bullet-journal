@@ -217,7 +217,11 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     }
 
     return (
-        <div className={`transition-all duration-500 ${isShort ? '' : 'padding-x pb-12'} ${isShort && !showFullAddForm ? 'max-h-16 overflow-hidden mb-4' : 'max-h-[300rem]'}`}>
+        <div
+            className={`transition-all duration-500 ${isShort ? '' : `${user.isSidebarShown ? 'small-padding-x' : 'padding-x'} pb-12`} ${
+                isShort && !showFullAddForm ? 'max-h-16 overflow-hidden mb-4' : 'max-h-[300rem]'
+            }`}
+        >
             <form onClick={() => setShowFullAddForm && setShowFullAddForm(true)} className={`bg-white rounded-sm shadow-xl ${isShort ? 'pb-4 pt-2 px-8' : 'pt-3 pb-6 mt-12 px-10'}`}>
                 <TextareaAutosize
                     spellCheck={false}

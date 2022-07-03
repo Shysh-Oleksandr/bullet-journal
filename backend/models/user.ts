@@ -7,7 +7,8 @@ const UserSchema: Schema = new Schema(
         uid: { type: String, unique: true },
         name: { type: String },
         customNoteTypes: { type: String },
-        customNoteCategories: { type: String }
+        customNoteCategories: { type: String },
+        isSidebarShown: { type: Boolean }
     },
     {
         timestamps: true

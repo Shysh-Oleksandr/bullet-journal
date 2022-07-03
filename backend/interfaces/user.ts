@@ -6,4 +6,5 @@ export default interface IUser extends Document {
     name: string;
     customNoteTypes?: string;
     customNoteCategories?: string;
+    isSidebarShown?: string;
 }

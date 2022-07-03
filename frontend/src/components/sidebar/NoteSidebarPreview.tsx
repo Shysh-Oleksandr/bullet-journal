@@ -1,7 +1,7 @@
 import React from 'react';
 import { INITIAL_NOTE_ID } from '../../utils/functions';
 import INote from './../../interfaces/note';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import NoteInfo from './../note/NoteInfo';
 
 interface NoteSidebarPreviewProps {
@@ -11,11 +11,15 @@ interface NoteSidebarPreviewProps {
 const NoteSidebarPreview = ({ note }: NoteSidebarPreviewProps) => {
     const isInitialNote: boolean = note._id === INITIAL_NOTE_ID;
     const navigate = useNavigate();
+    const params = useParams();
+    const currentNoteOpenedId = params.noteID;
 
     return (
         <div
             onClick={() => !isInitialNote && navigate(`/edit/${note._id}`)}
-            className={`py-2 px-4 bg-cyan-800 my-[2px] transition-all duration-200 hover:bg-cyan-700 text-left w-full ${isInitialNote ? '' : 'cursor-pointer'}`}
+            className={`py-2 px-4 ${currentNoteOpenedId === note._id ? '!bg-cyan-700' : 'bg-cyan-800'} my-[2px] transition-all duration-200 hover:bg-cyan-900 text-left w-full ${
+                isInitialNote ? '' : 'cursor-pointer'
+            }`}
         >
             <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis">{note.title}</h4>
             <div className="flex-between">

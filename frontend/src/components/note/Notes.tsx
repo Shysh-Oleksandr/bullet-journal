@@ -10,13 +10,14 @@ import NotePreview from './NotePreview';
 const Notes = () => {
     const { notes, loading, error } = useAppSelector((store) => store.journal);
     const [showFullAddForm, setShowFullAddForm] = useState<boolean>(false);
+    const { user } = useAppSelector((store) => store.user);
 
     if (loading) {
         return <Loading scaleSize={2} className="mt-20" />;
     }
 
     return (
-        <div className="notes padding-x pt-12 relative">
+        <div className={`notes ${user.isSidebarShown ? 'small-padding-x' : 'padding-x'} transition-all duration-500 pt-12 relative`}>
             <h5 className="text-2xl text-left mb-2 text-slate-500 font-semibold">Add a quick note</h5>
             <button
                 onClick={() => setShowFullAddForm(!showFullAddForm)}

@@ -10,6 +10,7 @@ import IUser from '../../interfaces/user';
 import { defaultNoteTypes, SEPARATOR } from '../../utils/data';
 import { getCustomLabels } from '../../utils/functions';
 import { useAppDispatch } from './../../app/hooks';
+import { updateUserData } from './../../features/user/userSlice';
 
 interface NoteLabelInputProps {
     setLabel: React.Dispatch<React.SetStateAction<string>>;
@@ -22,6 +23,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
     const labelInputRef = useRef<HTMLInputElement>(null);
 
     const { user } = useAppSelector((store) => store.user);
+    // const { sidebarShown } = useAppSelector((store) => store.journal);
     const [userCustomNoteLabels, setUserCustomNoteLabels] = useState<string>(isCustomTypes ? user.customNoteTypes || '' : user.customNoteCategories || '');
     const [availableLabels, setAvailableLabels] = useState<string[]>(isCustomTypes ? [...defaultNoteTypes, ...getCustomLabels(userCustomNoteLabels)] : getCustomLabels(userCustomNoteLabels));
     const [removedLabels, setRemovedLabels] = useState(label.split(SEPARATOR).filter((category) => !availableLabels.includes(category) && category !== ''));
@@ -67,46 +69,21 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
         }
     };
 
-    const updateUserData = async (newCustomNoteLabels: string, isAdding: boolean, changedLabel: string) => {
-        if (isAdding && label.trim() === '') {
-            dispatch(setError(`Please enter ${labelName} name.`));
-            dispatch(setSuccess(''));
-            return null;
-        }
-
-        dispatch(setError(''));
-        dispatch(setSuccess(''));
-
+    const updateUserCustomLabels = (newCustomNoteLabels: string, isAdding: boolean, changedLabel: string) => {
         const newUserData = isCustomTypes
             ? {
-                  uid: user.uid,
-                  name: user.name,
                   customNoteTypes: newCustomNoteLabels
               }
             : {
-                  uid: user.uid,
-                  name: user.name,
                   customNoteCategories: newCustomNoteLabels
               };
+        console.log('before disp');
+        dispatch(updateUserData({ oldUser: user, newUserData }));
+        console.log('after dispF');
 
-        try {
-            const response = await axios({
-                method: 'PATCH',
-                url: `${config.server.url}/users/update/${user._id}`,
-                data: newUserData
-            });
-
-            if (response.status === 201) {
-                setUserCustomNoteLabels(newCustomNoteLabels);
-
-                setAvailableLabels(isCustomTypes ? [...defaultNoteTypes, ...removedLabels, ...getCustomLabels(newCustomNoteLabels)] : [...getCustomLabels(newCustomNoteLabels), ...removedLabels]);
-                dispatch(setSuccess(isAdding ? `New ${labelName} "${changedLabel}" added.` : `The ${labelName} "${changedLabel}" has been removed.`));
-            } else {
-                dispatch(setError(`Unable to ${isAdding ? 'add' : 'delete'} note ${labelName}.`));
-            }
-        } catch (error: any) {
-            dispatch(setError(error.message));
-        }
+        setUserCustomNoteLabels(newCustomNoteLabels);
+        setAvailableLabels(isCustomTypes ? [...defaultNoteTypes, ...removedLabels, ...getCustomLabels(newCustomNoteLabels)] : [...getCustomLabels(newCustomNoteLabels), ...removedLabels]);
+        dispatch(setSuccess(isAdding ? `New ${labelName} "${changedLabel}" added.` : `The ${labelName} "${changedLabel}" has been deleted.`));
     };
 
     const addNewLabel = () => {
@@ -124,7 +101,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
             });
             const newCustomNoteLabels = `${userCustomNoteLabels || ''}${SEPARATOR}${newLabel}`;
 
-            updateUserData(newCustomNoteLabels, true, newLabel);
+            updateUserCustomLabels(newCustomNoteLabels, true, newLabel);
         }
     };
 
@@ -133,7 +110,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
         !isCustomTypes && label.split(SEPARATOR).includes(labelToDelete) && setLabel((prevLabel) => prevLabel.replace(`${SEPARATOR}${labelToDelete}`, ''));
         const newCustomNoteLabels = userCustomNoteLabels.replace(`${SEPARATOR}${labelToDelete}`, '');
 
-        updateUserData(newCustomNoteLabels, false, labelToDelete);
+        updateUserCustomLabels(newCustomNoteLabels, false, labelToDelete);
     };
 
     const chooseLabel = (chosenLabel: string) => {

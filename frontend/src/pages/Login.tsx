@@ -71,8 +71,8 @@ const LoginPage = () => {
     return (
         <CenterPiece>
             <div className="flex flex-col items-center justify-center">
-                <div className="bg-white px-12 py-8 lg:w-[33vw] md:w-[50vw] sm:w-[65vw] w-[80vw] rounded-lg shadow-xl">
-                    <div className="text-5xl font-semibold text-center my-4">{isLogin ? 'Login' : 'Sign Up'}</div>
+                <div className="bg-white md:px-12 sm:px-8 px-6 py-8 lg:w-[40vw] md:w-[55vw] sm:w-[65vw] w-[90vw] rounded-lg shadow-xl">
+                    <div className="sm:text-5xl text-4xl font-semibold text-center my-4">{isLogin ? 'Login' : 'Sign Up'}</div>
                     <div className="text-center">
                         <InfoMessage message={error} isError={true} />
                         <button
@@ -83,7 +83,7 @@ const LoginPage = () => {
                             <span className="mr-4">
                                 <BsGoogle />
                             </span>
-                            <span>Sign {isLogin ? 'In' : 'Up'} with Google</span>
+                            <span className="sm:text-2xl text-xl">Sign {isLogin ? 'In' : 'Up'} with Google</span>
                         </button>
                         {authenticating && <Loading />}
                     </div>

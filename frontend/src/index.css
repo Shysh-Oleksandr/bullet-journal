@@ -183,6 +183,10 @@ h6 {
     @apply px-[15vw];
 }
 
+.small-padding-x {
+    @apply px-[5vw];
+}
+
 /* Alert */
 .alert-shown {
     opacity: 1;
@@ -203,4 +207,8 @@ h6 {
 
 .public-DraftStyleDefault-block {
     margin: 0.5rem 0;
+}
+
+.new-note:hover .plus {
+    transform: rotateZ(90deg);
 }

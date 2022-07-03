@@ -6,6 +6,7 @@ export default interface IUser {
     updatedAt: string;
     customNoteTypes?: string;
     customNoteCategories?: string;
+    isSidebarShown?: boolean;
 }
 
 export const DEFAULT_USER: IUser = {

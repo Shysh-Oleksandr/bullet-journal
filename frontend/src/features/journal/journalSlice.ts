@@ -10,6 +10,7 @@ export interface IJournalState {
     loading: boolean;
     error: string;
     success: string;
+    // sidebarShown: boolean;
 }
 
 const initialState: IJournalState = {
@@ -17,6 +18,7 @@ const initialState: IJournalState = {
     loading: true,
     error: '',
     success: ''
+    // sidebarShown: true
 };
 
 export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', async (user: IUser) => {
@@ -60,6 +62,9 @@ export const journalSlice = createSlice({
         setSuccess: (state, { payload }: PayloadAction<string>) => {
             state.success = payload;
         }
+        // setSidebar: (state, { payload }: PayloadAction<boolean>) => {
+        //     state.sidebarShown = payload;
+        // }
     },
     extraReducers: (builder) => {
         // Add reducers for additional action types here, and handle loading state as needed
