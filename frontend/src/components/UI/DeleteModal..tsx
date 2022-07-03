@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useAppSelector } from '../../app/hooks';
 import InfoMessage from './InfoMessage';
 import Loading from './Loading';
 
@@ -6,12 +7,12 @@ type Props = {
     setModal: React.Dispatch<React.SetStateAction<boolean>>;
     modal: boolean;
     deleting: boolean;
-    error: string;
     deleteNote: () => Promise<void>;
 };
 
-const DeleteModal = ({ setModal, modal, deleting, error, deleteNote }: Props) => {
+const DeleteModal = ({ setModal, modal, deleting, deleteNote }: Props) => {
     const ref = useRef() as React.MutableRefObject<HTMLDivElement>;
+    const { error } = useAppSelector((store) => store.journal);
 
     useEffect(() => {
         const checkIfClickedOutside = (e: any) => {

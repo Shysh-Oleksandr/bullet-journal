@@ -10,28 +10,28 @@ import { IoIosColorPalette } from 'react-icons/io';
 import { MdDelete } from 'react-icons/md';
 import { RiSave3Fill } from 'react-icons/ri';
 import { useNavigate, useParams } from 'react-router-dom';
+import TextareaAutosize from 'react-textarea-autosize';
 import { useAppSelector } from '../../app/hooks';
 import config from '../../config/config';
 import logging from '../../config/logging';
+import { fetchAllNotes, setError, setSuccess } from '../../features/journal/journalSlice';
 import INote from '../../interfaces/note';
-import Alert from '../UI/Alert';
 import DeleteModal from '../UI/DeleteModal.';
 import Loading from '../UI/Loading';
+import { useAppDispatch } from './../../app/hooks';
 import InputLabel from './InputLabel';
 import NoteBody from './NoteBody';
 import NoteDate from './NoteDate';
 import NoteLabelInput from './NoteLabelInput';
 import SaveButton from './SaveButton';
-import TextareaAutosize from 'react-textarea-autosize';
 
 interface NoteFormProps {
     isShort?: boolean;
     showFullAddForm?: boolean;
-    getAllNotes?: () => Promise<void>;
     setShowFullAddForm?: (value: React.SetStateAction<boolean>) => void;
 }
 
-const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }: NoteFormProps) => {
+const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProps) => {
     const [_id, setId] = useState<string>('');
     const [title, setTitle] = useState<string>('');
     const [startDate, setStartDate] = useState<number>(new Date().getTime());
@@ -48,26 +48,11 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
     const [saving, setSaving] = useState<boolean>(false);
     const [deleting, setDeleting] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [success, setSuccess] = useState<string>('');
-    const [error, setError] = useState<string>('');
 
     const { user } = useAppSelector((store) => store.user);
     const params = useParams();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        let noteID = params.noteID;
-
-        // If it's edit page, get note by id.
-        if (noteID) {
-            setId(noteID);
-            getNote(noteID);
-        }
-        // Otherwise, have the blank form.
-        else {
-            setIsLoading(false);
-        }
-    }, []);
+    const dispatch = useAppDispatch();
 
     const resetState = () => {
         setId('');
@@ -81,6 +66,32 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
         setType('Note');
         setCategory('');
         setEditorState(EditorState.createEmpty());
+    };
+
+    useEffect(() => {
+        let noteID = params.noteID;
+
+        // If it's edit page, get note by id.
+        if (noteID) {
+            setId(noteID);
+            getNote(noteID);
+        }
+        // Otherwise, have the blank form.
+        else {
+            resetState();
+            setIsLoading(false);
+        }
+    }, [params]);
+
+    const onEditorStateChange = (newState: EditorState) => {
+        const newContent = draftToHtml(convertToRaw(newState.getCurrentContent()));
+        setEditorState(newState);
+        setContent(newContent);
+
+        const regex = /(?<=src=")(.*)(?=" alt)/g;
+        const images = newContent.match(regex);
+
+        images && setImage(images[0]);
     };
 
     const getNote = async (id: string) => {
@@ -114,11 +125,11 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
                     setEditorState(_editorState);
                 }
             } else {
-                setError('Unable to retrieve note ' + id);
+                dispatch(setError('Unable to retrieve note ' + id));
                 setId('');
             }
         } catch (error: any) {
-            setError(error.message);
+            dispatch(setError(error.message));
         } finally {
             setIsLoading(false);
         }
@@ -126,16 +137,16 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
 
     const saveNote = async (method: string, url: string, isCreating: boolean) => {
         if (title === '' || type === '' || color === '' || !startDate || !endDate) {
-            setError('Please fill out all required fields.');
-            setSuccess('');
+            dispatch(setError('Please fill out all required fields.'));
+            dispatch(setSuccess(''));
             return null;
         } else if (startDate > endDate) {
-            setError('End date cannot be earlier than start date.');
+            dispatch(setError('End date cannot be earlier than start date.'));
             return null;
         }
 
-        setError('');
-        setSuccess('');
+        dispatch(setError(''));
+        dispatch(setSuccess(''));
         setSaving(true);
 
         try {
@@ -158,17 +169,17 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
 
             if (response.status === 201) {
                 if (isShort) {
-                    getAllNotes && getAllNotes();
+                    dispatch(fetchAllNotes(user));
                     resetState();
                 } else {
                     setId(response.data.note._id);
                 }
-                setSuccess(`Note ${isCreating ? 'added' : 'updated'}.`);
+                dispatch(setSuccess(`Note ${isCreating ? 'added' : 'updated'}.`));
             } else {
-                setError('Unable to save note.');
+                dispatch(setError('Unable to save note.'));
             }
         } catch (error: any) {
-            setError(error.message);
+            dispatch(setError(error.message));
         } finally {
             setSaving(false);
         }
@@ -188,16 +199,16 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
             if (response.status === 200) {
                 setTimeout(() => {
                     navigate('/');
+                    dispatch(setSuccess('Note has been deleted.'));
+                    setDeleting(false);
                 }, 500);
             } else {
-                setError('Unable to delete note ' + _id);
+                dispatch(setError('Unable to delete note.'));
+                setDeleting(false);
             }
         } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setTimeout(() => {
-                setDeleting(false);
-            }, 500);
+            dispatch(setError(error.message));
+            setDeleting(false);
         }
     };
 
@@ -260,11 +271,11 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
                 </div>
                 <div className="flex-between border-bottom my-3">
                     <div className="relative mr-4">
-                        <NoteLabelInput setSuccess={setSuccess} setError={setError} label={type} setLabel={setType} isCustomTypes={true} />
+                        <NoteLabelInput label={type} setLabel={setType} isCustomTypes={true} />
                         <InputLabel htmlFor="noteTypeInput" text="Type" />
                     </div>
                     <div className="relative basis-3/4">
-                        <NoteLabelInput setSuccess={setSuccess} setError={setError} label={category} setLabel={setCategory} isCustomTypes={false} />
+                        <NoteLabelInput label={category} setLabel={setCategory} isCustomTypes={false} />
                         <InputLabel htmlFor="noteCategoryInput" text="Categories" />
                     </div>
                 </div>
@@ -288,16 +299,7 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
                                   }
                                 : {}
                         }
-                        onEditorStateChange={(newState) => {
-                            const newContent = draftToHtml(convertToRaw(newState.getCurrentContent()));
-                            setEditorState(newState);
-                            setContent(newContent);
-
-                            const regex = /(?<=src=")(.*)(?=" alt)/g;
-                            const images = newContent.match(regex);
-
-                            images && setImage(images[0]);
-                        }}
+                        onEditorStateChange={onEditorStateChange}
                     />
                 </div>
                 <div>
@@ -326,9 +328,7 @@ const NoteForm = ({ isShort, showFullAddForm, getAllNotes, setShowFullAddForm }:
                 )}
                 <NoteBody className={isShort ? 'note__body my-8' : ''} note={{ _id, title, startDate, endDate, content, image, color, rating, category, type, author: '' }} />
             </div>
-            {_id !== '' && modal && <DeleteModal deleteNote={deleteNote} deleting={deleting} error={error} modal={modal} setModal={setModal} />}
-            <Alert message={error} isError={true} />
-            <Alert message={success} isError={false} />
+            {_id !== '' && modal && <DeleteModal deleteNote={deleteNote} deleting={deleting} modal={modal} setModal={setModal} />}
         </div>
     );
 };

@@ -1,66 +1,17 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { BsPlusLg } from 'react-icons/bs';
 import { useAppSelector } from '../../app/hooks';
 import '../../styles/note.scss';
-import NotePreview from './NotePreview';
-import { useAppDispatch } from '../../app/hooks';
-import Loading from '../UI/Loading';
 import InfoMessage from '../UI/InfoMessage';
-import config from '../../config/config';
-import INote from '../../interfaces/note';
-import { getInitialNote } from '../../utils/functions';
-import { setNotes } from '../../features/journal/journalSlice';
-import logging from '../../config/logging';
+import Loading from '../UI/Loading';
 import NoteForm from './NoteForm';
-import { BsPlusLg } from 'react-icons/bs';
-import { dateDiffInDays } from './../../utils/functions';
+import NotePreview from './NotePreview';
 
 const Notes = () => {
-    const { notes } = useAppSelector((store) => store.journal);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string>('');
+    const { notes, loading, error } = useAppSelector((store) => store.journal);
     const [showFullAddForm, setShowFullAddForm] = useState<boolean>(false);
-    const dispatch = useAppDispatch();
 
-    const { user } = useAppSelector((store) => store.user);
-
-    useEffect(() => {
-        getAllNotes();
-    }, []);
-
-    const getAllNotes = async () => {
-        try {
-            const response = await axios({
-                method: 'GET',
-                url: `${config.server.url}/notes/${user._id}`
-            });
-
-            if (response.status === 200 || response.status === 304) {
-                let notes = response.data.notes as INote[];
-                const endNotes: INote[] = notes
-                    .filter((note) => dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 >= 2)
-                    .map((note) => {
-                        const copyNote = JSON.parse(JSON.stringify(note));
-                        copyNote.isEndNote = true;
-                        const startDate = copyNote.startDate;
-                        copyNote.startDate = copyNote.endDate;
-                        copyNote.endDate = startDate;
-                        return copyNote;
-                    });
-                notes = [...notes, ...endNotes].filter((note) => note.startDate <= new Date().getTime());
-                notes.push(getInitialNote(user));
-                notes.sort((x, y) => y.startDate - x.startDate);
-                dispatch(setNotes(notes));
-            }
-        } catch (error) {
-            logging.error(error);
-            setError('Unable to retreive notes.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    if (isLoading) {
+    if (loading) {
         return <Loading scaleSize={2} className="mt-20" />;
     }
 
@@ -75,7 +26,7 @@ const Notes = () => {
             >
                 <BsPlusLg />
             </button>
-            <NoteForm showFullAddForm={showFullAddForm} setShowFullAddForm={setShowFullAddForm} isShort={true} getAllNotes={getAllNotes} />{' '}
+            <NoteForm showFullAddForm={showFullAddForm} setShowFullAddForm={setShowFullAddForm} isShort={true} />
             {notes.map((note, index) => {
                 return <NotePreview note={note} key={`${note._id}${note.isEndNote && 'endNote'}`} previousNote={index === 0 ? null : notes[index - 1]} />;
             })}

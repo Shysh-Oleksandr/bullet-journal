@@ -2,7 +2,6 @@ import IRoute from '../interfaces/route';
 import LoginPage from '../pages/Login';
 import EditPage from '../pages/EditPage';
 import HomePage from '../pages/HomePage';
-import NoteForm from '../components/note/NoteForm';
 
 const authRoutes: IRoute[] = [
     {
@@ -23,7 +22,7 @@ const noteRoutes: IRoute[] = [
         path: '/edit',
         name: 'Edit',
         auth: true,
-        component: NoteForm
+        component: EditPage
     },
     {
         path: '/edit/:noteID',

@@ -4,6 +4,7 @@ import { AiOutlineArrowRight } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
 import { useAppSelector } from '../../app/hooks';
 import config from '../../config/config';
+import { setError, setSuccess } from '../../features/journal/journalSlice';
 import { updateUser } from '../../features/user/userSlice';
 import IUser from '../../interfaces/user';
 import { defaultNoteTypes, SEPARATOR } from '../../utils/data';
@@ -14,11 +15,9 @@ interface NoteLabelInputProps {
     setLabel: React.Dispatch<React.SetStateAction<string>>;
     label: string;
     isCustomTypes: boolean;
-    setError: React.Dispatch<React.SetStateAction<string>>;
-    setSuccess: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const NoteLabelInput = ({ label, setLabel, isCustomTypes, setError, setSuccess }: NoteLabelInputProps) => {
+const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps) => {
     const [focused, setFocused] = useState(false);
     const labelInputRef = useRef<HTMLInputElement>(null);
 
@@ -49,10 +48,10 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setError, setSuccess }
                 let user = response.data.user as IUser;
                 dispatch(updateUser(user));
             } else {
-                setError('Unable to retrieve user ' + id);
+                dispatch(setError('Unable to retrieve user ' + id));
             }
         } catch (error: any) {
-            setError(error.message);
+            dispatch(setError(error.message));
         }
     };
 
@@ -70,13 +69,13 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setError, setSuccess }
 
     const updateUserData = async (newCustomNoteLabels: string, isAdding: boolean, changedLabel: string) => {
         if (isAdding && label.trim() === '') {
-            setError(`Please enter ${labelName} name.`);
-            setSuccess('');
+            dispatch(setError(`Please enter ${labelName} name.`));
+            dispatch(setSuccess(''));
             return null;
         }
 
-        setError('');
-        setSuccess('');
+        dispatch(setError(''));
+        dispatch(setSuccess(''));
 
         const newUserData = isCustomTypes
             ? {
@@ -101,12 +100,12 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setError, setSuccess }
                 setUserCustomNoteLabels(newCustomNoteLabels);
 
                 setAvailableLabels(isCustomTypes ? [...defaultNoteTypes, ...removedLabels, ...getCustomLabels(newCustomNoteLabels)] : [...getCustomLabels(newCustomNoteLabels), ...removedLabels]);
-                setSuccess(isAdding ? `New ${labelName} "${changedLabel}" added.` : `The ${labelName} "${changedLabel}" has been removed.`);
+                dispatch(setSuccess(isAdding ? `New ${labelName} "${changedLabel}" added.` : `The ${labelName} "${changedLabel}" has been removed.`));
             } else {
-                setError(`Unable to ${isAdding ? 'add' : 'delete'} note ${labelName}.`);
+                dispatch(setError(`Unable to ${isAdding ? 'add' : 'delete'} note ${labelName}.`));
             }
         } catch (error: any) {
-            setError(error.message);
+            dispatch(setError(error.message));
         }
     };
 
@@ -115,9 +114,9 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setError, setSuccess }
         const isNew: boolean = !availableLabels.includes(newLabel);
 
         if (newLabel.trim() === '') {
-            setError(`Note ${labelName} cannot be empty.`);
+            dispatch(setError(`Note ${labelName} cannot be empty.`));
         } else if (!isNew) {
-            setError(`Note ${labelName} "${newLabel}" already exist.`);
+            dispatch(setError(`Note ${labelName} "${newLabel}" already exist.`));
         } else {
             labelInputRef.current?.blur();
             setLabel((prevLabel) => {
