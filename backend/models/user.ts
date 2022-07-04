@@ -8,7 +8,8 @@ const UserSchema: Schema = new Schema(
         name: { type: String },
         customNoteTypes: { type: String },
         customNoteCategories: { type: String },
-        isSidebarShown: { type: Boolean }
+        isSidebarShown: { type: Boolean },
+        isFilterBarShown: { type: Boolean }
     },
     {
         timestamps: true

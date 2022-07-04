@@ -62,7 +62,7 @@ function App() {
 
     return (
         <Router>
-            <div className="app text-center w-full h-full bg-slate-300">
+            <div className="app text-center w-full h-full">
                 <Routes>
                     {routes.map((route, index) => {
                         if (route.auth) {

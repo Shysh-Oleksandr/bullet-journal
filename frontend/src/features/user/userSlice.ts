@@ -28,6 +28,7 @@ export const updateUserData = createAsyncThunk('user/updateUserStatus', async ({
 
     if (response.status === 201) {
         const updatedUser = response.data.user as IUser;
+
         return updatedUser;
     } else {
         return oldUser;

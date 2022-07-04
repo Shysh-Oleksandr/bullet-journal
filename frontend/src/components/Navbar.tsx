@@ -16,7 +16,7 @@ const Navbar = () => {
 
     return (
         <div
-            className={`flex sticky top-0 left-0 right-0 z-50 shadow-lg items-center transition-all duration-500 justify-between ${
+            className={`flex sticky top-0 left-0 right-0 z-[999] shadow-lg items-center transition-all duration-500 justify-between ${
                 user.isSidebarShown ? 'small-padding-x' : 'padding-x'
             } py-4 text-white bg-cyan-700 h-[65px]`}
         >

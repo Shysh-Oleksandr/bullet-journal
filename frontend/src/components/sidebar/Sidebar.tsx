@@ -5,7 +5,7 @@ import { BsPlusLg } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import { fetchAllNotes, setError } from '../../features/journal/journalSlice';
-import useDebounce from '../../hooks';
+import { useDebounce } from '../../hooks';
 import { getInitialNote } from '../../utils/functions';
 import Loading from '../UI/Loading';
 import { useAppDispatch } from './../../app/hooks';
@@ -18,7 +18,6 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ sidebarRef }: SidebarProps) => {
-    const { notes } = useAppSelector((store) => store.journal);
     const { user } = useAppSelector((store) => store.user);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredNotes, setFilteredNotes] = useState<INote[]>([]);
@@ -38,7 +37,6 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
 
     const filterNotes = async (q: string) => {
         setIsSearching(true);
-        console.log('filter');
 
         try {
             const response = await axios({
@@ -66,7 +64,9 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
                 user.isSidebarShown ? 'translate-x-0' : '-translate-x-full'
             } w-[24rem] transition-all ease-in-out bg-cyan-900 overflow-x-hidden text-white text-left text-xl`}
         >
-            <h2 className="text-3xl h-[65px] font-semibold px-4 flex items-center break-all bg-cyan-900">{user.name.split(' ')[0]}'s Journal</h2>
+            <Link to={'/'} className="text-3xl h-[65px] font-semibold px-4 flex items-center break-all bg-cyan-900 hover:text-cyan-100 transition-colors">
+                {user.name.split(' ')[0]}'s Journal
+            </Link>
             <div className="relative bg-cyan-800">
                 <input
                     type="text"

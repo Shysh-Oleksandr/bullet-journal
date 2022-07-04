@@ -35,7 +35,7 @@ aside {
 html,
 body,
 #root {
-    @apply bg-slate-300;
+    background-color: #d4e0f1;
     font-family: 'Montserrat', sans-serif;
     height: 100%;
     width: 100%;
@@ -211,4 +211,8 @@ h6 {
 
 .new-note:hover .plus {
     transform: rotateZ(90deg);
+}
+
+.filter-option:hover .filter-arrow {
+    color: #fff;
 }

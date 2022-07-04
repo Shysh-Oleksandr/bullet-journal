@@ -7,18 +7,18 @@ import { dateDiffInDays, getInitialNote } from './../../utils/functions';
 
 export interface IJournalState {
     notes: INote[];
+    filteredNotes: INote[];
     loading: boolean;
     error: string;
     success: string;
-    // sidebarShown: boolean;
 }
 
 const initialState: IJournalState = {
     notes: [],
+    filteredNotes: [],
     loading: true,
     error: '',
     success: ''
-    // sidebarShown: true
 };
 
 export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', async (user: IUser) => {
@@ -47,6 +47,20 @@ export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', asy
         return [];
     }
 });
+
+// export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async (user: IUser) => {
+//     const response = await axios({
+//         method: 'GET',
+//         url: `${config.server.url}/notes/query/${user._id}?q=${q}`
+//     });
+
+//     if (response.status === 200 || response.status === 304) {
+//         let notes = response.data.notes as INote[];
+//         q === '' && notes.push(getInitialNote(user));
+//         notes.sort((x, y) => y.startDate - x.startDate);
+//         return notes;
+//     }
+// };
 
 export const journalSlice = createSlice({
     name: 'journal',

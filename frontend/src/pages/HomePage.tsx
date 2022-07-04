@@ -1,8 +1,8 @@
 import React, { MutableRefObject, useRef } from 'react';
-import Notes from '../components/note/Notes';
-import Navbar from './../components/Navbar';
-import Sidebar from '../components/sidebar/Sidebar';
 import { useAppSelector } from '../app/hooks';
+import Notes from '../components/note/Notes';
+import Sidebar from '../components/sidebar/Sidebar';
+import Navbar from './../components/Navbar';
 
 const HomePage = () => {
     const sidebarRef = useRef() as MutableRefObject<HTMLDivElement>;

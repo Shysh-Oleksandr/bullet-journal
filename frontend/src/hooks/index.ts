@@ -1,17 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 
-export default function useDebounce(value: any, delay: number) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
+export function useDebounce(value: any, delay: number) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
 
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value]);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value]);
 
-  return debouncedValue;
+    return debouncedValue;
+}
+
+export function useWindowSize() {
+    const [size, setSize] = useState([0, 0]);
+    useLayoutEffect(() => {
+        function updateSize() {
+            setSize([window.innerWidth, window.innerHeight]);
+        }
+        window.addEventListener('resize', updateSize);
+        updateSize();
+        return () => window.removeEventListener('resize', updateSize);
+    }, []);
+    return size;
 }
