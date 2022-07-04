@@ -216,3 +216,7 @@ h6 {
 .filter-option:hover .filter-arrow {
     color: #fff;
 }
+
+.filter-search-input:hover + .filter-search-delete {
+    @apply !text-white;
+}

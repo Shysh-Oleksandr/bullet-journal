@@ -48,19 +48,26 @@ export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', asy
     }
 });
 
-// export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async (user: IUser) => {
-//     const response = await axios({
-//         method: 'GET',
-//         url: `${config.server.url}/notes/query/${user._id}?q=${q}`
-//     });
+export interface IFilterNotes {
+    user: IUser;
+    title: string;
+}
 
-//     if (response.status === 200 || response.status === 304) {
-//         let notes = response.data.notes as INote[];
-//         q === '' && notes.push(getInitialNote(user));
-//         notes.sort((x, y) => y.startDate - x.startDate);
-//         return notes;
-//     }
-// };
+export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async ({ user, title }: IFilterNotes) => {
+    const response = await axios({
+        method: 'GET',
+        url: `${config.server.url}/notes/query/${user._id}?title=${title}`
+    });
+
+    if (response.status === 200 || response.status === 304) {
+        let notes = response.data.notes as INote[];
+        title === '' && notes.push(getInitialNote(user));
+        notes.sort((x, y) => y.startDate - x.startDate);
+        return notes;
+    } else {
+        return [];
+    }
+});
 
 export const journalSlice = createSlice({
     name: 'journal',
@@ -81,7 +88,7 @@ export const journalSlice = createSlice({
         // }
     },
     extraReducers: (builder) => {
-        // Add reducers for additional action types here, and handle loading state as needed
+        // Fetch all notes
         builder.addCase(fetchAllNotes.pending, (state, action) => {
             state.loading = true;
         });
@@ -90,6 +97,18 @@ export const journalSlice = createSlice({
             state.loading = false;
         });
         builder.addCase(fetchAllNotes.rejected, (state, action) => {
+            state.loading = false;
+            state.error = 'Unable to retreive notes.';
+        });
+        // Filter notes
+        builder.addCase(filterNotes.pending, (state, action) => {
+            state.loading = true;
+        });
+        builder.addCase(filterNotes.fulfilled, (state, action) => {
+            state.notes = action.payload; // filteredNotes
+            state.loading = false;
+        });
+        builder.addCase(filterNotes.rejected, (state, action) => {
             state.loading = false;
             state.error = 'Unable to retreive notes.';
         });

@@ -1,8 +1,8 @@
 import { IconType } from 'react-icons';
-import { MdSort } from 'react-icons/md';
+import { AiOutlineStar } from 'react-icons/ai';
 import { BiCalendarAlt, BiCategory } from 'react-icons/bi';
 import { IoIosJournal } from 'react-icons/io';
-import { AiOutlineStar, AiOutlineSearch } from 'react-icons/ai';
+import { MdSort } from 'react-icons/md';
 
 export const defaultNoteTypes: string[] = ['Note', 'Event', 'Diary', 'Habit'];
 
@@ -39,10 +39,10 @@ export const filterOptions: IFilterOption[] = [
         name: 'Importance',
         icon: AiOutlineStar,
         isDropdown: true
-    },
-    {
-        name: 'Search',
-        icon: AiOutlineSearch,
-        isDropdown: false
     }
+    // {
+    //     name: 'Search',
+    //     icon: AiOutlineSearch,
+    //     isDropdown: false
+    // }
 ];

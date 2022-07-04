@@ -35,18 +35,18 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
         filterNotes(debouncedSearchTerm);
     }, [debouncedSearchTerm]);
 
-    const filterNotes = async (q: string) => {
+    const filterNotes = async (title: string) => {
         setIsSearching(true);
 
         try {
             const response = await axios({
                 method: 'GET',
-                url: `${config.server.url}/notes/query/${user._id}?q=${q}`
+                url: `${config.server.url}/notes/query/${user._id}?title=${title}`
             });
 
             if (response.status === 200 || response.status === 304) {
                 let notes = response.data.notes as INote[];
-                q === '' && notes.push(getInitialNote(user));
+                title === '' && notes.push(getInitialNote(user));
                 notes.sort((x, y) => y.startDate - x.startDate);
                 setFilteredNotes(notes);
             }

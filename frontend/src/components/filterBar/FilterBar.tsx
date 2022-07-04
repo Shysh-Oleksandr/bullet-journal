@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAppSelector } from '../../app/hooks';
-import { filterOptions } from './../../utils/data';
-import FilterOption from './FilterOption';
 import { useAppDispatch } from './../../app/hooks';
 import { updateUserData } from './../../features/user/userSlice';
+import { filterOptions } from './../../utils/data';
+import FilterOption from './FilterOption';
+import FilterSearchInput from './FilterSearchInput';
+
 interface FilterBarProps {
     filterBarRef: React.MutableRefObject<HTMLDivElement>;
 }
 
 const FilterBar = ({ filterBarRef }: FilterBarProps) => {
     const { user } = useAppSelector((store) => store.user);
+    const [searchQuery, setSearchQuery] = useState<string>('');
     const dispatch = useAppDispatch();
     return (
         <div
@@ -22,6 +25,8 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
             {filterOptions.map((option) => {
                 return <FilterOption option={option} key={option.name} />;
             })}
+            <FilterSearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
             <span
                 onClick={() => dispatch(updateUserData({ oldUser: user, newUserData: { isFilterBarShown: !user.isFilterBarShown } }))}
                 className={`text-4xl absolute -bottom-7 text-cyan-600 z-50 cursor-pointer transition-all duration-300 block right-4 ${user.isFilterBarShown ? 'rotate-180' : ''} hover:text-cyan-700`}
