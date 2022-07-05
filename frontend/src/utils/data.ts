@@ -11,8 +11,6 @@ export const SEPARATOR = '_SEP_';
 export interface IFilterOption {
     name: string;
     icon: IconType;
-    isDropdown: boolean;
-    data?: any;
 }
 
 export enum FilterOptions {
@@ -26,29 +24,23 @@ export enum FilterOptions {
 export const filterOptions: IFilterOption[] = [
     {
         name: FilterOptions.SORT,
-        icon: MdSort,
-        isDropdown: true
+        icon: MdSort
     },
     {
         name: FilterOptions.DATE,
-        icon: BiCalendarAlt,
-        isDropdown: true
+        icon: BiCalendarAlt
     },
     {
         name: FilterOptions.TYPE,
-        icon: IoIosJournal,
-        isDropdown: true,
-        data: {}
+        icon: IoIosJournal
     },
     {
         name: FilterOptions.CATEGORY,
-        icon: BiCategory,
-        isDropdown: true
+        icon: BiCategory
     },
     {
         name: FilterOptions.IMPORTANCE,
-        icon: AiOutlineStar,
-        isDropdown: true
+        icon: AiOutlineStar
     }
     // {
     //     name: 'Search',

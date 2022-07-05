@@ -5,9 +5,10 @@ import { filterNotes } from '../../features/journal/journalSlice';
 import { useDebounce } from '../../hooks';
 import { useAppDispatch } from './../../app/hooks';
 import { updateUserData } from './../../features/user/userSlice';
-import { filterOptions } from './../../utils/data';
+import { defaultNoteTypes, filterOptions, SEPARATOR } from './../../utils/data';
 import FilterOption from './FilterOption';
 import FilterSearchInput from './FilterSearchInput';
+import { getAllLabels } from './../../utils/functions';
 
 interface FilterBarProps {
     filterBarRef: React.MutableRefObject<HTMLDivElement>;
@@ -15,23 +16,29 @@ interface FilterBarProps {
 
 const FilterBar = ({ filterBarRef }: FilterBarProps) => {
     const { user } = useAppSelector((store) => store.user);
+    const { notes } = useAppSelector((store) => store.journal);
     const dispatch = useAppDispatch();
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [sortType, setSortType] = useState<string>('');
-    const [startDate, setStartDate] = useState<number>(0);
-    const [endDate, setEndDate] = useState<number>(0);
-    const [type, setType] = useState<string>('');
-    const [category, setCategory] = useState<string>('');
+    const [startDate, setStartDate] = useState<number>(notes.at(-1)?.startDate || 1);
+    const [endDate, setEndDate] = useState<number>(new Date().getTime());
+    const [type, setType] = useState<string[]>(getAllLabels(defaultNoteTypes, user.customNoteTypes));
+    const [category, setCategory] = useState<string[]>(getAllLabels([], user.customNoteCategories));
     const [importance, setImportance] = useState<number>(1);
 
     const filterData = { sortType, startDate, endDate, type, category, importance };
     const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportance };
     const debouncedSearchTerm = useDebounce(searchQuery, 500);
+    const debouncedStartDate = useDebounce(startDate, 500);
+    const debouncedEndDate = useDebounce(endDate, 500);
+    const debouncedType = useDebounce(type, 500);
+    const debouncedCategory = useDebounce(category, 500);
+    const debouncedImportance = useDebounce(importance, 500);
 
     useEffect(() => {
         console.log('filter');
         dispatch(filterNotes({ user, title: debouncedSearchTerm }));
-    }, [sortType, startDate, endDate, type, category, importance, debouncedSearchTerm]);
+    }, [sortType, debouncedStartDate, debouncedEndDate, debouncedType, debouncedCategory, debouncedImportance, debouncedSearchTerm]);
 
     return (
         <div

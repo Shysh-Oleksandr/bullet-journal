@@ -36,6 +36,10 @@ export function getCustomLabels(customLabels: string | undefined): string[] {
     return customLabels?.split(SEPARATOR) || [];
 }
 
+export function getAllLabels(defaultLabels: string[], customLabels: string | undefined, additionalLabels?: string[]): string[] {
+    return [...defaultLabels, ...(additionalLabels || []), ...getCustomLabels(customLabels)].filter((label) => label !== '');
+}
+
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 // a and b are javascript Date objects

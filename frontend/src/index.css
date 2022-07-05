@@ -221,10 +221,45 @@ h6 {
     transform: rotateZ(90deg);
 }
 
-.filter-option:hover .filter-arrow {
+.filter-option.focused .filter-arrow {
     color: #fff;
+    animation-name: rotate-filter-arrow-on;
+    animation-duration: 0.75s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
 }
 
-.filter-search-input:hover + .filter-search-delete {
+.filter-arrow.closed {
+    animation-name: rotate-filter-arrow-off;
+    animation-duration: 0.75s;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease;
+}
+
+@keyframes rotate-filter-arrow-on {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(540deg);
+    }
+}
+
+@keyframes rotate-filter-arrow-off {
+    from {
+        transform: rotate(540deg);
+    }
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+.filter-search-input:hover + .filter-search-delete,
+.filter-option.focused .filter-arrow,
+.filter-option:hover .filter-arrow {
     @apply !text-white;
+}
+
+.filter-modal-option:hover .option-checkbox {
+    @apply border-white;
 }

@@ -11,6 +11,7 @@ import { defaultNoteTypes, SEPARATOR } from '../../utils/data';
 import { getCustomLabels } from '../../utils/functions';
 import { useAppDispatch } from './../../app/hooks';
 import { updateUserData } from './../../features/user/userSlice';
+import { getAllLabels } from './../../utils/functions';
 
 interface NoteLabelInputProps {
     setLabel: React.Dispatch<React.SetStateAction<string>>;
@@ -24,7 +25,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
 
     const { user } = useAppSelector((store) => store.user);
     const [userCustomNoteLabels, setUserCustomNoteLabels] = useState<string>(isCustomTypes ? user.customNoteTypes || '' : user.customNoteCategories || '');
-    const [availableLabels, setAvailableLabels] = useState<string[]>(isCustomTypes ? [...defaultNoteTypes, ...getCustomLabels(userCustomNoteLabels)] : getCustomLabels(userCustomNoteLabels));
+    const [availableLabels, setAvailableLabels] = useState<string[]>(isCustomTypes ? getAllLabels(defaultNoteTypes, userCustomNoteLabels) : getCustomLabels(userCustomNoteLabels));
     const [removedLabels, setRemovedLabels] = useState(label.split(SEPARATOR).filter((category) => !availableLabels.includes(category) && category !== ''));
     const [previousLabel, setPreviousLabel] = useState(label);
     const labelName = isCustomTypes ? 'type' : 'category';
@@ -79,7 +80,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
         dispatch(updateUserData({ oldUser: user, newUserData }));
 
         setUserCustomNoteLabels(newCustomNoteLabels);
-        setAvailableLabels(isCustomTypes ? [...defaultNoteTypes, ...removedLabels, ...getCustomLabels(newCustomNoteLabels)] : [...getCustomLabels(newCustomNoteLabels), ...removedLabels]);
+        setAvailableLabels(isCustomTypes ? getAllLabels(defaultNoteTypes, newCustomNoteLabels, removedLabels) : getAllLabels([], newCustomNoteLabels, removedLabels));
         dispatch(setSuccess(isAdding ? `New ${labelName} "${changedLabel}" added.` : `The ${labelName} "${changedLabel}" has been deleted.`));
     };
 
