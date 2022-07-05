@@ -18,7 +18,6 @@ const Notes = () => {
 
     useEffect(() => {
         setTimeout(() => {
-            console.log('resi');
             window.dispatchEvent(new Event('resize'));
         }, 500);
     }, [user.isSidebarShown]);
@@ -30,7 +29,7 @@ const Notes = () => {
     return (
         <div
             style={{ paddingTop: user.isFilterBarShown ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 15 : 112) : 25 }}
-            className={`notes ${user.isSidebarShown ? 'small-padding-x' : 'padding-x'}  transition-all duration-500 relative`}
+            className={`notes ${user.isSidebarShown ? 'small-padding-x' : 'padding-x'} transition-all duration-500 relative`}
         >
             <FilterBar filterBarRef={filterBarRef} />
 

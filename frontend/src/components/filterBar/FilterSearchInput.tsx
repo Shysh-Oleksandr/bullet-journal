@@ -28,7 +28,7 @@ const FilterSearchInput = ({ setSearchQuery, searchQuery }: FilterSearchInputPro
             <label
                 htmlFor="filter-note-search-input"
                 onClick={() => setSearchQuery('')}
-                className={`filter-search-delete text-2xl absolute right-1 top-1/2 rotate-45 ${
+                className={`filter-search-delete text-2xl absolute right-2 top-1/2 rotate-45 ${
                     searchFocus ? 'text-white' : 'text-cyan-600'
                 } -translate-y-1/2 transition-all cursor-pointer duration-[250ms] ${searchQuery.length > 0 ? 'opacity-100' : 'opacity-0 invisible'}`}
             >

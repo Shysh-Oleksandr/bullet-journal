@@ -12,31 +12,41 @@ export interface IFilterOption {
     name: string;
     icon: IconType;
     isDropdown: boolean;
+    data?: any;
+}
+
+export enum FilterOptions {
+    SORT = 'Sort by Date',
+    DATE = 'Any Date',
+    TYPE = 'Type',
+    CATEGORY = 'Category',
+    IMPORTANCE = 'Importance'
 }
 
 export const filterOptions: IFilterOption[] = [
     {
-        name: 'Sort by Date',
+        name: FilterOptions.SORT,
         icon: MdSort,
         isDropdown: true
     },
     {
-        name: 'Any Date',
+        name: FilterOptions.DATE,
         icon: BiCalendarAlt,
         isDropdown: true
     },
     {
-        name: 'Type',
+        name: FilterOptions.TYPE,
         icon: IoIosJournal,
-        isDropdown: true
+        isDropdown: true,
+        data: {}
     },
     {
-        name: 'Category',
+        name: FilterOptions.CATEGORY,
         icon: BiCategory,
         isDropdown: true
     },
     {
-        name: 'Importance',
+        name: FilterOptions.IMPORTANCE,
         icon: AiOutlineStar,
         isDropdown: true
     }

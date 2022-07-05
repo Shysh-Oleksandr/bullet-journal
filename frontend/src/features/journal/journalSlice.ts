@@ -102,14 +102,14 @@ export const journalSlice = createSlice({
         });
         // Filter notes
         builder.addCase(filterNotes.pending, (state, action) => {
-            state.loading = true;
+            // state.loading = true;
         });
         builder.addCase(filterNotes.fulfilled, (state, action) => {
             state.notes = action.payload; // filteredNotes
-            state.loading = false;
+            // state.loading = false;
         });
         builder.addCase(filterNotes.rejected, (state, action) => {
-            state.loading = false;
+            // state.loading = false;
             state.error = 'Unable to retreive notes.';
         });
     }

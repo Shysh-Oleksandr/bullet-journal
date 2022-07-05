@@ -23,7 +23,6 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
     const labelInputRef = useRef<HTMLInputElement>(null);
 
     const { user } = useAppSelector((store) => store.user);
-    // const { sidebarShown } = useAppSelector((store) => store.journal);
     const [userCustomNoteLabels, setUserCustomNoteLabels] = useState<string>(isCustomTypes ? user.customNoteTypes || '' : user.customNoteCategories || '');
     const [availableLabels, setAvailableLabels] = useState<string[]>(isCustomTypes ? [...defaultNoteTypes, ...getCustomLabels(userCustomNoteLabels)] : getCustomLabels(userCustomNoteLabels));
     const [removedLabels, setRemovedLabels] = useState(label.split(SEPARATOR).filter((category) => !availableLabels.includes(category) && category !== ''));
@@ -77,9 +76,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
             : {
                   customNoteCategories: newCustomNoteLabels
               };
-        console.log('before disp');
         dispatch(updateUserData({ oldUser: user, newUserData }));
-        console.log('after dispF');
 
         setUserCustomNoteLabels(newCustomNoteLabels);
         setAvailableLabels(isCustomTypes ? [...defaultNoteTypes, ...removedLabels, ...getCustomLabels(newCustomNoteLabels)] : [...getCustomLabels(newCustomNoteLabels), ...removedLabels]);
@@ -142,10 +139,10 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
                 ref={labelInputRef}
                 value={isCustomTypes ? label : label.replace(SEPARATOR, '').replaceAll(SEPARATOR, ', ')}
                 required={true}
-                onChange={(e) => setLabel(e.target.value)} // !
+                onChange={(e) => setLabel(e.target.value)}
             />
             <ul
-                className={`categories-list rounded-b-xl overflow-y-auto h-auto max-h-0 opacity-0 left-1/2 overflow-hidden -translate-x-1/2 w-full transition-all duration-300 absolute bg-cyan-600 bottom-0 translate-y-full z-[200] text-white`}
+                className={`categories-list rounded-b-xl shadow-xl overflow-y-auto h-auto max-h-0 opacity-0 left-1/2 overflow-hidden -translate-x-1/2 w-full transition-all duration-300 absolute bg-cyan-600 bottom-0 translate-y-full z-[200] text-white`}
             >
                 {availableLabels.map((availableLabel) => {
                     if (availableLabel.trim() === '') return null;

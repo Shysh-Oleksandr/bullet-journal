@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAppSelector } from '../../app/hooks';
+import { filterNotes } from '../../features/journal/journalSlice';
+import { useDebounce } from '../../hooks';
 import { useAppDispatch } from './../../app/hooks';
 import { updateUserData } from './../../features/user/userSlice';
 import { filterOptions } from './../../utils/data';
@@ -13,8 +15,24 @@ interface FilterBarProps {
 
 const FilterBar = ({ filterBarRef }: FilterBarProps) => {
     const { user } = useAppSelector((store) => store.user);
-    const [searchQuery, setSearchQuery] = useState<string>('');
     const dispatch = useAppDispatch();
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [sortType, setSortType] = useState<string>('');
+    const [startDate, setStartDate] = useState<number>(0);
+    const [endDate, setEndDate] = useState<number>(0);
+    const [type, setType] = useState<string>('');
+    const [category, setCategory] = useState<string>('');
+    const [importance, setImportance] = useState<number>(1);
+
+    const filterData = { sortType, startDate, endDate, type, category, importance };
+    const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportance };
+    const debouncedSearchTerm = useDebounce(searchQuery, 500);
+
+    useEffect(() => {
+        console.log('filter');
+        dispatch(filterNotes({ user, title: debouncedSearchTerm }));
+    }, [sortType, startDate, endDate, type, category, importance, debouncedSearchTerm]);
+
     return (
         <div
             ref={filterBarRef}
@@ -23,7 +41,7 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
             }`}
         >
             {filterOptions.map((option) => {
-                return <FilterOption option={option} key={option.name} />;
+                return <FilterOption option={option} key={option.name} filterData={filterData} filterDataSetters={filterDataSetters} />;
             })}
             <FilterSearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 

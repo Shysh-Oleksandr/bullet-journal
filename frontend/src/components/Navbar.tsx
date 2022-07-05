@@ -22,19 +22,19 @@ const Navbar = () => {
         >
             <button
                 onClick={() => dispatch(updateUserData({ oldUser: user, newUserData: { isSidebarShown: !user.isSidebarShown } }))}
-                className="text-4xl transition-colors absolute left-4 top-1/2 -translate-y-1/2 hover:text-cyan-100"
+                className="text-4xl transition-colors absolute sm:left-4 left-2 top-1/2 -translate-y-1/2 hover:text-cyan-100"
             >
                 <IoMdMenu />
             </button>
-            <Link to={'/'} className="text-3xl font-bold cursor-pointer transition-colors hover:text-cyan-100">
+            <Link to={'/'} className="sm:text-3xl text-2xl font-bold cursor-pointer transition-colors hover:text-cyan-100">
                 Bullet Journal
             </Link>
             <div className="flex items-center">
-                <Link to={'/edit'} className="text-3xl cursor-pointer transition-all hover:rotate-90 hover:opacity-80 duration-500">
+                <Link to={'/edit'} className="sm:text-3xl text-2xl cursor-pointer transition-all hover:rotate-90 hover:opacity-80 duration-500">
                     <BsPlusLg />
                 </Link>
                 <span className="mx-4 text-4xl">|</span>
-                <button onClick={() => Logout()} className="text-2xl cursor-pointer transition-all bg-cyan-500 px-4 py-1 rounded-md hover:bg-cyan-600 hover:shadow-sm">
+                <button onClick={() => Logout()} className="sm:text-2xl text-xl cursor-pointer transition-all bg-cyan-500 sm:px-4 px-3 py-1 rounded-md hover:bg-cyan-600 hover:shadow-sm">
                     Logout
                 </button>
             </div>
