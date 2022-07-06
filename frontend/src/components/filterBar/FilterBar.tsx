@@ -37,7 +37,7 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
 
     useEffect(() => {
         console.log('filter');
-        dispatch(filterNotes({ user, title: debouncedSearchTerm }));
+        dispatch(filterNotes({ user, title: debouncedSearchTerm, type: type }));
     }, [sortType, debouncedStartDate, debouncedEndDate, debouncedType, debouncedCategory, debouncedImportance, debouncedSearchTerm]);
 
     return (

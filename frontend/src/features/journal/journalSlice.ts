@@ -51,12 +51,16 @@ export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', asy
 export interface IFilterNotes {
     user: IUser;
     title: string;
+    type: string[];
 }
 
-export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async ({ user, title }: IFilterNotes) => {
+export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async ({ user, title, type }: IFilterNotes) => {
+    const typeParams = ['', ...type].join('&type=');
+    console.log(typeParams);
+
     const response = await axios({
         method: 'GET',
-        url: `${config.server.url}/notes/query/${user._id}?title=${title}`
+        url: `${config.server.url}/notes/query/${user._id}?title=${title}${typeParams}`
     });
 
     if (response.status === 200 || response.status === 304) {

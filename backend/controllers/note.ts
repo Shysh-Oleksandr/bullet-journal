@@ -89,7 +89,7 @@ const query = (req: Request, res: Response, next: NextFunction) => {
     console.log(categoryRegexs);
 
     const titleRegex = (title && new RegExp(title.toString(), 'i')) || new RegExp('');
-    return Note.find({ title: { $regex: titleRegex }, type: { $in: type }, category: { $in: categoryRegexs }, author: author_id })
+    return Note.find({ title: { $regex: titleRegex }, type: { $in: type }, author: author_id })
         .exec()
         .then((notes) => {
             return res.status(200).json({
