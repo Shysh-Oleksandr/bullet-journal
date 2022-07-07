@@ -75,21 +75,13 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const query = (req: Request, res: Response, next: NextFunction) => {
-    const { title, type } = req.query;
-    const category: any = req.query.category;
+    const { title } = req.query;
     const author_id = req.params.authorID;
-    const categoryRegexs = [];
-    for (var index in category) {
-        console.log(category[index]);
-
-        categoryRegexs.push(new RegExp(category[index].toString(), 'i'));
-    }
 
     logging.info(`Incoming query...`);
-    console.log(categoryRegexs);
 
-    const titleRegex = (title && new RegExp(title.toString(), 'i')) || new RegExp('');
-    return Note.find({ title: { $regex: titleRegex }, type: { $in: type }, author: author_id })
+    const titleRegex = title ? new RegExp(title.toString(), 'i') : new RegExp('');
+    return Note.find({ title: { $regex: titleRegex }, author: author_id })
         .exec()
         .then((notes) => {
             return res.status(200).json({

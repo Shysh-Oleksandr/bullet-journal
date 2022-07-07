@@ -15,7 +15,7 @@ export interface IFilterOption {
 
 export enum FilterOptions {
     SORT = 'Sort by Date',
-    DATE = 'Any Date',
+    DATE = 'Date',
     TYPE = 'Type',
     CATEGORY = 'Category',
     IMPORTANCE = 'Importance'
@@ -42,9 +42,10 @@ export const filterOptions: IFilterOption[] = [
         name: FilterOptions.IMPORTANCE,
         icon: AiOutlineStar
     }
-    // {
-    //     name: 'Search',
-    //     icon: AiOutlineSearch,
-    //     isDropdown: false
-    // }
 ];
+
+export function getLastPeriodDate(days: number, date?: number) {
+    const now = new Date(date || new Date().getTime());
+
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate() - days).getTime();
+}

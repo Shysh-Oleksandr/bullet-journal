@@ -7,16 +7,16 @@ import { dateDiffInDays, getInitialNote } from './../../utils/functions';
 
 export interface IJournalState {
     notes: INote[];
-    filteredNotes: INote[];
     loading: boolean;
+    showFilteredNotes?: boolean;
     error: string;
     success: string;
 }
 
 const initialState: IJournalState = {
     notes: [],
-    filteredNotes: [],
     loading: true,
+    showFilteredNotes: false,
     error: '',
     success: ''
 };
@@ -51,21 +51,32 @@ export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', asy
 export interface IFilterNotes {
     user: IUser;
     title: string;
-    type: string[];
+    filter: (notes: INote[]) => INote[];
 }
 
-export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async ({ user, title, type }: IFilterNotes) => {
-    const typeParams = ['', ...type].join('&type=');
-    console.log(typeParams);
+export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async ({ user, title, filter }: IFilterNotes) => {
+    const titleParams = `title=${title}`;
 
     const response = await axios({
         method: 'GET',
-        url: `${config.server.url}/notes/query/${user._id}?title=${title}${typeParams}`
+        url: `${config.server.url}/notes/query/${user._id}?${titleParams}`
     });
 
     if (response.status === 200 || response.status === 304) {
         let notes = response.data.notes as INote[];
         title === '' && notes.push(getInitialNote(user));
+        notes = filter(notes);
+        const endNotes: INote[] = notes
+            .filter((note) => dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 >= 2)
+            .map((note) => {
+                const copyNote = JSON.parse(JSON.stringify(note));
+                copyNote.isEndNote = true;
+                const startDate = copyNote.startDate;
+                copyNote.startDate = copyNote.endDate;
+                copyNote.endDate = startDate;
+                return copyNote;
+            });
+        notes = [...notes, ...endNotes].filter((note) => note.startDate <= new Date().getTime());
         notes.sort((x, y) => y.startDate - x.startDate);
         return notes;
     } else {
@@ -87,9 +98,6 @@ export const journalSlice = createSlice({
         setSuccess: (state, { payload }: PayloadAction<string>) => {
             state.success = payload;
         }
-        // setSidebar: (state, { payload }: PayloadAction<boolean>) => {
-        //     state.sidebarShown = payload;
-        // }
     },
     extraReducers: (builder) => {
         // Fetch all notes
@@ -109,7 +117,7 @@ export const journalSlice = createSlice({
             // state.loading = true;
         });
         builder.addCase(filterNotes.fulfilled, (state, action) => {
-            state.notes = action.payload; // filteredNotes
+            state.notes = action.payload;
             // state.loading = false;
         });
         builder.addCase(filterNotes.rejected, (state, action) => {

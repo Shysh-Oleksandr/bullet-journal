@@ -50,3 +50,9 @@ export function dateDiffInDays(a: Date, b: Date) {
 
     return Math.abs(Math.floor((utc2 - utc1) / _MS_PER_DAY));
 }
+
+export const areArraysEqual = (firstArray: any[], secondArray: any[]) => {
+    return firstArray.every(function (element) {
+        return secondArray.includes(element);
+    });
+};

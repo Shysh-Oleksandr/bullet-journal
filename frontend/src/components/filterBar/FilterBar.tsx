@@ -5,10 +5,11 @@ import { filterNotes } from '../../features/journal/journalSlice';
 import { useDebounce } from '../../hooks';
 import { useAppDispatch } from './../../app/hooks';
 import { updateUserData } from './../../features/user/userSlice';
-import { defaultNoteTypes, filterOptions, SEPARATOR } from './../../utils/data';
+import { defaultNoteTypes, filterOptions, getLastPeriodDate, SEPARATOR } from './../../utils/data';
+import { getAllLabels } from './../../utils/functions';
 import FilterOption from './FilterOption';
 import FilterSearchInput from './FilterSearchInput';
-import { getAllLabels } from './../../utils/functions';
+import INote from './../../interfaces/note';
 
 interface FilterBarProps {
     filterBarRef: React.MutableRefObject<HTMLDivElement>;
@@ -20,25 +21,45 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
     const dispatch = useAppDispatch();
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [sortType, setSortType] = useState<string>('');
-    const [startDate, setStartDate] = useState<number>(notes.at(-1)?.startDate || 1);
+    const [veryStartDate, setVeryStartDate] = useState(notes.at(-1)?.startDate || 1);
+    const [startDate, setStartDate] = useState<number>(veryStartDate);
     const [endDate, setEndDate] = useState<number>(new Date().getTime());
-    const [type, setType] = useState<string[]>(getAllLabels(defaultNoteTypes, user.customNoteTypes));
-    const [category, setCategory] = useState<string[]>(getAllLabels([], user.customNoteCategories));
-    const [importance, setImportance] = useState<number>(1);
+    const allTypes = getAllLabels(defaultNoteTypes, user.customNoteTypes);
+    const allCategories = getAllLabels([], user.customNoteCategories);
+    const [type, setType] = useState<string[]>(allTypes);
+    const [category, setCategory] = useState<string[]>(allCategories);
+    const [showNoCategory, setShowNoCategory] = useState<boolean>(true);
+    const [importanceMin, setImportanceMin] = useState<number>(1);
+    const [importanceMax, setImportanceMax] = useState<number>(10);
 
-    const filterData = { sortType, startDate, endDate, type, category, importance };
-    const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportance };
+    const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showNoCategory, veryStartDate };
+    const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportanceMin, setImportanceMax, setShowNoCategory };
     const debouncedSearchTerm = useDebounce(searchQuery, 500);
     const debouncedStartDate = useDebounce(startDate, 500);
     const debouncedEndDate = useDebounce(endDate, 500);
-    const debouncedType = useDebounce(type, 500);
-    const debouncedCategory = useDebounce(category, 500);
-    const debouncedImportance = useDebounce(importance, 500);
+    const debouncedShowNoCategory = useDebounce(showNoCategory, 500);
+    const debouncedType: string[] = useDebounce(type, 500);
+    const debouncedCategory: string[] = useDebounce(category, 500);
+    const debouncedImportanceMin = useDebounce(importanceMin, 500);
+    const debouncedImportanceMax = useDebounce(importanceMax, 500);
+
+    const filter = (notes: INote[]) => {
+        const filteredNotes = notes.filter((note) => {
+            const typeFilter = debouncedType.includes(note.type);
+            const categoryFilter = note.category?.split(SEPARATOR).some((r) => debouncedCategory.includes(r)) || (showNoCategory && !note.category);
+            const dateFilter = note.startDate >= debouncedStartDate && note.startDate <= getLastPeriodDate(-1, debouncedEndDate);
+
+            return typeFilter && categoryFilter && dateFilter;
+        });
+
+        return filteredNotes;
+    };
 
     useEffect(() => {
         console.log('filter');
-        dispatch(filterNotes({ user, title: debouncedSearchTerm, type: type }));
-    }, [sortType, debouncedStartDate, debouncedEndDate, debouncedType, debouncedCategory, debouncedImportance, debouncedSearchTerm]);
+
+        dispatch(filterNotes({ user, title: debouncedSearchTerm, filter }));
+    }, [sortType, debouncedStartDate, debouncedEndDate, debouncedType, debouncedCategory, debouncedImportanceMin, debouncedImportanceMax, debouncedSearchTerm, debouncedShowNoCategory]);
 
     return (
         <div

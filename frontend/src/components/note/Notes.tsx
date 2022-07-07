@@ -14,7 +14,7 @@ const Notes = () => {
     const [showFullAddForm, setShowFullAddForm] = useState<boolean>(false);
     const { user } = useAppSelector((store) => store.user);
     const filterBarRef = useRef() as MutableRefObject<HTMLDivElement>;
-    const [width, height] = useWindowSize();
+    const [] = useWindowSize();
 
     useEffect(() => {
         setTimeout(() => {

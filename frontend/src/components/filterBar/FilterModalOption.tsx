@@ -3,16 +3,20 @@ import { AiOutlineCheck } from 'react-icons/ai';
 
 interface FilterModalOptionProps {
     text: string;
-    onchange?: (label: string, isFirstIteration?: boolean) => void;
     checkedAtStart?: boolean;
+    onchange?: (label: string, checked?: boolean) => void;
+    showCheckmark?: boolean;
+    canToggle?: boolean;
+    forceCheck?: boolean;
 }
 
-const FilterModalOption = ({ text, onchange, checkedAtStart }: FilterModalOptionProps) => {
+const FilterModalOption = ({ text, onchange, checkedAtStart, showCheckmark = true, canToggle = true, forceCheck }: FilterModalOptionProps) => {
     const [checked, setChecked] = useState<boolean>(checkedAtStart === undefined ? true : checkedAtStart);
+    console.log(forceCheck === undefined ? checked : forceCheck);
 
     useEffect(() => {
-        onchange && onchange(text, true);
-    }, []);
+        forceCheck !== undefined && setChecked(forceCheck);
+    }, [forceCheck]);
 
     return (
         <label
@@ -22,16 +26,18 @@ const FilterModalOption = ({ text, onchange, checkedAtStart }: FilterModalOption
             } hover:bg-cyan-500 hover:text-white duration-300 hover:shadow-md hover:border-cyan-500`}
         >
             <input
-                checked={checked}
+                checked={forceCheck === undefined ? checked : forceCheck}
                 type="checkbox"
                 onChange={(e) => {
-                    setChecked(e.target.checked);
-                    onchange && onchange(text);
+                    canToggle && setChecked(e.target.checked);
+                    onchange && onchange(text, !checked);
                 }}
                 className="hidden"
                 id={`option-checkbox_${text}`}
             />
-            <span className="option-checkbox inline-block transition-all duration-300 absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 bg-transparent text-2xl">{checked && <AiOutlineCheck />}</span>
+            <span className="option-checkbox inline-block transition-all duration-300 absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 bg-transparent text-2xl">
+                {checked && showCheckmark && <AiOutlineCheck />}
+            </span>
             {text}
         </label>
     );
