@@ -1,22 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { BiError } from 'react-icons/bi';
 import { IoIosCheckmarkCircle } from 'react-icons/io';
+import { setError, setSuccess } from '../../features/journal/journalSlice';
+import { useAppDispatch } from './../../app/hooks';
 
 interface AlertProps {
     message: string;
     isError: boolean;
+    anotherMessage: string;
 }
 
-const Alert = ({ message, isError }: AlertProps) => {
+const Alert = ({ message, isError, anotherMessage }: AlertProps) => {
     const [isShowingAlert, setShowingAlert] = useState(false);
+    const dispatch = useAppDispatch();
+    const isAnotherAlertShown = anotherMessage !== '';
 
     useEffect(() => {
         setShowingAlert(message !== '');
+        setTimeout(() => {
+            if (message !== '') {
+                dispatch(isError ? setError('') : setSuccess(''));
+            }
+        }, 3000);
     }, [message]);
 
     return (
         <div
-            className={`fixed bottom-12 left-1/2 -translate-x-1/2 z-40 ${message === '' ? 'hidden' : ''} ${isShowingAlert ? 'alert-shown' : 'alert-hidden'}`}
+            className={`fixed left-1/2 -translate-x-1/2 z-40 ${isAnotherAlertShown && !isError ? 'bottom-32' : 'bottom-12'} ${isShowingAlert ? 'alert-shown' : 'alert-hidden hidden'}`}
             onTransitionEnd={() => {
                 setShowingAlert(false);
             }}

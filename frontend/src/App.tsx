@@ -9,6 +9,7 @@ import routes from './config/routes';
 import { login, logout } from './features/user/userSlice';
 import { Validate } from './modules/auth';
 import Alert from './components/UI/Alert';
+import { setError, setSuccess } from './features/journal/journalSlice';
 
 function App() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -81,8 +82,8 @@ function App() {
                         return <Route key={index} path={route.path} element={<route.component {...route.props} />} />;
                     })}
                 </Routes>
-                <Alert message={error} isError={true} />
-                <Alert message={success} isError={false} />
+                <Alert message={error} isError={true} anotherMessage={success} />
+                <Alert message={success} isError={false} anotherMessage={error} />
             </div>
         </Router>
     );

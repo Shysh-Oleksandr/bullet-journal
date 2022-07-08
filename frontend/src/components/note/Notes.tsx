@@ -48,7 +48,6 @@ const Notes = () => {
             {notes.map((note, index) => {
                 return <NotePreview note={note} key={`${note._id}${note.isEndNote && 'endNote'}`} previousNote={index === 0 ? null : notes[index - 1]} />;
             })}
-            <InfoMessage message={error} isError={true} />
         </div>
     );
 };

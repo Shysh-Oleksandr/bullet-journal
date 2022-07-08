@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { useAppSelector } from '../../app/hooks';
-import InfoMessage from './InfoMessage';
 import Loading from './Loading';
 
 type Props = {
@@ -46,7 +45,6 @@ const DeleteModal = ({ setModal, modal, deleting, deleteNote }: Props) => {
                         Cancel
                     </button>
                 </div>
-                <InfoMessage isError={true} message={error || ''} />
             </div>
         </div>
     );
