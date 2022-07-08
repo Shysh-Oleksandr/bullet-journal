@@ -7,9 +7,10 @@ interface NoteDateProps {
     setDate: (value: React.SetStateAction<number>) => void;
     isStartDate: boolean;
     inputClassname?: string;
+    refToClick?: React.MutableRefObject<HTMLDivElement>;
 }
 
-const NoteDate = ({ date, setDate, isStartDate, inputClassname }: NoteDateProps) => {
+const NoteDate = ({ date, setDate, isStartDate, inputClassname, refToClick }: NoteDateProps) => {
     return (
         <div className="relative">
             <div className={`flex items-center ${inputClassname}`}>
@@ -19,7 +20,12 @@ const NoteDate = ({ date, setDate, isStartDate, inputClassname }: NoteDateProps)
                 <input
                     type="date"
                     id={`${isStartDate ? 'start' : 'end'}DateInput`}
-                    onChange={(e) => setDate(new Date(e.target.value).getTime())}
+                    onChange={(e) => {
+                        setDate(new Date(e.target.value).getTime());
+                        setTimeout(() => {
+                            refToClick?.current.click();
+                        }, 0);
+                    }}
                     className={`pl-2 py-3 cursor-pointer`}
                     value={new Date(date).toLocaleDateString('en-CA')}
                 />

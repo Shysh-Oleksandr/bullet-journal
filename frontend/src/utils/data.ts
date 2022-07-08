@@ -44,6 +44,31 @@ export const filterOptions: IFilterOption[] = [
     }
 ];
 
+export const getDateOptions = (veryStartDate: number) => {
+    return [
+        {
+            name: 'Any Date',
+            startDate: veryStartDate
+        },
+        {
+            name: 'Last week',
+            startDate: getLastPeriodDate(7)
+        },
+        {
+            name: 'Last month',
+            startDate: getLastPeriodDate(30)
+        },
+        {
+            name: 'Last 6 months',
+            startDate: getLastPeriodDate(183)
+        },
+        {
+            name: 'Last year',
+            startDate: getLastPeriodDate(365)
+        }
+    ];
+};
+
 export function getLastPeriodDate(days: number, date?: number) {
     const now = new Date(date || new Date().getTime());
 

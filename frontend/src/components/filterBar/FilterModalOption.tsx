@@ -8,11 +8,11 @@ interface FilterModalOptionProps {
     showCheckmark?: boolean;
     canToggle?: boolean;
     forceCheck?: boolean;
+    refToClick?: React.MutableRefObject<HTMLDivElement>;
 }
 
-const FilterModalOption = ({ text, onchange, checkedAtStart, showCheckmark = true, canToggle = true, forceCheck }: FilterModalOptionProps) => {
+const FilterModalOption = ({ text, onchange, checkedAtStart, showCheckmark = true, canToggle = true, forceCheck, refToClick }: FilterModalOptionProps) => {
     const [checked, setChecked] = useState<boolean>(checkedAtStart === undefined ? true : checkedAtStart);
-    console.log(forceCheck === undefined ? checked : forceCheck);
 
     useEffect(() => {
         forceCheck !== undefined && setChecked(forceCheck);
@@ -31,6 +31,9 @@ const FilterModalOption = ({ text, onchange, checkedAtStart, showCheckmark = tru
                 onChange={(e) => {
                     canToggle && setChecked(e.target.checked);
                     onchange && onchange(text, !checked);
+                    setTimeout(() => {
+                        refToClick?.current.click();
+                    }, 0);
                 }}
                 className="hidden"
                 id={`option-checkbox_${text}`}

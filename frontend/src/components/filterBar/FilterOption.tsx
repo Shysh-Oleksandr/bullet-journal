@@ -5,7 +5,7 @@ import { useAppSelector } from '../../app/hooks';
 import { useOnClickOutside } from '../../hooks';
 import { areArraysEqual, getAllLabels } from '../../utils/functions';
 import NoteDate from '../note/NoteDate';
-import { defaultNoteTypes, FilterOptions, getLastPeriodDate, IFilterOption } from './../../utils/data';
+import { defaultNoteTypes, FilterOptions, getDateOptions, getLastPeriodDate, IFilterOption } from './../../utils/data';
 import FilterModal from './FilterModal';
 import FilterModalOption from './FilterModalOption';
 
@@ -39,6 +39,7 @@ const FilterOption = ({ option, filterData, filterDataSetters }: FilterOptionPro
     const [optionsChosen, setOptionsChosen] = useState<number | undefined>(undefined);
     const [modalProps, setModalProps] = useState({ content: '' });
     const modalRef = useRef() as MutableRefObject<HTMLDivElement>;
+    const dateDashRef = useRef() as MutableRefObject<HTMLDivElement>;
     useOnClickOutside(modalRef, () => setIsModalOpened(false));
     const { user } = useAppSelector((store) => store.user);
 
@@ -112,7 +113,6 @@ const FilterOption = ({ option, filterData, filterDataSetters }: FilterOptionPro
                     _endDate.setHours(0, 0, 0, 0);
                     stardD.setHours(0, 0, 0, 0);
                     endD.setHours(0, 0, 0, 0);
-                    console.log(filterData.startDate, startDate);
 
                     return stardD.getTime() === _stardDate.getTime() && endD.getTime() === _endDate.getTime();
                 };
@@ -120,50 +120,37 @@ const FilterOption = ({ option, filterData, filterDataSetters }: FilterOptionPro
                 content = (
                     <>
                         <div className="fl mb-8">
-                            <NoteDate date={filterData.startDate} setDate={filterDataSetters.setStartDate} inputClassname="border-2 border-solid border-cyan-100 px-2 rounded-md" isStartDate={true} />
-                            <BsDashLg className="mx-6 text-xl" />
-                            <NoteDate date={filterData.endDate} setDate={filterDataSetters.setEndDate} inputClassname="border-2 border-solid border-cyan-100 px-2 rounded-md" isStartDate={false} />
+                            <NoteDate
+                                refToClick={dateDashRef}
+                                date={filterData.startDate}
+                                setDate={filterDataSetters.setStartDate}
+                                inputClassname="border-2 border-solid border-cyan-100 px-2 rounded-md"
+                                isStartDate={true}
+                            />
+                            <div ref={dateDashRef}>
+                                <BsDashLg className="mx-6 text-xl" />
+                            </div>
+                            <NoteDate
+                                refToClick={dateDashRef}
+                                date={filterData.endDate}
+                                setDate={filterDataSetters.setEndDate}
+                                inputClassname="border-2 border-solid border-cyan-100 px-2 rounded-md"
+                                isStartDate={false}
+                            />
                         </div>
-                        <FilterModalOption
-                            forceCheck={checkDatePeriodChosen(filterData.veryStartDate)}
-                            canToggle={false}
-                            onchange={() => chooseDatePeriod(filterData.veryStartDate)}
-                            text={'Any Date'}
-                            showCheckmark={false}
-                            checkedAtStart={true}
-                        />
-                        <FilterModalOption
-                            forceCheck={checkDatePeriodChosen(getLastPeriodDate(7))}
-                            canToggle={false}
-                            onchange={() => chooseDatePeriod(getLastPeriodDate(7))}
-                            text={'Last week'}
-                            showCheckmark={false}
-                            checkedAtStart={false}
-                        />
-                        <FilterModalOption
-                            forceCheck={checkDatePeriodChosen(getLastPeriodDate(30))}
-                            canToggle={false}
-                            onchange={() => chooseDatePeriod(getLastPeriodDate(30))}
-                            text={'Last month'}
-                            showCheckmark={false}
-                            checkedAtStart={false}
-                        />
-                        <FilterModalOption
-                            forceCheck={checkDatePeriodChosen(getLastPeriodDate(183))}
-                            canToggle={false}
-                            onchange={() => chooseDatePeriod(getLastPeriodDate(183))}
-                            text={'Last 6 months'}
-                            showCheckmark={false}
-                            checkedAtStart={false}
-                        />
-                        <FilterModalOption
-                            forceCheck={checkDatePeriodChosen(getLastPeriodDate(365))}
-                            canToggle={false}
-                            onchange={() => chooseDatePeriod(getLastPeriodDate(365))}
-                            text={'Last year'}
-                            showCheckmark={false}
-                            checkedAtStart={false}
-                        />
+                        {getDateOptions(filterData.veryStartDate).map((option) => {
+                            return (
+                                <FilterModalOption
+                                    key={option.name + '_date_option'}
+                                    refToClick={dateDashRef}
+                                    forceCheck={checkDatePeriodChosen(option.startDate)}
+                                    onchange={() => chooseDatePeriod(option.startDate)}
+                                    text={option.name}
+                                    showCheckmark={false}
+                                    canToggle={false}
+                                />
+                            );
+                        })}
                     </>
                 );
                 break;
