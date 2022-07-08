@@ -91,6 +91,27 @@ export const importanceFilterOptions = [
         max: 3
     }
 ];
+
+export const sortOptions = [
+    {
+        name: 'By date (new first)'
+    },
+    {
+        name: 'By date (old first)'
+    },
+    {
+        name: 'By importance'
+    },
+    {
+        name: 'By type'
+    },
+    {
+        name: 'By category'
+    },
+    {
+        name: 'By title'
+    }
+];
 export function getLastPeriodDate(days: number, date?: number) {
     const now = new Date(date || new Date().getTime());
 

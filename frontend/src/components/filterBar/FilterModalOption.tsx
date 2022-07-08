@@ -32,7 +32,7 @@ const FilterModalOption = ({ text, onchange, checkedAtStart, showCheckmark = tru
                     canToggle && setChecked(e.target.checked);
                     onchange && onchange(text, !checked);
                     setTimeout(() => {
-                        refToClick?.current.click();
+                        refToClick?.current && refToClick?.current.click();
                     }, 0);
                 }}
                 className="hidden"

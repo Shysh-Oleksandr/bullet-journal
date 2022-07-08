@@ -9,7 +9,7 @@ import { BsDashLg } from 'react-icons/bs';
 import { IoIosColorPalette } from 'react-icons/io';
 import { MdDelete } from 'react-icons/md';
 import { RiSave3Fill } from 'react-icons/ri';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useAppSelector } from '../../app/hooks';
 import config from '../../config/config';
@@ -52,6 +52,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     const { user } = useAppSelector((store) => store.user);
     const params = useParams();
+    const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
@@ -72,17 +73,19 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     useEffect(() => {
         let noteID = params.noteID;
 
-        // If it's edit page, get note by id.
-        if (noteID) {
-            setId(noteID);
-            getNote(noteID);
+        if (_id === '') {
+            if (noteID) {
+                // If it's edit page, get note by id.
+                setId(noteID);
+                getNote(noteID);
+            }
+            // Otherwise, have the blank form.
+            else {
+                resetState();
+                setIsLoading(false);
+            }
         }
-        // Otherwise, have the blank form.
-        else {
-            resetState();
-            setIsLoading(false);
-        }
-    }, [params]);
+    }, [location]);
 
     const onEditorStateChange = (newState: EditorState) => {
         const newContent = draftToHtml(convertToRaw(newState.getCurrentContent()));
@@ -137,11 +140,15 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     };
 
     const saveNote = async (method: string, url: string, isCreating: boolean) => {
+        const _startDate = new Date(startDate);
+        const _endDate = new Date(endDate);
+        _startDate.setHours(0, 0, 0, 0);
+        _endDate.setHours(0, 0, 0, 0);
         if (title === '' || type === '' || color === '' || !startDate || !endDate) {
             dispatch(setError('Please fill out all required fields.'));
             dispatch(setSuccess(''));
             return null;
-        } else if (startDate > endDate) {
+        } else if (_startDate.getTime() > _endDate.getTime()) {
             dispatch(setError('End date cannot be earlier than start date.'));
             return null;
         }

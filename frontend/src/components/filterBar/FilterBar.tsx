@@ -19,6 +19,7 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
     const { user } = useAppSelector((store) => store.user);
     const { notes } = useAppSelector((store) => store.journal);
     const dispatch = useAppDispatch();
+    const [wasReset, setWasReset] = useState(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [sortType, setSortType] = useState<string>('');
     const [veryStartDate, setVeryStartDate] = useState(notes.at(-1)?.startDate || 1);
@@ -32,7 +33,7 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
     const [importanceMin, setImportanceMin] = useState<number>(1);
     const [importanceMax, setImportanceMax] = useState<number>(10);
 
-    const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showNoCategory, veryStartDate };
+    const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showNoCategory, veryStartDate, wasReset };
     const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportanceMin, setImportanceMax, setShowNoCategory };
     const debouncedSearchTerm = useDebounce(searchQuery, 500);
     const debouncedStartDate = useDebounce(startDate, 500);
@@ -56,9 +57,20 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
         return filteredNotes;
     };
 
-    useEffect(() => {
-        console.log('filter');
+    const resetFilters = () => {
+        setSearchQuery('');
+        setStartDate(veryStartDate);
+        setEndDate(new Date().getTime());
+        setType(allTypes);
+        setCategory(allCategories);
+        setShowNoCategory(true);
+        setImportanceMin(1);
+        setImportanceMax(10);
 
+        setWasReset(!wasReset);
+    };
+
+    useEffect(() => {
         dispatch(filterNotes({ user, title: debouncedSearchTerm, filter }));
     }, [sortType, debouncedStartDate, debouncedEndDate, debouncedType, debouncedCategory, debouncedImportanceMin, debouncedImportanceMax, debouncedSearchTerm, debouncedShowNoCategory]);
 
@@ -79,6 +91,12 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
                 className={`text-4xl absolute -bottom-7 text-cyan-600 z-50 cursor-pointer transition-all duration-300 block right-4 ${user.isFilterBarShown ? 'rotate-180' : ''} hover:text-cyan-700`}
             >
                 <IoIosArrowDown />
+            </span>
+            <span
+                onClick={resetFilters}
+                className={`text-lg absolute -bottom-[22px] px-[6px] py-[1px] bg-cyan-500 text-white rounded-lg z-50 cursor-pointer transition-all duration-300 block right-16  hover:bg-cyan-600`}
+            >
+                Reset
             </span>
         </div>
     );

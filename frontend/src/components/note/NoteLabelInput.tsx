@@ -30,6 +30,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
     const [previousLabel, setPreviousLabel] = useState(label);
     const labelName = isCustomTypes ? 'type' : 'category';
     const dispatch = useAppDispatch();
+    let addedLabel = '';
 
     useEffect(() => {
         setAvailableLabels([...availableLabels, ...removedLabels]);
@@ -59,14 +60,18 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
 
     const onFocus = () => {
         setFocused(true);
-        setLabel('');
         setPreviousLabel(label);
+        setLabel('');
     };
     const onBlur = () => {
         setFocused(false);
-        if (labelInputRef.current?.value.trim() === '' || !availableLabels.includes(labelInputRef.current?.value!)) {
-            setLabel(previousLabel);
-        }
+        const labelInputText = labelInputRef.current?.value;
+
+        setTimeout(() => {
+            if (labelInputText?.trim() === '' || ![...availableLabels, addedLabel].includes(labelInputText!)) {
+                setLabel(previousLabel);
+            }
+        }, 0);
     };
 
     const updateUserCustomLabels = (newCustomNoteLabels: string, isAdding: boolean, changedLabel: string) => {
@@ -81,6 +86,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
 
         setUserCustomNoteLabels(newCustomNoteLabels);
         setAvailableLabels(isCustomTypes ? getAllLabels(defaultNoteTypes, newCustomNoteLabels, removedLabels) : getAllLabels([], newCustomNoteLabels, removedLabels));
+
         dispatch(setSuccess(isAdding ? `New ${labelName} "${changedLabel}" added.` : `The ${labelName} "${changedLabel}" has been deleted.`));
     };
 
@@ -91,12 +97,15 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
         if (newLabel.trim() === '') {
             dispatch(setError(`Note ${labelName} cannot be empty.`));
         } else if (!isNew) {
-            dispatch(setError(`Note ${labelName} "${newLabel}" already exist.`));
+            dispatch(setError(`Note ${labelName} "${newLabel}" already exists.`));
         } else {
+            addedLabel = newLabel;
             labelInputRef.current?.blur();
+
             setLabel((prevLabel) => {
-                return isCustomTypes ? newLabel : `${prevLabel}${SEPARATOR}${newLabel}`;
+                return isCustomTypes ? newLabel : `${previousLabel === '' ? '' : previousLabel}${SEPARATOR}${newLabel}`;
             });
+
             const newCustomNoteLabels = `${userCustomNoteLabels || ''}${SEPARATOR}${newLabel}`;
 
             updateUserCustomLabels(newCustomNoteLabels, true, newLabel);
