@@ -4,8 +4,10 @@ import { IoIosArrowDown } from 'react-icons/io';
 import { useAppSelector } from '../../app/hooks';
 import { useOnClickOutside } from '../../hooks';
 import { areArraysEqual, getAllLabels } from '../../utils/functions';
+import InputLabel from '../note/InputLabel';
 import NoteDate from '../note/NoteDate';
-import { defaultNoteTypes, FilterOptions, getDateOptions, getLastPeriodDate, IFilterOption } from './../../utils/data';
+import NoteImportanceInput from '../note/NoteImportanceInput';
+import { defaultNoteTypes, FilterOptions, getDateOptions, getLastPeriodDate, IFilterOption, importanceFilterOptions } from './../../utils/data';
 import FilterModal from './FilterModal';
 import FilterModalOption from './FilterModalOption';
 
@@ -40,6 +42,7 @@ const FilterOption = ({ option, filterData, filterDataSetters }: FilterOptionPro
     const [modalProps, setModalProps] = useState({ content: '' });
     const modalRef = useRef() as MutableRefObject<HTMLDivElement>;
     const dateDashRef = useRef() as MutableRefObject<HTMLDivElement>;
+    const importanceDashRef = useRef() as MutableRefObject<HTMLDivElement>;
     useOnClickOutside(modalRef, () => setIsModalOpened(false));
     const { user } = useAppSelector((store) => store.user);
 
@@ -155,6 +158,45 @@ const FilterOption = ({ option, filterData, filterDataSetters }: FilterOptionPro
                 );
                 break;
             case FilterOptions.IMPORTANCE:
+                const chooseImportance = (min: number, max: number) => {
+                    filterDataSetters.setImportanceMin(min);
+                    filterDataSetters.setImportanceMax(max);
+                };
+                const checkImportanceChosen = (min: number, max: number) => {
+                    return filterData.importanceMin === min && filterData.importanceMax === max;
+                };
+                content = (
+                    <div>
+                        <div className="flex-between mb-8 mx-6">
+                            <div className="fl relative">
+                                <NoteImportanceInput importance={filterData.importanceMin} setImportance={filterDataSetters.setImportanceMin} inputId="noteImportanceMinFilterOption" />
+                                <InputLabel htmlFor="noteImportanceMinFilterOption" text="Min" />
+                            </div>
+                            <div ref={importanceDashRef}>
+                                <BsDashLg className="mx-6 text-xl" />
+                            </div>
+                            <div className="fl relative">
+                                <NoteImportanceInput importance={filterData.importanceMax} setImportance={filterDataSetters.setImportanceMax} inputId="noteImportanceMaxFilterOption" />
+                                <InputLabel htmlFor="noteImportanceMaxFilterOption" text="Max" />
+                            </div>
+                        </div>
+                        <div>
+                            {importanceFilterOptions.map((option) => {
+                                return (
+                                    <FilterModalOption
+                                        key={option.name + '_importance_option'}
+                                        forceCheck={checkImportanceChosen(option.min, option.max)}
+                                        onchange={() => chooseImportance(option.min, option.max)}
+                                        text={option.name}
+                                        showCheckmark={false}
+                                        canToggle={false}
+                                        refToClick={importanceDashRef}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
                 break;
 
             default:

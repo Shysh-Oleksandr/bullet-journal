@@ -48,8 +48,9 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
             const typeFilter = debouncedType.includes(note.type);
             const categoryFilter = note.category?.split(SEPARATOR).some((r) => debouncedCategory.includes(r)) || (showNoCategory && !note.category);
             const dateFilter = note.startDate >= debouncedStartDate && note.startDate <= getLastPeriodDate(-1, debouncedEndDate);
+            const importanceFilter = note.rating >= importanceMin && note.rating <= importanceMax;
 
-            return typeFilter && categoryFilter && dateFilter;
+            return typeFilter && categoryFilter && dateFilter && importanceFilter;
         });
 
         return filteredNotes;

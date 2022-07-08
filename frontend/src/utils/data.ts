@@ -69,6 +69,28 @@ export const getDateOptions = (veryStartDate: number) => {
     ];
 };
 
+export const importanceFilterOptions = [
+    {
+        name: 'Any importance',
+        min: 1,
+        max: 10
+    },
+    {
+        name: 'Great (7-10)',
+        min: 7,
+        max: 10
+    },
+    {
+        name: 'Medium (4-6)',
+        min: 4,
+        max: 6
+    },
+    {
+        name: 'Low (1-3)',
+        min: 1,
+        max: 3
+    }
+];
 export function getLastPeriodDate(days: number, date?: number) {
     const now = new Date(date || new Date().getTime());
 

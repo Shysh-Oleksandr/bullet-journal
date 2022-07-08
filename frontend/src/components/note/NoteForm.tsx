@@ -24,6 +24,7 @@ import NoteBody from './NoteBody';
 import NoteDate from './NoteDate';
 import NoteLabelInput from './NoteLabelInput';
 import SaveButton from './SaveButton';
+import NoteImportanceInput from './NoteImportanceInput';
 
 interface NoteFormProps {
     isShort?: boolean;
@@ -241,19 +242,10 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     </div>
                     <div className="fl">
                         <div className="relative fl mr-3 h-11">
-                            <input
-                                type="number"
-                                min={1}
-                                max={10}
-                                id="noteRatingInput"
-                                className="w-16 text-xl font-medium bg-[#ebf5fe] transition-all hover:bg-[#e1f1ff] focus-within:bg-[#e1f1ff] px-2 py-1 rounded-sm text-[#6aaac2]"
-                                value={rating}
-                                onChange={(e) => setRating(Number(e.target.value))}
-                            />
+                            <NoteImportanceInput importance={rating} setImportance={setRating} inputId="noteRatingInput" />
                             <label htmlFor="noteRatingInput" className="cursor-pointer text-3xl px-1 text-[#6aaac2] py-2">
                                 /10
                             </label>
-
                             <InputLabel htmlFor="noteRatingInput" text="Importance" />
                         </div>
                         <div className="relative fl h-11">
