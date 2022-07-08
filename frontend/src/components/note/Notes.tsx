@@ -3,18 +3,17 @@ import { BsPlusLg } from 'react-icons/bs';
 import { useAppSelector } from '../../app/hooks';
 import { useWindowSize } from '../../hooks';
 import '../../styles/note.scss';
-import InfoMessage from '../UI/InfoMessage';
 import Loading from '../UI/Loading';
 import FilterBar from './../filterBar/FilterBar';
 import NoteForm from './NoteForm';
 import NotePreview from './NotePreview';
 
 const Notes = () => {
-    const { notes, loading, error } = useAppSelector((store) => store.journal);
+    const { notes, loading } = useAppSelector((store) => store.journal);
     const [showFullAddForm, setShowFullAddForm] = useState<boolean>(false);
     const { user } = useAppSelector((store) => store.user);
     const filterBarRef = useRef() as MutableRefObject<HTMLDivElement>;
-    const [] = useWindowSize();
+    const [_] = useWindowSize();
 
     useEffect(() => {
         setTimeout(() => {
@@ -31,7 +30,7 @@ const Notes = () => {
             style={{ paddingTop: user.isFilterBarShown ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 15 : 112) : 25 }}
             className={`notes ${user.isSidebarShown ? 'small-padding-x' : 'padding-x'} transition-all duration-500 relative`}
         >
-            <FilterBar filterBarRef={filterBarRef} />
+            <FilterBar filterBarRef={filterBarRef} setShowFullAddForm={setShowFullAddForm} />
 
             <h5 className="text-2xl text-left mb-2 text-slate-500 font-semibold">Add a quick note</h5>
             <div className="relative">

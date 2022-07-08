@@ -263,3 +263,7 @@ h6 {
 .filter-modal-option:hover .option-checkbox {
     @apply border-white;
 }
+
+.filter-modal {
+    min-width: max(25vw, 250px);
+}

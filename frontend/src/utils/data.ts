@@ -14,7 +14,7 @@ export interface IFilterOption {
 }
 
 export enum FilterOptions {
-    SORT = 'Sort by Date',
+    SORT = 'Sort',
     DATE = 'Date',
     TYPE = 'Type',
     CATEGORY = 'Category',
@@ -30,6 +30,7 @@ export const filterOptions: IFilterOption[] = [
         name: FilterOptions.DATE,
         icon: BiCalendarAlt
     },
+
     {
         name: FilterOptions.TYPE,
         icon: IoIosJournal
@@ -92,24 +93,39 @@ export const importanceFilterOptions = [
     }
 ];
 
+export enum SortOptions {
+    NEWEST = 'newest',
+    OLDEST = 'oldest',
+    IMPORTANCE = 'importance',
+    TYPE = 'type',
+    CATEGORY = 'categories',
+    ALPHABETICAL = 'alphabetically'
+}
+
 export const sortOptions = [
     {
-        name: 'By date (new first)'
+        name: 'By date (newest)',
+        sortType: SortOptions.NEWEST
     },
     {
-        name: 'By date (old first)'
+        name: 'By date (oldest)',
+        sortType: SortOptions.OLDEST
     },
     {
-        name: 'By importance'
+        name: 'By importance',
+        sortType: SortOptions.IMPORTANCE
     },
     {
-        name: 'By type'
+        name: 'By type',
+        sortType: SortOptions.TYPE
     },
     {
-        name: 'By category'
+        name: 'By categories',
+        sortType: SortOptions.CATEGORY
     },
     {
-        name: 'By title'
+        name: 'Alphabetically',
+        sortType: SortOptions.ALPHABETICAL
     }
 ];
 export function getLastPeriodDate(days: number, date?: number) {

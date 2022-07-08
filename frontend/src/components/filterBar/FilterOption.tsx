@@ -7,14 +7,15 @@ import { areArraysEqual, getAllLabels } from '../../utils/functions';
 import InputLabel from '../note/InputLabel';
 import NoteDate from '../note/NoteDate';
 import NoteImportanceInput from '../note/NoteImportanceInput';
-import { defaultNoteTypes, FilterOptions, getDateOptions, getLastPeriodDate, IFilterOption, importanceFilterOptions, sortOptions } from './../../utils/data';
+import { defaultNoteTypes, FilterOptions, getDateOptions, getLastPeriodDate, IFilterOption, importanceFilterOptions, SortOptions, sortOptions } from './../../utils/data';
 import FilterModal from './FilterModal';
 import FilterModalOption from './FilterModalOption';
 
 interface FilterOptionProps {
     option: IFilterOption;
+    setShowFullAddForm: React.Dispatch<React.SetStateAction<boolean>>;
     filterData: {
-        sortType: string;
+        sortType: SortOptions;
         startDate: number;
         endDate: number;
         type: string[];
@@ -26,7 +27,7 @@ interface FilterOptionProps {
         veryStartDate: number;
     };
     filterDataSetters: {
-        setSortType: React.Dispatch<React.SetStateAction<string>>;
+        setSortType: React.Dispatch<React.SetStateAction<SortOptions>>;
         setStartDate: React.Dispatch<React.SetStateAction<number>>;
         setEndDate: React.Dispatch<React.SetStateAction<number>>;
         setType: React.Dispatch<React.SetStateAction<string[]>>;
@@ -37,14 +38,15 @@ interface FilterOptionProps {
     };
 }
 
-const FilterOption = ({ option, filterData, filterDataSetters }: FilterOptionProps) => {
+const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddForm }: FilterOptionProps) => {
     const [isModalOpened, setIsModalOpened] = useState<boolean>(false);
-    const [optionsChosen, setOptionsChosen] = useState<number | undefined>(undefined);
+    const [optionsChosen, setOptionsChosen] = useState<number | string | undefined>(undefined);
     const [modalProps, setModalProps] = useState({ content: '' });
     const modalRef = useRef() as MutableRefObject<HTMLDivElement>;
     const optionRef = useRef() as MutableRefObject<HTMLDivElement>;
     const dateDashRef = useRef() as MutableRefObject<HTMLDivElement>;
     const importanceDashRef = useRef() as MutableRefObject<HTMLDivElement>;
+    const sortingRef = useRef() as MutableRefObject<HTMLDivElement>;
     useOnClickOutside(modalRef, () => setIsModalOpened(false));
     const { user } = useAppSelector((store) => store.user);
 
@@ -57,18 +59,21 @@ const FilterOption = ({ option, filterData, filterDataSetters }: FilterOptionPro
         let checkLabel;
         switch (option.name) {
             case FilterOptions.SORT:
+                setOptionsChosen(filterData.sortType.toString());
+
                 content = (
                     <div>
+                        <span ref={sortingRef}></span>
                         {sortOptions.map((option) => {
                             return (
                                 <FilterModalOption
                                     key={option.name + '_importance_option'}
-                                    // forceCheck={checkImportanceChosen(option.min, option.max)}
-                                    // onchange={() => chooseImportance(option.min, option.max)}
+                                    forceCheck={filterData.sortType === option.sortType}
+                                    onchange={() => filterDataSetters.setSortType(option.sortType)}
                                     text={option.name}
                                     showCheckmark={false}
                                     canToggle={false}
-                                    refToClick={importanceDashRef}
+                                    refToClick={sortingRef}
                                 />
                             );
                         })}
@@ -135,7 +140,7 @@ const FilterOption = ({ option, filterData, filterDataSetters }: FilterOptionPro
 
                 content = (
                     <>
-                        <div className="fl mb-8">
+                        <div className="fl mb-8 justify-center sm:flex-row flex-col">
                             <NoteDate
                                 refToClick={dateDashRef}
                                 date={filterData.startDate}
@@ -144,7 +149,7 @@ const FilterOption = ({ option, filterData, filterDataSetters }: FilterOptionPro
                                 isStartDate={true}
                             />
                             <div ref={dateDashRef}>
-                                <BsDashLg className="mx-6 text-xl" />
+                                <BsDashLg className="mx-6 text-xl block sm:my-0 mt-6 mb-3" />
                             </div>
                             <NoteDate
                                 refToClick={dateDashRef}
@@ -218,24 +223,25 @@ const FilterOption = ({ option, filterData, filterDataSetters }: FilterOptionPro
 
         setModalProps({ content });
         setIsModalOpened(true);
+        setShowFullAddForm(false);
     };
 
     return (
         <div
             ref={optionRef}
             onClick={() => openDropdown()}
-            className={`filter-option cursor-pointer relative flex-between mx-3 px-4 py-3 mt-2 flex-1 rounded-lg shadow-md text-cyan-700 transition-all duration-[250ms] ${
+            className={`filter-option min-w-[12rem] cursor-pointer relative flex-between mx-3 pl-4 pr-7 py-3 mt-2 flex-1 rounded-lg shadow-md text-cyan-700 transition-all duration-[250ms] ${
                 isModalOpened ? '!bg-cyan-600 !text-white !shadow-lg focused' : ''
             } hover:bg-cyan-600 hover:text-white hover:shadow-lg`}
         >
             <div className="fl">
                 <span className="text-2xl mr-2">{<option.icon />}</span>
-                <h4 className="text-lg whitespace-nowrap">
+                <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis text-left w-[115px]">
                     {option.name}
                     {optionsChosen !== undefined && ` (${optionsChosen})`}
                 </h4>
             </div>
-            <span className={`text-2xl ml-1 text-cyan-500 filter-arrow transition-all duration-[250ms] ${isModalOpened ? 'opened' : 'closed'}`}>
+            <span className={`text-2xl absolute right-2 top-4 text-cyan-500 filter-arrow transition-all duration-[250ms] ${isModalOpened ? 'opened' : 'closed'}`}>
                 <IoIosArrowDown />
             </span>
             {isModalOpened && <FilterModal optionRef={optionRef} content={modalProps.content} modalRef={modalRef} />}

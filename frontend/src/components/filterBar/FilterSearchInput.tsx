@@ -21,7 +21,7 @@ const FilterSearchInput = ({ setSearchQuery, searchQuery }: FilterSearchInputPro
                 id="filter-note-search-input"
                 className={`filter-search-input text-lg whitespace-nowrap block py-3 ${
                     searchFocus ? 'pl-2' : 'pl-10'
-                } w-full bg-white text-cyan-700 h-full rounded-lg min-w-[12rem] pr-8 transition-all duration-[250ms] hover:text-white focus-within:text-white focus-within:bg-cyan-600 hover:bg-cyan-600 focus-within:placeholder:text-white hover:placeholder:text-white`}
+                } w-full  bg-white text-cyan-700 h-full rounded-lg min-w-[12rem] pr-8 transition-all duration-[250ms] hover:text-white focus-within:text-white focus-within:bg-cyan-600 hover:bg-cyan-600 focus-within:placeholder:text-white hover:placeholder:text-white`}
                 placeholder="Search"
             />
 

@@ -5,7 +5,7 @@ import { filterNotes } from '../../features/journal/journalSlice';
 import { useDebounce } from '../../hooks';
 import { useAppDispatch } from './../../app/hooks';
 import { updateUserData } from './../../features/user/userSlice';
-import { defaultNoteTypes, filterOptions, getLastPeriodDate, SEPARATOR } from './../../utils/data';
+import { defaultNoteTypes, filterOptions, getLastPeriodDate, SEPARATOR, SortOptions } from './../../utils/data';
 import { getAllLabels } from './../../utils/functions';
 import FilterOption from './FilterOption';
 import FilterSearchInput from './FilterSearchInput';
@@ -13,15 +13,16 @@ import INote from './../../interfaces/note';
 
 interface FilterBarProps {
     filterBarRef: React.MutableRefObject<HTMLDivElement>;
+    setShowFullAddForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const FilterBar = ({ filterBarRef }: FilterBarProps) => {
+const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const { user } = useAppSelector((store) => store.user);
     const { notes } = useAppSelector((store) => store.journal);
     const dispatch = useAppDispatch();
     const [wasReset, setWasReset] = useState(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [sortType, setSortType] = useState<string>('');
+    const [sortType, setSortType] = useState<SortOptions>(SortOptions.NEWEST);
     const [veryStartDate, setVeryStartDate] = useState(notes.at(-1)?.startDate || 1);
     const [startDate, setStartDate] = useState<number>(veryStartDate);
     const [endDate, setEndDate] = useState<number>(new Date().getTime());
@@ -43,6 +44,41 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
     const debouncedCategory: string[] = useDebounce(category, 500);
     const debouncedImportanceMin = useDebounce(importanceMin, 500);
     const debouncedImportanceMax = useDebounce(importanceMax, 500);
+
+    const sort = (notes: INote[]) => {
+        const sortedNotes = notes.sort((x, y) => {
+            switch (sortType) {
+                case SortOptions.NEWEST:
+                    return y.startDate - x.startDate;
+                case SortOptions.OLDEST:
+                    return x.startDate - y.startDate;
+
+                case SortOptions.IMPORTANCE:
+                    return y.rating - x.rating;
+
+                case SortOptions.TYPE:
+                    return y.type.localeCompare(x.type);
+
+                case SortOptions.CATEGORY:
+                    const xCategory = x.category?.split(SEPARATOR).filter((cat) => cat !== '');
+                    const yCategory = y.category?.split(SEPARATOR).filter((cat) => cat !== '');
+                    if (xCategory && yCategory) {
+                        return yCategory?.length - xCategory?.length;
+                    } else if (xCategory) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+
+                case SortOptions.ALPHABETICAL:
+                    return x.title.localeCompare(y.title);
+
+                default:
+                    return y.startDate - x.startDate;
+            }
+        });
+        return sortedNotes;
+    };
 
     const filter = (notes: INote[]) => {
         const filteredNotes = notes.filter((note) => {
@@ -71,7 +107,7 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
     };
 
     useEffect(() => {
-        dispatch(filterNotes({ user, title: debouncedSearchTerm, filter }));
+        dispatch(filterNotes({ user, title: debouncedSearchTerm, filter, sort }));
     }, [sortType, debouncedStartDate, debouncedEndDate, debouncedType, debouncedCategory, debouncedImportanceMin, debouncedImportanceMax, debouncedSearchTerm, debouncedShowNoCategory]);
 
     return (
@@ -82,7 +118,7 @@ const FilterBar = ({ filterBarRef }: FilterBarProps) => {
             }`}
         >
             {filterOptions.map((option) => {
-                return <FilterOption option={option} key={option.name} filterData={filterData} filterDataSetters={filterDataSetters} />;
+                return <FilterOption setShowFullAddForm={setShowFullAddForm} option={option} key={option.name} filterData={filterData} filterDataSetters={filterDataSetters} />;
             })}
             <FilterSearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 

@@ -52,9 +52,10 @@ export interface IFilterNotes {
     user: IUser;
     title: string;
     filter: (notes: INote[]) => INote[];
+    sort: (notes: INote[]) => INote[];
 }
 
-export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async ({ user, title, filter }: IFilterNotes) => {
+export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async ({ user, title, filter, sort }: IFilterNotes) => {
     const titleParams = `title=${title}`;
 
     const response = await axios({
@@ -77,7 +78,8 @@ export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async (
                 return copyNote;
             });
         notes = [...notes, ...endNotes].filter((note) => note.startDate <= new Date().getTime());
-        notes.sort((x, y) => y.startDate - x.startDate);
+        // notes.sort((x, y) => y.startDate - x.startDate);
+        notes = sort(notes);
         return notes;
     } else {
         return [];

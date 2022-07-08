@@ -286,7 +286,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     <Editor
                         placeholder="Write your note here..."
                         editorState={editorState}
-                        toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm z-10 sticky top-0 left-0"
+                        toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm z-[150] sticky top-[4.6rem] left-0"
                         wrapperClassName="mt-8"
                         editorClassName={`${
                             isShort ? 'min-h-[10vh]' : 'min-h-[40vh]'

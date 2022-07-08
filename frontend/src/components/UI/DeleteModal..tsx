@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { useAppSelector } from '../../app/hooks';
+import React, { useRef } from 'react';
+import { useOnClickOutside } from '../../hooks';
 import Loading from './Loading';
 
 type Props = {
@@ -11,21 +11,7 @@ type Props = {
 
 const DeleteModal = ({ setModal, modal, deleting, deleteNote }: Props) => {
     const ref = useRef() as React.MutableRefObject<HTMLDivElement>;
-    const { error } = useAppSelector((store) => store.journal);
-
-    useEffect(() => {
-        const checkIfClickedOutside = (e: any) => {
-            if (modal && ref.current && !ref.current.contains(e.target)) {
-                setModal(false);
-            }
-        };
-
-        document.addEventListener('mousedown', checkIfClickedOutside);
-
-        return () => {
-            document.removeEventListener('mousedown', checkIfClickedOutside);
-        };
-    }, [modal]);
+    useOnClickOutside(ref, () => setModal(false));
 
     return (
         <div className="fixed z-[100000] h-full w-full top-0 left-0 flex justify-center items-center bg-black bg-opacity-40">
