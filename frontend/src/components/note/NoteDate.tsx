@@ -12,7 +12,7 @@ interface NoteDateProps {
 
 const NoteDate = ({ date, setDate, isStartDate, inputClassname, refToClick }: NoteDateProps) => {
     return (
-        <div className="relative">
+        <div className="relative w-full fl justify-center">
             <div className={`flex items-center ${inputClassname}`}>
                 <label htmlFor={`${isStartDate ? 'start' : 'end'}DateInput`} className="cursor-pointer text-2xl">
                     <BiCalendarAlt />

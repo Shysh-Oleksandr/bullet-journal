@@ -15,7 +15,7 @@ const SaveButton = ({ type, onclick, disabled, icon, text, className }: SaveButt
             type={type}
             onClick={onclick}
             disabled={disabled}
-            className={`text-2xl fl justify-center font-bold px-8 py-3 rounded-md text-white cursor-pointer shadow-md transition-all hover:shadow-lg w-full ${className}`}
+            className={`sm:text-2xl text-xl fl justify-center font-bold sm:px-8 px-6 sm:py-3 py-2 rounded-md text-white cursor-pointer shadow-md transition-all hover:shadow-lg w-full ${className}`}
         >
             {icon} {text}
         </button>

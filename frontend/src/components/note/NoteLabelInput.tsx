@@ -144,7 +144,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
                 id={isCustomTypes ? 'noteTypeInput' : 'noteCategoryInput'}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                className="term-input category-input font-medium w-full text-xl bg-[#ebf5fe] transition-all hover:bg-[#e1f1ff] focus-within:bg-[#e1f1ff] px-3 py-1 h-11 rounded-t-sm text-[#6aaac2]"
+                className="term-input category-input font-medium w-full sm:text-xl text-lg bg-[#ebf5fe] transition-all hover:bg-[#e1f1ff] focus-within:bg-[#e1f1ff] sm:pl-3 pl-1 sm:pr-8 pr-5 py-1 h-11 rounded-t-sm text-[#6aaac2]"
                 placeholder={`Enter a new ${labelName}...`}
                 ref={labelInputRef}
                 value={isCustomTypes ? label : label.replace(SEPARATOR, '').replaceAll(SEPARATOR, ', ')}
@@ -152,14 +152,16 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
                 onChange={(e) => setLabel(e.target.value)}
             />
             <ul
-                className={`categories-list rounded-b-xl shadow-xl overflow-y-auto h-auto max-h-0 opacity-0 left-1/2 overflow-hidden -translate-x-1/2 w-full transition-all duration-300 absolute bg-cyan-600 bottom-0 translate-y-full z-[200] text-white`}
+                className={`categories-list rounded-b-xl shadow-xl overflow-y-auto h-auto max-h-0 opacity-0 sm:left-1/2 ${
+                    isCustomTypes ? 'left-0' : 'right-0'
+                } overflow-hidden sm:-translate-x-1/2 sm:w-full w-[70vw] transition-all duration-300 absolute bg-cyan-600 bottom-0 translate-y-full z-[200] text-white`}
             >
                 {availableLabels.map((availableLabel) => {
                     if (availableLabel.trim() === '') return null;
 
                     return (
                         <li
-                            className={`relative block px-4 py-2 text-lg tracking-wide transition-all cursor-pointer ${
+                            className={`relative block whitespace-nowrap overflow-hidden text-ellipsis px-8 py-2 text-lg tracking-wide transition-all cursor-pointer ${
                                 (isCustomTypes ? availableLabel === label : label.split(SEPARATOR).includes(availableLabel)) ? 'bg-cyan-500 font-semibold' : ''
                             } hover:bg-cyan-700`}
                             key={availableLabel}
@@ -186,7 +188,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
                 <button
                     onMouseDown={(e) => e.preventDefault()}
                     type="button"
-                    className="absolute right-0 top-1/2 py-2 px-2 -translate-y-1/2 text-2xl hover:text-cyan-500 text-cyan-400 transition-colors"
+                    className="absolute sm:right-0 -right-2 top-1/2 py-2 px-2 -translate-y-1/2 text-2xl hover:text-cyan-500 text-cyan-400 transition-colors"
                     onClick={addNewLabel}
                 >
                     <AiOutlineArrowRight />

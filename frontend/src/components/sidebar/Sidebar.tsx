@@ -1,11 +1,11 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import { fetchAllNotes, setError } from '../../features/journal/journalSlice';
-import { useDebounce, useWindowSize } from '../../hooks';
+import { useDebounce, useOnClickOutside, useWindowSize } from '../../hooks';
 import { getInitialNote } from '../../utils/functions';
 import Loading from '../UI/Loading';
 import { useAppDispatch } from './../../app/hooks';
@@ -27,6 +27,7 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
     const [isSearching, setIsSearching] = useState(false);
     const debouncedSearchTerm = useDebounce(searchQuery, 600);
     const isEditPage = window.location.pathname.includes('edit');
+    useOnClickOutside(sidebarRef, () => dispatch(updateUserData({ oldUser: user, newUserData: { isSidebarShown: false } })));
 
     const dispatch = useAppDispatch();
 
@@ -66,9 +67,9 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
             ref={sidebarRef}
             className={`h-full fixed top-0 left-0 z-50 duration-500 ${
                 user.isSidebarShown ? 'translate-x-0' : '-translate-x-full'
-            } sm:w-[24rem] w-[100%] transition-all z-[2000] ease-in-out bg-cyan-900 overflow-x-hidden text-white text-left text-xl`}
+            } xs:w-[24rem] w-[100%] transition-all z-[2000] ease-in-out bg-cyan-900 overflow-x-hidden text-white text-left text-xl`}
         >
-            <div className="fl sm:h-[65px] h-[50px] relative">
+            <div className="fl sm:h-[65px] h-[50px] sticky top-0 left-0 bg-cyan-900 z-[200]">
                 <button
                     onClick={() => dispatch(updateUserData({ oldUser: user, newUserData: { isSidebarShown: !user.isSidebarShown } }))}
                     className={`text-4xl transition-colors md:hidden absolute left-4 top-1/2 -translate-y-1/2 hover:text-cyan-100`}

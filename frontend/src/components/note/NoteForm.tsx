@@ -25,6 +25,7 @@ import NoteDate from './NoteDate';
 import NoteLabelInput from './NoteLabelInput';
 import SaveButton from './SaveButton';
 import NoteImportanceInput from './NoteImportanceInput';
+import { useWindowSize } from '../../hooks';
 
 interface NoteFormProps {
     isShort?: boolean;
@@ -55,6 +56,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const [width] = useWindowSize();
 
     const resetState = () => {
         setId('');
@@ -226,11 +228,14 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     return (
         <div
-            className={`transition-all duration-500 ${isShort ? '' : `${user.isSidebarShown ? 'small-padding-x' : 'padding-x'} pb-12`} ${
+            className={`transition-all duration-500 ${isShort ? '' : `${user.isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`} ${
                 isShort && !showFullAddForm ? 'max-h-16 overflow-hidden mb-4' : 'max-h-[300rem]'
             }`}
         >
-            <form onClick={() => setShowFullAddForm && setShowFullAddForm(true)} className={`bg-white rounded-sm shadow-xl ${isShort ? 'pb-4 pt-2 px-8' : 'pt-3 pb-6 mt-12 px-10'}`}>
+            <form
+                onClick={() => setShowFullAddForm && setShowFullAddForm(true)}
+                className={`bg-white rounded-sm shadow-xl ${isShort ? 'pb-4 pt-2 px-8' : 'md:pt-3 sm:pt-2 pt-[6px] md:pb-6 sm:pb-4 pb-3 md:mt-12 sm:mt-8 mt-6 md:px-10 sm:px-6 px-4'}`}
+            >
                 <TextareaAutosize
                     spellCheck={false}
                     maxRows={5}
@@ -238,17 +243,17 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     placeholder="Title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className={`border-bottom font-medium w-full resize-none overflow-hidden ${isShort ? 'py-2 text-2xl' : 'py-4 text-3xl'}`}
+                    className={`border-bottom font-medium w-full resize-none overflow-hidden ${isShort ? 'py-2 text-2xl' : 'md:py-4 sm:py-3 py-[6px] md:text-3xl sm:text-2xl text-xl'}`}
                     required={true}
                 />
-                <div className="flex-between border-bottom mb-6">
-                    <div className="fl h-11">
-                        <NoteDate date={startDate} isStartDate={true} setDate={setStartDate} />
-                        <BsDashLg className="mx-6 text-xl" />
-                        <NoteDate date={endDate} isStartDate={false} setDate={setEndDate} />
+                <div className="flex-between md:flex-row flex-col border-bottom-md mb-6">
+                    <div className="fl xs:h-11 border-bottom-sm md:w-auto w-full md:justify-start xs:justify-between justify-center xs:flex-row flex-col">
+                        <NoteDate date={startDate} isStartDate={true} setDate={setStartDate} inputClassname="border-bottom-xs w-full fl justify-center" />
+                        <BsDashLg className="lg:mx-6 mx-3 xs:block hidden xs:text-4xl text-xl" />
+                        <NoteDate date={endDate} isStartDate={false} setDate={setEndDate} inputClassname="mt-3" />
                     </div>
-                    <div className="fl">
-                        <div className="relative fl mr-3 h-11">
+                    <div className="fl border-bottom-sm md:mt-0 mt-5 md:w-auto w-full md:justify-start justify-between md:px-0 px-4">
+                        <div className="relative fl lg:mr-3 mr-1 h-11">
                             <NoteImportanceInput importance={rating} setImportance={setRating} inputId="noteRatingInput" />
                             <label htmlFor="noteRatingInput" className="cursor-pointer text-3xl px-1 text-[#6aaac2] py-2">
                                 /10
@@ -256,7 +261,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                             <InputLabel htmlFor="noteRatingInput" text="Importance" />
                         </div>
                         <div className="relative fl h-11">
-                            <label style={{ color: color }} htmlFor="noteColorInput" className="cursor-pointer text-3xl px-4 text-[#6aaac2] py-2">
+                            <label style={{ color: color }} htmlFor="noteColorInput" className="cursor-pointer text-3xl lg:px-4 px-3 text-[#6aaac2] py-2">
                                 <IoIosColorPalette />
                             </label>
                             <input
@@ -273,11 +278,11 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     </div>
                 </div>
                 <div className="flex-between border-bottom my-3">
-                    <div className="relative mr-4">
+                    <div className="relative sm:mr-4 mr-2 sm:basis-auto basis-1/2">
                         <NoteLabelInput label={type} setLabel={setType} isCustomTypes={true} />
                         <InputLabel htmlFor="noteTypeInput" text="Type" />
                     </div>
-                    <div className="relative basis-3/4">
+                    <div className="relative sm:basis-3/4 basis-1/2">
                         <NoteLabelInput label={category} setLabel={setCategory} isCustomTypes={false} />
                         <InputLabel htmlFor="noteCategoryInput" text="Categories" />
                     </div>
@@ -286,13 +291,21 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     <Editor
                         placeholder="Write your note here..."
                         editorState={editorState}
-                        toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm z-[150] sticky top-[4.6rem] left-0"
+                        toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm z-[150] sticky sm:top-[65px] top-[50px] left-0"
                         wrapperClassName="mt-8"
                         editorClassName={`${
                             isShort ? 'min-h-[10vh]' : 'min-h-[40vh]'
                         } h-auto  cursor-text border-cyan-100 transition-all border-2 rounded-sm border-solid focus-within:border-[3px] focus-within:border-cyan-200 px-3 text-[1.25rem] !leading-[100%]`}
                         toolbar={
                             isShort
+                                ? {
+                                      options: ['inline', 'fontSize', 'textAlign', 'history', 'embedded', 'emoji', 'image'],
+                                      inline: { inDropdown: true },
+                                      textAlign: { inDropdown: true },
+                                      link: { inDropdown: true },
+                                      history: { inDropdown: true }
+                                  }
+                                : width < 640
                                 ? {
                                       options: ['inline', 'fontSize', 'textAlign', 'history', 'embedded', 'emoji', 'image'],
                                       inline: { inDropdown: true },
@@ -323,7 +336,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                 </div>
             </form>
             <div className="text-left mt-4">
-                <h4 className="text-2xl mb-1">Preview</h4>
+                <h4 className="sm:text-2xl text-xl mb-1">Preview</h4>
                 {isShort && (
                     <div className="text-[#267491] text-xl">
                         <h4>{new Date(startDate).toDateString()}</h4>

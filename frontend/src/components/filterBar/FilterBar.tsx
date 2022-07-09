@@ -95,6 +95,7 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
 
     const resetFilters = () => {
         setSearchQuery('');
+        setSortType(SortOptions.NEWEST);
         setStartDate(veryStartDate);
         setEndDate(new Date().getTime());
         setType(allTypes);

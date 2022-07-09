@@ -111,6 +111,18 @@ h6 {
     @apply border-b-2 border-solid border-cyan-100 transition-all focus-within:border-b-[3px] focus-within:border-cyan-200;
 }
 
+.border-bottom-md {
+    @apply md:border-b-2 border-solid border-cyan-100 transition-all md:focus-within:border-b-[3px] focus-within:border-cyan-200;
+}
+
+.border-bottom-sm {
+    @apply md:border-b-0 border-b-2 border-solid border-cyan-100 transition-all md:focus-within:border-b-0 focus-within:border-b-[3px] focus-within:border-cyan-200;
+}
+
+.border-bottom-xs {
+    @apply xs:border-b-0 border-b-2 border-solid border-cyan-100 transition-all xs:focus-within:border-b-0 focus-within:border-b-[3px] focus-within:border-cyan-200;
+}
+
 .flex-between {
     @apply flex justify-between items-center;
 }
@@ -258,4 +270,10 @@ h6 {
 
 .filter-modal {
     min-width: max(25vw, 270px);
+}
+
+.rdw-emoji-modal,
+.rdw-embedded-modal {
+    left: auto !important;
+    right: 0 !important;
 }

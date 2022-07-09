@@ -230,13 +230,13 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
         <div
             ref={optionRef}
             onClick={() => openDropdown()}
-            className={`filter-option min-w-[12rem] cursor-pointer relative flex-between mx-3 pl-4 pr-7 py-3 mt-2 flex-1  basis-[15%] rounded-lg shadow-md text-cyan-700 transition-all duration-[250ms] ${
+            className={`filter-option min-w-[12rem] cursor-pointer relative flex-between mx-3 pl-4 pr-7 py-3 mt-2 flex-1 xs:basis-[15%] basis-full rounded-lg shadow-md text-cyan-700 transition-all duration-[250ms] ${
                 isModalOpened ? '!bg-cyan-600 !text-white !shadow-lg focused' : ''
             } hover:bg-cyan-600 hover:text-white hover:shadow-lg`}
         >
             <div className="fl">
                 <span className="text-2xl mr-2">{<option.icon />}</span>
-                <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis text-left w-[115px]">
+                <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis text-left xs:w-[115px]">
                     {option.name}
                     {optionsChosen !== undefined && ` (${optionsChosen})`}
                 </h4>

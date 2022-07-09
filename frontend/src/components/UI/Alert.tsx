@@ -31,8 +31,8 @@ const Alert = ({ message, isError, anotherMessage }: AlertProps) => {
                 setShowingAlert(false);
             }}
         >
-            <div className={`text-xl bg-white px-8 py-4 rounded-md flex items-center ${isError ? 'text-red-500' : 'text-green-500'} shadow-lg`}>
-                <span className="mr-4 text-4xl">{isError ? <BiError /> : <IoIosCheckmarkCircle />}</span>
+            <div className={`sm:text-xl text-lg bg-white sm:px-8 px-4 sm:py-4 py-3 rounded-md flex items-center ${isError ? 'text-red-500' : 'text-green-500'} shadow-lg`}>
+                <span className="mr-4 sm:text-4xl text-3xl">{isError ? <BiError /> : <IoIosCheckmarkCircle />}</span>
                 <h4>{message}</h4>
             </div>
         </div>
