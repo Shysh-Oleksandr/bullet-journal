@@ -17,14 +17,14 @@ const NoteSidebarPreview = ({ note }: NoteSidebarPreviewProps) => {
     return (
         <div
             onClick={() => !isInitialNote && navigate(`/edit/${note._id}`)}
-            className={`py-2 px-4 ${currentNoteOpenedId === note._id ? '!bg-cyan-700' : 'bg-cyan-800'} my-[2px] transition-all duration-200 hover:bg-cyan-900 text-left w-full ${
+            className={`pt-2 pb-1 px-4 ${currentNoteOpenedId === note._id ? '!bg-cyan-700' : 'bg-cyan-800'} my-[2px] transition-all duration-200 hover:bg-cyan-900 text-left w-full ${
                 isInitialNote ? '' : 'cursor-pointer'
             }`}
         >
             <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis">{note.title}</h4>
             <div className="flex-between">
                 <h5 className="text-sm text-cyan-500">{new Date(note.startDate).toDateString()}</h5>
-                <NoteInfo text={note.type} color="#0e7490" className="text-base mr-0 py-[1px] px-[6px]" />
+                <NoteInfo text={note.type} color="#0e7490" className="!text-base mr-0 !py-[1px] !px-[6px]" />
             </div>
         </div>
     );

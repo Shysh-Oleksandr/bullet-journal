@@ -21,7 +21,7 @@ const FilterModalOption = ({ text, onchange, checkedAtStart, showCheckmark = tru
     return (
         <label
             htmlFor={`option-checkbox_${text}`}
-            className={`block text-xl filter-modal-option relative px-10 py-2 border-solid border-2 w-full border-cyan-100 rounded-md mb-3 cursor-pointer transition-all ${
+            className={`block sm:text-xl text-lg filter-modal-option relative px-10 sm:py-2 py-1 border-solid border-2 w-full border-cyan-100 rounded-md sm:mb-3 mb-2 cursor-pointer transition-all ${
                 checked ? 'bg-cyan-600 border-cyan-600 text-white' : ''
             } hover:bg-cyan-500 hover:text-white duration-300 hover:shadow-md hover:border-cyan-500`}
         >

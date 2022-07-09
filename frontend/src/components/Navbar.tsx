@@ -18,22 +18,23 @@ const Navbar = () => {
         <div
             className={`flex sticky top-0 left-0 right-0 z-[999] shadow-lg items-center transition-all duration-500 justify-between ${
                 user.isSidebarShown ? 'small-padding-x' : 'padding-x'
-            } py-4 text-white bg-cyan-700 h-[65px]`}
+            } py-4 text-white bg-cyan-700 sm:h-[65px] h-[50px]`}
         >
             <button
                 onClick={() => dispatch(updateUserData({ oldUser: user, newUserData: { isSidebarShown: !user.isSidebarShown } }))}
-                className="text-4xl transition-colors absolute sm:left-4 left-2 top-1/2 -translate-y-1/2 hover:text-cyan-100"
+                className={`text-4xl transition-colors absolute lg:left-4 ${user.isSidebarShown ? 'sm:left-2' : ''} left-4 top-1/2 -translate-y-1/2 hover:text-cyan-100`}
             >
                 <IoMdMenu />
             </button>
-            <Link to={'/'} className="sm:text-3xl text-2xl font-bold cursor-pointer transition-colors hover:text-cyan-100">
-                Bullet Journal
+            <Link to={'/'} className="lg:text-3xl text-2xl font-bold cursor-pointer transition-colors hover:text-cyan-100">
+                <span className="sm:block hidden md:ml-4">Bullet Journal</span>
+                <img className="sm:hidden block ml-6 w-10 h-10 transition-opacity hover:opacity-90" src="/favicon.png" alt="Journal logo" />
             </Link>
             <div className="flex items-center">
                 <Link to={'/edit'} className="sm:text-3xl text-2xl cursor-pointer transition-all hover:rotate-90 hover:opacity-80 duration-500">
                     <BsPlusLg />
                 </Link>
-                <span className="mx-4 text-4xl">|</span>
+                <span className="sm:mx-4 mx-3 text-4xl">|</span>
                 <button onClick={() => Logout()} className="sm:text-2xl text-xl cursor-pointer transition-all bg-cyan-500 sm:px-4 px-3 py-1 rounded-md hover:bg-cyan-600 hover:shadow-sm">
                     Logout
                 </button>

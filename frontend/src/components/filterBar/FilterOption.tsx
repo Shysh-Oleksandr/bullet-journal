@@ -3,11 +3,11 @@ import { BsDashLg } from 'react-icons/bs';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAppSelector } from '../../app/hooks';
 import { useOnClickOutside } from '../../hooks';
-import { areArraysEqual, getAllLabels } from '../../utils/functions';
+import { getAllLabels } from '../../utils/functions';
 import InputLabel from '../note/InputLabel';
 import NoteDate from '../note/NoteDate';
 import NoteImportanceInput from '../note/NoteImportanceInput';
-import { defaultNoteTypes, FilterOptions, getDateOptions, getLastPeriodDate, IFilterOption, importanceFilterOptions, SortOptions, sortOptions } from './../../utils/data';
+import { defaultNoteTypes, FilterOptions, getDateOptions, IFilterOption, importanceFilterOptions, SortOptions, sortOptions } from './../../utils/data';
 import FilterModal from './FilterModal';
 import FilterModalOption from './FilterModalOption';
 
@@ -140,7 +140,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
 
                 content = (
                     <>
-                        <div className="fl mb-8 justify-center sm:flex-row flex-col">
+                        <div className="fl sm:mb-8 mb-6 justify-center sm:flex-row flex-col">
                             <NoteDate
                                 refToClick={dateDashRef}
                                 date={filterData.startDate}
@@ -149,7 +149,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                                 isStartDate={true}
                             />
                             <div ref={dateDashRef}>
-                                <BsDashLg className="mx-6 text-xl block sm:my-0 mt-6 mb-3" />
+                                <BsDashLg className="mx-6 text-xl block sm:my-0 mt-4 mb-1" />
                             </div>
                             <NoteDate
                                 refToClick={dateDashRef}
@@ -185,7 +185,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 };
                 content = (
                     <div>
-                        <div className="flex-between mb-8 mx-6">
+                        <div className="flex-between sm:mb-8 mb-6 sm:mx-6 mx-4">
                             <div className="fl relative">
                                 <NoteImportanceInput importance={filterData.importanceMin} setImportance={filterDataSetters.setImportanceMin} inputId="noteImportanceMinFilterOption" />
                                 <InputLabel htmlFor="noteImportanceMinFilterOption" text="Min" />
@@ -230,7 +230,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
         <div
             ref={optionRef}
             onClick={() => openDropdown()}
-            className={`filter-option min-w-[12rem] cursor-pointer relative flex-between mx-3 pl-4 pr-7 py-3 mt-2 flex-1 rounded-lg shadow-md text-cyan-700 transition-all duration-[250ms] ${
+            className={`filter-option min-w-[12rem] cursor-pointer relative flex-between mx-3 pl-4 pr-7 py-3 mt-2 flex-1  basis-[15%] rounded-lg shadow-md text-cyan-700 transition-all duration-[250ms] ${
                 isModalOpened ? '!bg-cyan-600 !text-white !shadow-lg focused' : ''
             } hover:bg-cyan-600 hover:text-white hover:shadow-lg`}
         >

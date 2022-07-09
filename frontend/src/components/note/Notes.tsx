@@ -13,13 +13,13 @@ const Notes = () => {
     const [showFullAddForm, setShowFullAddForm] = useState<boolean>(false);
     const { user } = useAppSelector((store) => store.user);
     const filterBarRef = useRef() as MutableRefObject<HTMLDivElement>;
-    const [_] = useWindowSize();
+    useWindowSize();
 
     useEffect(() => {
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
         }, 500);
-    }, [user.isSidebarShown]);
+    }, [user.isSidebarShown, user.isFilterBarShown]);
 
     if (loading) {
         return <Loading scaleSize={2} className="mt-20" />;
@@ -27,18 +27,18 @@ const Notes = () => {
 
     return (
         <div
-            style={{ paddingTop: user.isFilterBarShown ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 15 : 112) : 25 }}
+            style={{ paddingTop: user.isFilterBarShown ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 20 : 112) : 30 }}
             className={`notes ${user.isSidebarShown ? 'small-padding-x' : 'padding-x'} transition-all duration-500 relative`}
         >
             <FilterBar filterBarRef={filterBarRef} setShowFullAddForm={setShowFullAddForm} />
 
-            <h5 className="text-2xl text-left mb-2 text-slate-500 font-semibold">Add a quick note</h5>
+            <h5 className="sm:text-2xl text-xl text-left lg:mb-2 md:mb-3 mb-6 text-slate-500 font-semibold">Add a quick note</h5>
             <div className="relative">
                 <button
                     onClick={() => setShowFullAddForm(!showFullAddForm)}
                     className={`${
                         showFullAddForm ? 'rotate-45 bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
-                    }  text-white p-2 transition-all shadow-md duration-300 z-30 text-xl rounded-full absolute -top-5 left-1/2 -translate-x-1/2`}
+                    }  text-white sm:p-2 p-[6px] transition-all shadow-md duration-300 z-30 sm:text-xl text-lg rounded-full absolute sm:-top-5 -top-4 left-1/2 -translate-x-1/2`}
                 >
                     <BsPlusLg />
                 </button>

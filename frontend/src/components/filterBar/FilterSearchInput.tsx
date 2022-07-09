@@ -11,7 +11,7 @@ const FilterSearchInput = ({ setSearchQuery, searchQuery }: FilterSearchInputPro
     const [searchFocus, setSearchFocus] = useState<boolean>(false);
 
     return (
-        <div className="filter-option relative flex-between mx-3 mt-2 flex-1 rounded-lg shadow-md text-cyan-700 transition-all duration-[250ms] hover:text-white hover:shadow-lg">
+        <div className="filter-option relative flex-between mx-3 mt-2 flex-1 basis-[15%] rounded-lg shadow-md text-cyan-700 transition-all duration-[250ms] hover:text-white hover:shadow-lg">
             <input
                 type="text"
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -20,7 +20,7 @@ const FilterSearchInput = ({ setSearchQuery, searchQuery }: FilterSearchInputPro
                 onBlur={() => setSearchFocus(false)}
                 id="filter-note-search-input"
                 className={`filter-search-input text-lg whitespace-nowrap block py-3 ${
-                    searchFocus ? 'pl-2' : 'pl-10'
+                    searchFocus ? 'pl-2' : 'pl-12'
                 } w-full  bg-white text-cyan-700 h-full rounded-lg min-w-[12rem] pr-8 transition-all duration-[250ms] hover:text-white focus-within:text-white focus-within:bg-cyan-600 hover:bg-cyan-600 focus-within:placeholder:text-white hover:placeholder:text-white`}
                 placeholder="Search"
             />
@@ -36,7 +36,7 @@ const FilterSearchInput = ({ setSearchQuery, searchQuery }: FilterSearchInputPro
             </label>
             <label
                 htmlFor="filter-note-search-input"
-                className={`text-2xl absolute left-2 top-1/2 -translate-y-1/2 transition-all duration-[250ms] ${searchFocus ? 'opacity-0 invisible' : 'opacity-100'}`}
+                className={`text-2xl absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-[250ms] ${searchFocus ? 'opacity-0 invisible' : 'opacity-100'}`}
             >
                 {<AiOutlineSearch />}
             </label>

@@ -71,20 +71,20 @@ const LoginPage = () => {
     return (
         <CenterPiece>
             <div className="flex flex-col items-center justify-center">
-                <div className="bg-white md:px-12 sm:px-8 px-6 py-8 lg:w-[40vw] md:w-[55vw] sm:w-[65vw] w-[90vw] rounded-lg shadow-xl">
+                <div className="bg-white md:px-12 sm:px-8 px-4 py-8 lg:w-[40vw] md:w-[55vw] sm:w-[65vw] w-[90vw] rounded-lg shadow-xl">
                     <div className="sm:text-5xl text-4xl font-semibold text-center my-4">{isLogin ? 'Login' : 'Sign Up'}</div>
                     <div className="text-center">
-                        <InfoMessage message={error} isError={true} />
                         <button
                             disabled={authenticating}
                             onClick={() => SignInWithSocialMedia(Providers.google)}
-                            className="flex items-center justify-center mx-auto shadow-lg my-6 w-full px-10 font-bold py-3 rounded-lg bg-orange-600 transition-all text-white text-2xl cursor-pointer hover:bg-orange-700 hover:shadow-xl disabled:shadow-xl disabled:cursor-default disabled:bg-orange-900"
+                            className="flex items-center justify-center mx-auto shadow-lg my-6 w-full sm:px-10 px-4 font-bold py-3 rounded-lg bg-orange-600 transition-all text-white text-2xl cursor-pointer hover:bg-orange-700 hover:shadow-xl disabled:shadow-xl disabled:cursor-default disabled:bg-orange-900"
                         >
                             <span className="mr-4">
                                 <BsGoogle />
                             </span>
                             <span className="sm:text-2xl text-xl">Sign {isLogin ? 'In' : 'Up'} with Google</span>
                         </button>
+                        <InfoMessage message={error} isError={true} />
                         {authenticating && <Loading />}
                     </div>
                 </div>

@@ -188,11 +188,11 @@ h6 {
 }
 
 .small-padding-x {
-    @apply px-[5vw];
+    @apply lg:px-[5vw] px-[4vw];
 }
 
 .small-margin-x {
-    @apply mx-[5vw];
+    @apply lg:mx-[5vw] mx-[4vw];
 }
 
 /* Alert */
@@ -265,5 +265,5 @@ h6 {
 }
 
 .filter-modal {
-    min-width: max(25vw, 250px);
+    min-width: max(25vw, 270px);
 }

@@ -5,7 +5,7 @@ import { BsPlusLg } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import { fetchAllNotes, setError } from '../../features/journal/journalSlice';
-import { useDebounce } from '../../hooks';
+import { useDebounce, useWindowSize } from '../../hooks';
 import { getInitialNote } from '../../utils/functions';
 import Loading from '../UI/Loading';
 import { useAppDispatch } from './../../app/hooks';
@@ -62,11 +62,14 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
     return (
         <div
             ref={sidebarRef}
-            className={`h-full absolute top-0 left-0 z-50 duration-500 ${
+            className={`h-full fixed top-0 left-0 z-50 duration-500 ${
                 user.isSidebarShown ? 'translate-x-0' : '-translate-x-full'
             } w-[24rem] transition-all ease-in-out bg-cyan-900 overflow-x-hidden text-white text-left text-xl`}
         >
-            <Link to={'/'} className="text-3xl h-[65px] font-semibold px-4 flex items-center break-all bg-cyan-900 hover:text-cyan-100 transition-colors">
+            <Link
+                to={'/'}
+                className="text-3xl sm:pt-5 pt-3 w-[24rem] whitespace-nowrap overflow-hidden text-ellipsis sm:h-[65px] h-[50px] font-semibold px-4 block align-middle break-all bg-cyan-900 hover:text-cyan-100 transition-colors"
+            >
                 {user.name.split(' ')[0]}'s Journal
             </Link>
             <div className="relative flex-between bg-cyan-800">
@@ -94,7 +97,7 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
                 </div>
             </div>
             <div>
-                <Link to={'/edit'} className="text-xl new-note py-5 px-4 bg-cyan-500 font-semibold mb-[2px] flex items-center cursor-pointer duration-300 transition-colors hover:bg-cyan-600">
+                <Link to={'/edit'} className="text-xl new-note py-4 px-4 bg-cyan-500 font-semibold mb-[2px] flex items-center cursor-pointer duration-300 transition-colors hover:bg-cyan-600">
                     <span className="mr-3 plus text-2xl transition-all duration-300">
                         <BsPlusLg />
                     </span>

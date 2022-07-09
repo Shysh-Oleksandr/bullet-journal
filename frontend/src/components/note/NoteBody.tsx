@@ -24,22 +24,22 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
 
     return (
         <div
-            className={`note__preview relative rounded-lg shadow-md py-4 px-8 transition-colors flex-between ${className}`}
+            className={`note__preview relative rounded-lg shadow-md sm:pt-4 sm:pb-2 pt-3 pb-1 sm:px-8 px-6 transition-colors flex-between ${className}`}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
             onClick={onClick}
             style={{ backgroundColor: bgColor || note.color, color: getDifferentColor(note.color, 185) }}
         >
             <div className="w-full">
-                <h3 className={`text-3xl font-bold mb-1 cursor-auto ${titleClassName}`}>{note.title}</h3>
+                <h3 className={`sm:text-3xl text-2xl font-bold mb-1 cursor-auto ${titleClassName}`}>{note.title}</h3>
 
                 {note.content && !note.isEndNote && (
                     <div
                         dangerouslySetInnerHTML={{ __html: sanitizedData(note.content) }}
-                        className={`px-2 break-words text-[1.25rem] overflow-y-auto !leading-6 max-h-32 h-auto ${contentClassName}`}
+                        className={`sm:px-2 px-1 break-words sm:text-[1.25rem] text-lg overflow-y-auto sm:!leading-6 !leading-5 max-h-32 h-auto ${contentClassName}`}
                     ></div>
                 )}
-                <div className="mt-2 text-lg flex-between">
+                <div className={`mt-2 text-lg flex-between ${noteTime >= 2 ? 'mr-16' : ''}`}>
                     <div>
                         <NoteInfo text={`${note.rating}/10`} color={note.color} className="tracking-widest" />
                         <NoteInfo text={note.type} color={note.color} />
@@ -49,7 +49,7 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
                         })}
                     </div>
                     {noteTime >= 2 && (
-                        <div className="absolute bottom-4 right-0 z-10">
+                        <div className="absolute sm:bottom-2 bottom-1 right-0 z-10">
                             <NoteInfo text={`${noteTime} days`} color={note.color} className={`${note.isEndNote ? 'font-bold' : ''}`} />
                         </div>
                     )}
@@ -60,7 +60,7 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
                     )}
                 </div>
             </div>
-            {note.image && showImage && note.isEndNote && <div className="w-64 h-24 note__image rounded-md ml-4" style={{ backgroundImage: `url(${note.image})` }}></div>}
+            {note.image && showImage && note.isEndNote && <div className="sm:w-64 w-56 sm:h-24 h-20 note__image rounded-md ml-4" style={{ backgroundImage: `url(${note.image})` }}></div>}
         </div>
     );
 };
