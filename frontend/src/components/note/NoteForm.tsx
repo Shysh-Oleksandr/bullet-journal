@@ -75,17 +75,15 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     useEffect(() => {
         let noteID = params.noteID;
 
-        if (_id === '') {
-            if (noteID) {
-                // If it's edit page, get note by id.
-                setId(noteID);
-                getNote(noteID);
-            }
-            // Otherwise, have the blank form.
-            else {
-                resetState();
-                setIsLoading(false);
-            }
+        if (noteID) {
+            // If it's edit page, get note by id.
+            setId(noteID);
+            getNote(noteID);
+        }
+        // Otherwise, have the blank form.
+        else {
+            resetState();
+            setIsLoading(false);
         }
     }, [location]);
 
@@ -294,7 +292,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                         toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm z-[150] sticky sm:top-[65px] top-[50px] left-0"
                         wrapperClassName="mt-8"
                         editorClassName={`${
-                            isShort ? 'min-h-[10vh]' : 'min-h-[40vh]'
+                            isShort ? 'min-h-[15vh]' : 'min-h-[45vh]'
                         } h-auto  cursor-text border-cyan-100 transition-all border-2 rounded-sm border-solid focus-within:border-[3px] focus-within:border-cyan-200 px-3 text-[1.25rem] !leading-[100%]`}
                         toolbar={
                             isShort

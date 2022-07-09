@@ -49,22 +49,27 @@ export const getDateOptions = (veryStartDate: number) => {
     return [
         {
             name: 'Any Date',
+            shortName: 'any',
             startDate: veryStartDate
         },
         {
             name: 'Last week',
+            shortName: 'week',
             startDate: getLastPeriodDate(7)
         },
         {
             name: 'Last month',
+            shortName: 'month',
             startDate: getLastPeriodDate(30)
         },
         {
             name: 'Last 6 months',
+            shortName: '6 months',
             startDate: getLastPeriodDate(183)
         },
         {
             name: 'Last year',
+            shortName: 'year',
             startDate: getLastPeriodDate(365)
         }
     ];
@@ -73,21 +78,25 @@ export const getDateOptions = (veryStartDate: number) => {
 export const importanceFilterOptions = [
     {
         name: 'Any importance',
+        shortName: 'any',
         min: 1,
         max: 10
     },
     {
-        name: 'Great (7-10)',
+        name: 'High (7-10)',
+        shortName: 'high',
         min: 7,
         max: 10
     },
     {
         name: 'Medium (4-6)',
+        shortName: 'medium',
         min: 4,
         max: 6
     },
     {
         name: 'Low (1-3)',
+        shortName: 'low',
         min: 1,
         max: 3
     }

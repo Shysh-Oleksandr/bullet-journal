@@ -119,11 +119,12 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 );
                 break;
             case FilterOptions.DATE:
-                const chooseDatePeriod = (startDate: number, endDate: number = new Date().getTime()) => {
+                const chooseDatePeriod = (startDate: number, periodName: string | undefined = undefined, endDate: number = new Date().getTime()) => {
                     const _stardDate = new Date(startDate);
                     _stardDate.setHours(0, 0, 0, 0);
                     filterDataSetters.setStartDate(_stardDate.getTime());
                     filterDataSetters.setEndDate(endDate);
+                    setOptionsChosen(periodName);
                 };
                 const checkDatePeriodChosen = (startDate: number, endDate: number = new Date().getTime()) => {
                     const _stardDate = new Date(startDate);
@@ -165,7 +166,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                                     key={option.name + '_date_option'}
                                     refToClick={dateDashRef}
                                     forceCheck={checkDatePeriodChosen(option.startDate)}
-                                    onchange={() => chooseDatePeriod(option.startDate)}
+                                    onchange={() => chooseDatePeriod(option.startDate, option.shortName)}
                                     text={option.name}
                                     showCheckmark={false}
                                     canToggle={false}
@@ -176,9 +177,10 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 );
                 break;
             case FilterOptions.IMPORTANCE:
-                const chooseImportance = (min: number, max: number) => {
+                const chooseImportance = (min: number, max: number, shortName: string | undefined = undefined) => {
                     filterDataSetters.setImportanceMin(min);
                     filterDataSetters.setImportanceMax(max);
+                    setOptionsChosen(shortName);
                 };
                 const checkImportanceChosen = (min: number, max: number) => {
                     return filterData.importanceMin === min && filterData.importanceMax === max;
@@ -204,7 +206,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                                     <FilterModalOption
                                         key={option.name + '_importance_option'}
                                         forceCheck={checkImportanceChosen(option.min, option.max)}
-                                        onchange={() => chooseImportance(option.min, option.max)}
+                                        onchange={() => chooseImportance(option.min, option.max, option.shortName)}
                                         text={option.name}
                                         showCheckmark={false}
                                         canToggle={false}
