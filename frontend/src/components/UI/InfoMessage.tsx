@@ -7,7 +7,7 @@ interface IInfoMessageProps {
 
 const InfoMessage = ({ message, isError }: IInfoMessageProps) => {
     if (message === '') return null;
-    return <small className={`${isError ? 'text-red-600' : 'text-green-600'} text-xl my-2 block`}>{message}</small>;
+    return <small className={`${isError ? 'text-red-600' : 'text-green-600'} sm:text-xl text-lg sm:my-2 my-1 block`}>{message}</small>;
 };
 
 export default InfoMessage;

@@ -1,6 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 import IUser, { DEFAULT_USER } from '../../interfaces/user';
 import { DEFAULT_FIRE_TOKEN } from '../../interfaces/user';
+import config from './../../config/config';
 
 export interface IUserState {
     user: IUser;
@@ -11,6 +13,27 @@ export const initialState: IUserState = {
     user: DEFAULT_USER,
     fire_token: DEFAULT_FIRE_TOKEN
 };
+
+interface IUserData {
+    oldUser: IUser;
+    newUserData: any;
+}
+
+export const updateUserData = createAsyncThunk('user/updateUserStatus', async ({ oldUser, newUserData }: IUserData) => {
+    const response = await axios({
+        method: 'PATCH',
+        url: `${config.server.url}/users/update/${oldUser._id}`,
+        data: newUserData
+    });
+
+    if (response.status === 201) {
+        const updatedUser = response.data.user as IUser;
+
+        return updatedUser;
+    } else {
+        return oldUser;
+    }
+});
 
 export const userSlice = createSlice({
     name: 'user',
@@ -29,10 +52,19 @@ export const userSlice = createSlice({
             localStorage.removeItem('fire_token');
 
             return initialState;
+        },
+        updateUser: (state, { payload }: PayloadAction<IUser>) => {
+            state.user = payload;
         }
+    },
+    extraReducers: (builder) => {
+        // Add reducers for additional action types here, and handle loading state as needed
+        builder.addCase(updateUserData.fulfilled, (state, action) => {
+            state.user = action.payload;
+        });
     }
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout, updateUser } = userSlice.actions;
 
 export default userSlice.reducer;

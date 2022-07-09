@@ -9,7 +9,7 @@ interface NoteInfoProps {
 
 const NoteInfo = ({ text, color, className }: NoteInfoProps) => {
     return (
-        <h4 className={`px-2 py-1 inline-block rounded-md ${className}`} style={{ backgroundColor: getDifferentColor(color, 20) }}>
+        <h4 className={`sm:px-2 px-[6px] sm:py-1 py-[2px] mr-2 mb-2 sm:text-xl text-lg inline-block rounded-md ${className}`} style={{ backgroundColor: getDifferentColor(color, 20) }}>
             {text}
         </h4>
     );

@@ -46,6 +46,36 @@ const create = (req: Request, res: Response, next: NextFunction) => {
         });
 };
 
+const update = (req: Request, res: Response, next: NextFunction) => {
+    const _id = req.params.userID;
+
+    logging.info(`Incoming update for ${_id} ...`);
+
+    return User.findById(_id)
+        .exec()
+        .then((user) => {
+            if (user) {
+                user.set(req.body);
+
+                user.save()
+                    .then((newUser) => {
+                        logging.info(`User updated...`);
+                        return res.status(201).json({ user: newUser });
+                    })
+                    .catch((error) => {
+                        logging.error(error);
+                        return res.status(500).json({ error });
+                    });
+            } else {
+                return res.status(404).json({ message: 'user not found' });
+            }
+        })
+        .catch((error) => {
+            logging.error(error);
+            return res.status(500).json({ error });
+        });
+};
+
 const login = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Loggin in user...');
 
@@ -110,5 +140,6 @@ export default {
     create,
     login,
     read,
+    update,
     readAll
 };

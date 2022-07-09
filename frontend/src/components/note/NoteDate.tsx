@@ -1,30 +1,37 @@
 import React from 'react';
 import { BiCalendarAlt } from 'react-icons/bi';
+import InputLabel from './InputLabel';
 
 interface NoteDateProps {
     date: number;
     setDate: (value: React.SetStateAction<number>) => void;
     isStartDate: boolean;
+    inputClassname?: string;
+    refToClick?: React.MutableRefObject<HTMLDivElement>;
 }
 
-const NoteDate = ({ date, setDate, isStartDate }: NoteDateProps) => {
+const NoteDate = ({ date, setDate, isStartDate, inputClassname, refToClick }: NoteDateProps) => {
     return (
-        <div className="relative">
-            <div className="flex items-center">
+        <div className="relative w-full fl justify-center">
+            <div className={`flex items-center ${inputClassname}`}>
                 <label htmlFor={`${isStartDate ? 'start' : 'end'}DateInput`} className="cursor-pointer text-2xl">
                     <BiCalendarAlt />
                 </label>
                 <input
                     type="date"
                     id={`${isStartDate ? 'start' : 'end'}DateInput`}
-                    onChange={(e) => setDate(new Date(e.target.value).getTime())}
-                    className="pl-2 py-3 cursor-pointer"
+                    onChange={(e) => {
+                        setDate(new Date(e.target.value).getTime());
+                        setTimeout(() => {
+                            refToClick?.current.click();
+                        }, 0);
+                    }}
+                    className={`pl-2 py-3 cursor-pointer`}
                     value={new Date(date).toLocaleDateString('en-CA')}
                 />
             </div>
-            <label htmlFor={`${isStartDate ? 'start' : 'end'}DateInput`} className="text-xs block text-left cursor-pointer absolute -bottom-[16px] left-1/2 -translate-x-1/2 ">
-                {isStartDate ? 'Start' : 'End'}
-            </label>
+
+            <InputLabel htmlFor={`${isStartDate ? 'start' : 'end'}DateInput`} text={isStartDate ? 'Start' : 'End'} />
         </div>
     );
 };

@@ -35,7 +35,7 @@ aside {
 html,
 body,
 #root {
-    @apply bg-slate-300;
+    background-color: #d4e0f1;
     font-family: 'Montserrat', sans-serif;
     height: 100%;
     width: 100%;
@@ -71,9 +71,27 @@ a:visited {
 a:hover {
     text-decoration: none;
 }
-ul li {
-    list-style: none;
+.note__preview ul,
+.note__preview li {
+    list-style: inside !important;
 }
+
+.note__preview ol li {
+    list-style: numbers inside !important;
+}
+
+.note__preview a {
+    text-decoration: underline;
+}
+
+.note__preview a:hover {
+    text-decoration: none;
+}
+
+.note__preview p {
+    min-height: 1rem;
+}
+
 img {
     vertical-align: top;
 }
@@ -91,6 +109,18 @@ h6 {
 
 .border-bottom {
     @apply border-b-2 border-solid border-cyan-100 transition-all focus-within:border-b-[3px] focus-within:border-cyan-200;
+}
+
+.border-bottom-md {
+    @apply md:border-b-2 border-solid border-cyan-100 transition-all md:focus-within:border-b-[3px] focus-within:border-cyan-200;
+}
+
+.border-bottom-sm {
+    @apply md:border-b-0 border-b-2 border-solid border-cyan-100 transition-all md:focus-within:border-b-0 focus-within:border-b-[3px] focus-within:border-cyan-200;
+}
+
+.border-bottom-xs {
+    @apply xs:border-b-0 border-b-2 border-solid border-cyan-100 transition-all xs:focus-within:border-b-0 focus-within:border-b-[3px] focus-within:border-cyan-200;
 }
 
 .flex-between {
@@ -162,7 +192,11 @@ h6 {
 }
 
 .padding-x {
-    @apply px-[15vw];
+    @apply md:px-[15vw] sm:px-[10vw] px-[6vw];
+}
+
+.small-padding-x {
+    @apply lg:px-[5vw] px-[4vw];
 }
 
 /* Alert */
@@ -181,4 +215,65 @@ h6 {
 .DraftEditor-root,
 .public-DraftEditor-content {
     height: auto;
+}
+
+.public-DraftStyleDefault-block {
+    margin: 0.5rem 0;
+}
+
+.new-note:hover .plus {
+    transform: rotateZ(90deg);
+}
+
+.filter-option.focused .filter-arrow {
+    color: #fff;
+    animation-name: rotate-filter-arrow-on;
+    animation-duration: 0.75s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+}
+
+.filter-arrow.closed {
+    animation-name: rotate-filter-arrow-off;
+    animation-duration: 0.75s;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease;
+}
+
+@keyframes rotate-filter-arrow-on {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(540deg);
+    }
+}
+
+@keyframes rotate-filter-arrow-off {
+    from {
+        transform: rotate(540deg);
+    }
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+.filter-search-input:hover + .filter-search-delete,
+.filter-option.focused .filter-arrow,
+.filter-option:hover .filter-arrow {
+    @apply !text-white;
+}
+
+.filter-modal-option:hover .option-checkbox {
+    @apply border-white;
+}
+
+.filter-modal {
+    min-width: max(25vw, 270px);
+}
+
+.rdw-emoji-modal,
+.rdw-embedded-modal {
+    left: auto !important;
+    right: 0 !important;
 }

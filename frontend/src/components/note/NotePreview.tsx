@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { getDifferentColor, INITIAL_NOTE_ID, sanitizedData } from '../../utils/functions';
+import { useNavigate } from 'react-router-dom';
 import INote from '../../interfaces/note';
+import { getDifferentColor, INITIAL_NOTE_ID } from '../../utils/functions';
 import NoteBody from './NoteBody';
-import NoteInfo from './NoteInfo';
 
 interface INotePreviewProps {
     note: INote;
@@ -18,7 +17,7 @@ const NotePreview = ({ note, previousNote }: INotePreviewProps) => {
     const isTheSameDate: boolean = new Date(note.startDate).toDateString() === new Date(previousNote?.startDate || 1).toDateString();
 
     return (
-        <div className="note mb-8 text-left text-white" key={note._id}>
+        <div className="note sm:mb-8 mb-6 text-left text-white" key={note._id}>
             {!isTheSameDate && (
                 <div className="text-[#267491] text-xl">
                     <h4>{new Date(note.startDate).toDateString()}</h4>
@@ -30,7 +29,7 @@ const NotePreview = ({ note, previousNote }: INotePreviewProps) => {
                 onClick={() => !isInitialNote && navigate(`/edit/${note._id}`)}
                 bgColor={hover ? getDifferentColor(note.color, -10) : note.color}
                 titleClassName={isInitialNote ? '' : 'hover:underline !cursor-pointer'}
-                className={`${isInitialNote ? 'cursor-auto' : 'cursor-pointer'} note__body mt-8`}
+                className={`${isInitialNote ? 'cursor-auto' : 'cursor-pointer'} note__body sm:mt-8 mt-6`}
                 note={note}
                 showImage={true}
                 contentClassName={'max-h-[75px]'}

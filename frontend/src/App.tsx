@@ -8,13 +8,13 @@ import logging from './config/logging';
 import routes from './config/routes';
 import { login, logout } from './features/user/userSlice';
 import { Validate } from './modules/auth';
-//  "homepage": "http://shysh-oleksandr.github.io/bullet-journal",
+import Alert from './components/UI/Alert';
+import { setError, setSuccess } from './features/journal/journalSlice';
 
 function App() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const dispatch = useAppDispatch();
-    const { user } = useAppSelector((store) => store.user);
-    const isAuthorized = user._id !== '';
+    const { error, success } = useAppSelector((store) => store.journal);
 
     useEffect(() => {
         setTimeout(() => {
@@ -63,8 +63,7 @@ function App() {
 
     return (
         <Router>
-            <div className="app text-center w-full h-full bg-slate-300">
-                {isAuthorized && <Navbar />}
+            <div className="app text-center w-full h-full">
                 <Routes>
                     {routes.map((route, index) => {
                         if (route.auth) {
@@ -83,6 +82,8 @@ function App() {
                         return <Route key={index} path={route.path} element={<route.component {...route.props} />} />;
                     })}
                 </Routes>
+                <Alert message={error} isError={true} anotherMessage={success} />
+                <Alert message={success} isError={false} anotherMessage={error} />
             </div>
         </Router>
     );

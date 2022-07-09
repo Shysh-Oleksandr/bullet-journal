@@ -75,9 +75,13 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const query = (req: Request, res: Response, next: NextFunction) => {
+    const { title } = req.query;
+    const author_id = req.params.authorID;
+
     logging.info(`Incoming query...`);
 
-    return Note.find()
+    const titleRegex = title ? new RegExp(title.toString(), 'i') : new RegExp('');
+    return Note.find({ title: { $regex: titleRegex }, author: author_id })
         .exec()
         .then((notes) => {
             return res.status(200).json({

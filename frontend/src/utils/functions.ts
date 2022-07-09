@@ -2,6 +2,7 @@ import DOMPurify from 'dompurify';
 import tinycolor from 'tinycolor2';
 import IUser from '../interfaces/user';
 import INote from '../interfaces/note';
+import { SEPARATOR } from './data';
 
 export function shadeColor(color: string, amount: number) {
     return '#' + color.replace(/^#/, '').replace(/../g, (color) => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
@@ -29,4 +30,29 @@ export const getInitialNote = (author: IUser): INote => {
         type: 'Event',
         rating: 1
     };
+};
+
+export function getCustomLabels(customLabels: string | undefined): string[] {
+    return customLabels?.split(SEPARATOR) || [];
+}
+
+export function getAllLabels(defaultLabels: string[], customLabels: string | undefined, additionalLabels?: string[]): string[] {
+    return [...defaultLabels, ...(additionalLabels || []), ...getCustomLabels(customLabels)].filter((label) => label !== '');
+}
+
+const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+// a and b are javascript Date objects
+export function dateDiffInDays(a: Date, b: Date) {
+    // Discard the time and time-zone information.
+    const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+    const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+    return Math.abs(Math.floor((utc2 - utc1) / _MS_PER_DAY));
+}
+
+export const areArraysEqual = (firstArray: any[], secondArray: any[]) => {
+    return firstArray.every(function (element) {
+        return secondArray.includes(element);
+    });
 };
