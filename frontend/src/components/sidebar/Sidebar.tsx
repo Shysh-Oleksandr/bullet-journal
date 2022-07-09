@@ -12,6 +12,8 @@ import { useAppDispatch } from './../../app/hooks';
 import config from './../../config/config';
 import INote from './../../interfaces/note';
 import NoteSidebarPreview from './NoteSidebarPreview';
+import { IoMdMenu } from 'react-icons/io';
+import { updateUserData } from '../../features/user/userSlice';
 
 interface SidebarProps {
     sidebarRef: React.MutableRefObject<HTMLDivElement>;
@@ -64,16 +66,24 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
             ref={sidebarRef}
             className={`h-full fixed top-0 left-0 z-50 duration-500 ${
                 user.isSidebarShown ? 'translate-x-0' : '-translate-x-full'
-            } w-[24rem] transition-all ease-in-out bg-cyan-900 overflow-x-hidden text-white text-left text-xl`}
+            } sm:w-[24rem] w-[100%] transition-all z-[2000] ease-in-out bg-cyan-900 overflow-x-hidden text-white text-left text-xl`}
         >
-            <Link
-                to={'/'}
-                className="text-3xl sm:pt-5 pt-3 w-[24rem] whitespace-nowrap overflow-hidden text-ellipsis sm:h-[65px] h-[50px] font-semibold px-4 block align-middle break-all bg-cyan-900 hover:text-cyan-100 transition-colors"
-            >
-                {user.name.split(' ')[0]}'s Journal
-            </Link>
+            <div className="fl sm:h-[65px] h-[50px] relative">
+                <button
+                    onClick={() => dispatch(updateUserData({ oldUser: user, newUserData: { isSidebarShown: !user.isSidebarShown } }))}
+                    className={`text-4xl transition-colors md:hidden absolute left-4 top-1/2 -translate-y-1/2 hover:text-cyan-100`}
+                >
+                    <IoMdMenu />
+                </button>
+                <Link
+                    to={'/'}
+                    className="md:text-3xl text-2xl md:ml-0 ml-12 w-[24rem] whitespace-nowrap overflow-hidden text-ellipsis font-semibold px-4 block break-all bg-cyan-900 hover:text-cyan-100 transition-colors"
+                >
+                    {user.name.split(' ')[0]}'s Journal
+                </Link>
+            </div>
             <div className="relative flex-between bg-cyan-800">
-                <div className="relative">
+                <div className="relative w-[90%]">
                     <input
                         type="text"
                         className="mx-4 w-full text-lg text-cyan-800 shadow-lg my-3 rounded-2xl pl-9 pr-3 py-1 border-solid transition-all border-cyan-500 focus:border-b-[3px] hover:bg-cyan-50"

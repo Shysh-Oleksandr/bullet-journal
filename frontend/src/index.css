@@ -180,19 +180,11 @@ h6 {
 }
 
 .padding-x {
-    @apply md:px-[15vw] px-[10vw];
-}
-
-.margin-x {
-    @apply md:mx-[15vw] mx-[10vw];
+    @apply md:px-[15vw] sm:px-[10vw] px-[6vw];
 }
 
 .small-padding-x {
     @apply lg:px-[5vw] px-[4vw];
-}
-
-.small-margin-x {
-    @apply lg:mx-[5vw] mx-[4vw];
 }
 
 /* Alert */

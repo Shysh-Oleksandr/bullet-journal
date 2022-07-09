@@ -13,7 +13,7 @@ const Notes = () => {
     const [showFullAddForm, setShowFullAddForm] = useState<boolean>(false);
     const { user } = useAppSelector((store) => store.user);
     const filterBarRef = useRef() as MutableRefObject<HTMLDivElement>;
-    useWindowSize();
+    const [width] = useWindowSize();
 
     useEffect(() => {
         setTimeout(() => {
@@ -28,7 +28,7 @@ const Notes = () => {
     return (
         <div
             style={{ paddingTop: user.isFilterBarShown ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 20 : 112) : 30 }}
-            className={`notes ${user.isSidebarShown ? 'small-padding-x' : 'padding-x'} transition-all duration-500 relative`}
+            className={`notes ${user.isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} transition-all duration-500 relative`}
         >
             <FilterBar filterBarRef={filterBarRef} setShowFullAddForm={setShowFullAddForm} />
 
