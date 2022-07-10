@@ -7,13 +7,13 @@ import Navbar from './../components/Navbar';
 
 const HomePage = () => {
     const sidebarRef = useRef() as MutableRefObject<HTMLDivElement>;
-    const { user } = useAppSelector((store) => store.user);
+    const { isSidebarShown } = useAppSelector((store) => store.journal);
     const [width] = useWindowSize();
 
     return (
         <div>
             <Sidebar sidebarRef={sidebarRef} />
-            <div style={{ marginLeft: user.isSidebarShown && width > 767 ? (sidebarRef.current ? sidebarRef.current.offsetWidth : 336) : 0 }} className="transition-all duration-500 ease-in-out">
+            <div style={{ marginLeft: isSidebarShown && width > 767 ? (sidebarRef.current ? sidebarRef.current.offsetWidth : 336) : 0 }} className="transition-all duration-500 ease-in-out">
                 <Navbar />
                 <Notes />
             </div>

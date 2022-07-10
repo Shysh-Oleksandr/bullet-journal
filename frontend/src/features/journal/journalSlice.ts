@@ -9,6 +9,8 @@ export interface IJournalState {
     notes: INote[];
     loading: boolean;
     showFilteredNotes?: boolean;
+    isSidebarShown?: boolean;
+    isFilterBarShown?: boolean;
     error: string;
     success: string;
 }
@@ -17,6 +19,8 @@ const initialState: IJournalState = {
     notes: [],
     loading: true,
     showFilteredNotes: false,
+    isSidebarShown: (document.documentElement.clientWidth > 767 && localStorage.getItem('isSidebarShown') === 'true') || false,
+    isFilterBarShown: (document.documentElement.clientWidth > 425 && localStorage.getItem('isFilterBarShown') === 'true') || false,
     error: '',
     success: ''
 };
@@ -78,7 +82,6 @@ export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async (
                 return copyNote;
             });
         notes = [...notes, ...endNotes].filter((note) => note.startDate <= new Date().getTime());
-        // notes.sort((x, y) => y.startDate - x.startDate);
         notes = sort(notes);
         return notes;
     } else {
@@ -96,6 +99,14 @@ export const journalSlice = createSlice({
         },
         setError: (state, { payload }: PayloadAction<string>) => {
             state.error = payload;
+        },
+        setShowSidebar: (state, { payload }: PayloadAction<boolean>) => {
+            state.isSidebarShown = payload;
+            localStorage.setItem('isSidebarShown', payload.toString());
+        },
+        setShowFilterBar: (state, { payload }: PayloadAction<boolean>) => {
+            state.isFilterBarShown = payload;
+            localStorage.setItem('isFilterBarShown', payload.toString());
         },
         setSuccess: (state, { payload }: PayloadAction<string>) => {
             state.success = payload;
@@ -129,6 +140,6 @@ export const journalSlice = createSlice({
     }
 });
 
-export const { setNotes, setError, setSuccess } = journalSlice.actions;
+export const { setNotes, setError, setSuccess, setShowFilterBar, setShowSidebar } = journalSlice.actions;
 
 export default journalSlice.reducer;

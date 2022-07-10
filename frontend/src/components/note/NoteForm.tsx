@@ -52,6 +52,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const { user } = useAppSelector((store) => store.user);
+    const { isSidebarShown } = useAppSelector((store) => store.journal);
     const params = useParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -226,7 +227,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     return (
         <div
-            className={`transition-all duration-500 ${isShort ? '' : `${user.isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`} ${
+            className={`transition-all duration-500 ${isShort ? '' : `${isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`} ${
                 isShort && !showFullAddForm ? 'max-h-16 overflow-hidden mb-4' : 'max-h-[300rem]'
             }`}
         >

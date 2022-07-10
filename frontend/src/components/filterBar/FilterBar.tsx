@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAppSelector } from '../../app/hooks';
-import { filterNotes } from '../../features/journal/journalSlice';
+import { filterNotes, setShowFilterBar } from '../../features/journal/journalSlice';
 import { useDebounce } from '../../hooks';
 import { useAppDispatch } from './../../app/hooks';
-import { updateUserData } from './../../features/user/userSlice';
+import INote from './../../interfaces/note';
 import { defaultNoteTypes, filterOptions, getLastPeriodDate, SEPARATOR, SortOptions } from './../../utils/data';
 import { getAllLabels } from './../../utils/functions';
 import FilterOption from './FilterOption';
 import FilterSearchInput from './FilterSearchInput';
-import INote from './../../interfaces/note';
 
 interface FilterBarProps {
     filterBarRef: React.MutableRefObject<HTMLDivElement>;
@@ -18,7 +17,7 @@ interface FilterBarProps {
 
 const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const { user } = useAppSelector((store) => store.user);
-    const { notes } = useAppSelector((store) => store.journal);
+    const { notes, isFilterBarShown } = useAppSelector((store) => store.journal);
     const dispatch = useAppDispatch();
     const [wasReset, setWasReset] = useState(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -115,18 +114,18 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
         <div
             ref={filterBarRef}
             className={`w-full absolute top-0 z-[99] left-0 right-0 pb-4 pt-2 rounded-b-xl shadow-md duration-500 ease-in-out bg-white px-[3vw] ${
-                user.isFilterBarShown ? '' : '-translate-y-[92%] max-h-36'
+                isFilterBarShown ? '' : '-translate-y-[92%] max-h-36'
             }`}
         >
-            <div className={`fl justify-between flex-wrap transition-all duration-300 ${user.isFilterBarShown ? 'delay-300' : 'opacity-0 invisible'}`}>
+            <div className={`fl justify-between flex-wrap transition-all duration-300 ${isFilterBarShown ? 'delay-300' : 'opacity-0 invisible'}`}>
                 {filterOptions.map((option) => {
                     return <FilterOption setShowFullAddForm={setShowFullAddForm} option={option} key={option.name} filterData={filterData} filterDataSetters={filterDataSetters} />;
                 })}
                 <FilterSearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             </div>
             <span
-                onClick={() => dispatch(updateUserData({ oldUser: user, newUserData: { isFilterBarShown: !user.isFilterBarShown } }))}
-                className={`text-4xl absolute -bottom-7 text-cyan-600 z-50 cursor-pointer transition-all duration-300 block right-4 ${user.isFilterBarShown ? 'rotate-180' : ''} hover:text-cyan-700`}
+                onClick={() => dispatch(setShowFilterBar(!isFilterBarShown))}
+                className={`text-4xl absolute -bottom-7 text-cyan-600 z-50 cursor-pointer transition-all duration-300 block right-4 ${isFilterBarShown ? 'rotate-180' : ''} hover:text-cyan-700`}
             >
                 <IoIosArrowDown />
             </span>
