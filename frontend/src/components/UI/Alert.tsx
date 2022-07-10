@@ -16,7 +16,7 @@ const Alert = ({ message, isError, anotherMessage }: AlertProps) => {
     const isAnotherAlertShown = anotherMessage !== '';
 
     useEffect(() => {
-        setShowingAlert(message !== '');
+        setShowingAlert(message !== '' && !message.includes('404') && !message.includes('failed'));
         setTimeout(() => {
             if (message !== '') {
                 dispatch(isError ? setError('') : setSuccess(''));
@@ -26,7 +26,7 @@ const Alert = ({ message, isError, anotherMessage }: AlertProps) => {
 
     return (
         <div
-            className={`fixed left-1/2 -translate-x-1/2 sm:w-[40vw] xs:w-[75vw] w-[90vw] z-40 ${isAnotherAlertShown && !isError ? 'bottom-32' : 'bottom-12'} ${
+            className={`fixed left-1/2 -translate-x-1/2 sm:w-[40vw] xs:w-[75vw] w-[85vw] sm:mx-4 mx-2 z-40 ${isAnotherAlertShown && !isError ? 'bottom-32' : 'bottom-12'} ${
                 isShowingAlert ? 'alert-shown' : 'alert-hidden hidden'
             }`}
             onTransitionEnd={() => {
