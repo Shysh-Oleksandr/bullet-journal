@@ -253,7 +253,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     <div className="fl xs:h-11 border-bottom-sm md:w-auto w-full md:justify-start xs:justify-between justify-center xs:flex-row flex-col">
                         <NoteDate date={startDate} isStartDate={true} setDate={setStartDate} inputClassname="border-bottom-xs w-full fl justify-center" />
                         <BsDashLg className="lg:mx-6 mx-3 xs:block hidden xs:text-4xl text-xl" />
-                        <NoteDate date={endDate} isStartDate={false} setDate={setEndDate} inputClassname="mt-3" />
+                        <NoteDate date={endDate} isStartDate={false} setDate={setEndDate} inputClassname="xs:mt-0 mt-3" />
                     </div>
                     <div className="fl border-bottom-sm md:mt-0 mt-5 md:w-auto w-full md:justify-start justify-between md:px-0 px-4">
                         <div className="relative fl lg:mr-3 mr-1 h-11">
