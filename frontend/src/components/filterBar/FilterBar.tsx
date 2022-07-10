@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAppSelector } from '../../app/hooks';
-import { filterNotes, setShowFilterBar } from '../../features/journal/journalSlice';
+import { fetchAllNotes, setShowFilterBar } from '../../features/journal/journalSlice';
 import { useDebounce } from '../../hooks';
 import { useAppDispatch } from './../../app/hooks';
 import INote from './../../interfaces/note';
@@ -17,13 +17,12 @@ interface FilterBarProps {
 
 const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const { user } = useAppSelector((store) => store.user);
-    const { notes, isFilterBarShown } = useAppSelector((store) => store.journal);
+    const { isFilterBarShown } = useAppSelector((store) => store.journal);
     const dispatch = useAppDispatch();
     const [wasReset, setWasReset] = useState(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [sortType, setSortType] = useState<SortOptions>(SortOptions.NEWEST);
-    const [veryStartDate, setVeryStartDate] = useState(notes.at(-1)?.startDate || 1);
-    const [startDate, setStartDate] = useState<number>(veryStartDate);
+    const [startDate, setStartDate] = useState<number>(1);
     const [endDate, setEndDate] = useState<number>(new Date().getTime());
     const allTypes = getAllLabels(defaultNoteTypes, user.customNoteTypes);
     const allCategories = getAllLabels([], user.customNoteCategories);
@@ -33,9 +32,10 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const [importanceMin, setImportanceMin] = useState<number>(1);
     const [importanceMax, setImportanceMax] = useState<number>(10);
 
-    const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showNoCategory, veryStartDate, wasReset };
+    const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showNoCategory, wasReset };
     const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportanceMin, setImportanceMax, setShowNoCategory };
-    const debouncedSearchTerm = useDebounce(searchQuery, 500);
+    const debouncedSearchTerm: string = useDebounce(searchQuery, 500);
+    const debouncedSortType = useDebounce(sortType, 500);
     const debouncedStartDate = useDebounce(startDate, 500);
     const debouncedEndDate = useDebounce(endDate, 500);
     const debouncedShowNoCategory = useDebounce(showNoCategory, 500);
@@ -81,12 +81,13 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
 
     const filter = (notes: INote[]) => {
         const filteredNotes = notes.filter((note) => {
+            const titleFilter = note.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
             const typeFilter = debouncedType.includes(note.type);
             const categoryFilter = note.category?.split(SEPARATOR).some((r) => debouncedCategory.includes(r)) || (showNoCategory && !note.category);
             const dateFilter = note.startDate >= debouncedStartDate && note.startDate <= getLastPeriodDate(-1, debouncedEndDate);
             const importanceFilter = note.rating >= importanceMin && note.rating <= importanceMax;
 
-            return typeFilter && categoryFilter && dateFilter && importanceFilter;
+            return titleFilter && typeFilter && categoryFilter && dateFilter && importanceFilter;
         });
 
         return filteredNotes;
@@ -95,7 +96,6 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const resetFilters = () => {
         setSearchQuery('');
         setSortType(SortOptions.NEWEST);
-        setStartDate(veryStartDate);
         setEndDate(new Date().getTime());
         setType(allTypes);
         setCategory(allCategories);
@@ -107,8 +107,8 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     };
 
     useEffect(() => {
-        dispatch(filterNotes({ user, title: debouncedSearchTerm, filter, sort }));
-    }, [sortType, debouncedStartDate, debouncedEndDate, debouncedType, debouncedCategory, debouncedImportanceMin, debouncedImportanceMax, debouncedSearchTerm, debouncedShowNoCategory]);
+        dispatch(fetchAllNotes({ user, filter, sort }));
+    }, [debouncedSortType, debouncedStartDate, debouncedEndDate, debouncedType, debouncedCategory, debouncedImportanceMin, debouncedImportanceMax, debouncedSearchTerm, debouncedShowNoCategory]);
 
     return (
         <div

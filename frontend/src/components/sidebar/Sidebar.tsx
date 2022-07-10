@@ -1,17 +1,12 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
 import { IoMdMenu } from 'react-icons/io';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
-import { fetchAllNotes, setError, setShowSidebar } from '../../features/journal/journalSlice';
+import { fetchAllNotes, setShowSidebar } from '../../features/journal/journalSlice';
 import { useDebounce, useOnClickOutside, useWindowSize } from '../../hooks';
-import { getInitialNote } from '../../utils/functions';
-import Loading from '../UI/Loading';
 import { useAppDispatch } from './../../app/hooks';
-import config from './../../config/config';
-import INote from './../../interfaces/note';
 import NoteSidebarPreview from './NoteSidebarPreview';
 
 interface SidebarProps {
@@ -22,8 +17,6 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
     const { user } = useAppSelector((store) => store.user);
     const { notes, isSidebarShown } = useAppSelector((store) => store.journal);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredNotes, setFilteredNotes] = useState<INote[]>([]);
-    const [isSearching, setIsSearching] = useState(false);
     const debouncedSearchTerm = useDebounce(searchQuery, 600);
     const isEditPage = window.location.pathname.includes('edit');
     const [width] = useWindowSize();
@@ -33,35 +26,8 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(fetchAllNotes(user));
-        filterNotes(debouncedSearchTerm);
+        isEditPage && dispatch(fetchAllNotes({ user }));
     }, []);
-
-    useEffect(() => {
-        filterNotes(debouncedSearchTerm);
-    }, [debouncedSearchTerm]);
-
-    const filterNotes = async (title: string) => {
-        setIsSearching(true);
-
-        try {
-            const response = await axios({
-                method: 'GET',
-                url: `${config.server.url}/notes/query/${user._id}?title=${title}`
-            });
-
-            if (response.status === 200 || response.status === 304) {
-                let notes = response.data.notes as INote[];
-                title === '' && notes.push(getInitialNote(user));
-                notes.sort((x, y) => y.startDate - x.startDate);
-                setFilteredNotes(notes);
-            }
-        } catch (error: any) {
-            dispatch(setError(error.message));
-        } finally {
-            setIsSearching(false);
-        }
-    };
 
     return (
         <div
@@ -112,17 +78,15 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
                     </span>
                     New note
                 </Link>
-                {isSearching ? (
-                    <Loading scaleSize={1.5} className="mt-20" />
-                ) : isEditPage || debouncedSearchTerm !== '' ? (
-                    filteredNotes.map((note) => {
-                        return note.isEndNote ? null : <NoteSidebarPreview note={note} key={note._id} />;
-                    })
-                ) : (
-                    notes.map((note) => {
-                        return note.isEndNote ? null : <NoteSidebarPreview note={note} key={note._id} />;
-                    })
-                )}
+                {isEditPage || debouncedSearchTerm !== ''
+                    ? notes
+                          .filter((note) => note.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()))
+                          .map((note) => {
+                              return note.isEndNote ? null : <NoteSidebarPreview note={note} key={note._id} />;
+                          })
+                    : notes.map((note) => {
+                          return note.isEndNote ? null : <NoteSidebarPreview note={note} key={note._id} />;
+                      })}
             </div>
         </div>
     );

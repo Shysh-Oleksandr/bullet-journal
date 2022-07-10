@@ -83,7 +83,6 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
                   customNoteCategories: newCustomNoteLabels
               };
         dispatch(updateUserData({ oldUser: user, newUserData }));
-
         setUserCustomNoteLabels(newCustomNoteLabels);
         setAvailableLabels(isCustomTypes ? getAllLabels(defaultNoteTypes, newCustomNoteLabels, removedLabels) : getAllLabels([], newCustomNoteLabels, removedLabels));
 
@@ -102,7 +101,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes }: NoteLabelInputProps)
             addedLabel = newLabel;
             labelInputRef.current?.blur();
 
-            setLabel((prevLabel) => {
+            setLabel(() => {
                 return isCustomTypes ? newLabel : `${previousLabel === '' ? '' : previousLabel}${SEPARATOR}${newLabel}`;
             });
 

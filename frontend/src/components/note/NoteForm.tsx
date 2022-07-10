@@ -178,7 +178,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
             if (response.status === 201) {
                 if (isShort) {
-                    dispatch(fetchAllNotes(user));
+                    dispatch(fetchAllNotes({ user }));
                     resetState();
                 } else {
                     setId(response.data.note._id);
@@ -222,7 +222,11 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     };
 
     if (isLoading) {
-        return <Loading scaleSize={2} className="mt-20" />;
+        return (
+            <div className={`transition-all duration-500 ${isShort ? '' : `${isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`}`}>
+                <Loading scaleSize={2} className="mt-20" />
+            </div>
+        );
     }
 
     return (
