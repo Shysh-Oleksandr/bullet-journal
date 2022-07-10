@@ -52,6 +52,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const { user } = useAppSelector((store) => store.user);
+    const { isSidebarShown } = useAppSelector((store) => store.journal);
     const params = useParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -177,7 +178,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
             if (response.status === 201) {
                 if (isShort) {
-                    dispatch(fetchAllNotes(user));
+                    dispatch(fetchAllNotes({ user }));
                     resetState();
                 } else {
                     setId(response.data.note._id);
@@ -221,12 +222,16 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     };
 
     if (isLoading) {
-        return <Loading scaleSize={2} className="mt-20" />;
+        return (
+            <div className={`transition-all duration-500 ${isShort ? '' : `${isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`}`}>
+                <Loading scaleSize={2} className="mt-20" />
+            </div>
+        );
     }
 
     return (
         <div
-            className={`transition-all duration-500 ${isShort ? '' : `${user.isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`} ${
+            className={`transition-all duration-500 ${isShort ? '' : `${isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`} ${
                 isShort && !showFullAddForm ? 'max-h-16 overflow-hidden mb-4' : 'max-h-[300rem]'
             }`}
         >

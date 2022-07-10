@@ -24,7 +24,6 @@ interface FilterOptionProps {
         importanceMax: number;
         showNoCategory: boolean;
         wasReset: boolean;
-        veryStartDate: number;
     };
     filterDataSetters: {
         setSortType: React.Dispatch<React.SetStateAction<SortOptions>>;
@@ -119,6 +118,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 );
                 break;
             case FilterOptions.DATE:
+                const newStartDate = filterData.startDate === 1 ? Number(localStorage.getItem('oldestNoteDate') || 1) : filterData.startDate;
                 const chooseDatePeriod = (startDate: number, periodName: string | undefined = undefined, endDate: number = new Date().getTime()) => {
                     const _stardDate = new Date(startDate);
                     _stardDate.setHours(0, 0, 0, 0);
@@ -129,7 +129,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 const checkDatePeriodChosen = (startDate: number, endDate: number = new Date().getTime()) => {
                     const _stardDate = new Date(startDate);
                     const _endDate = new Date(endDate);
-                    const stardD = new Date(filterData.startDate);
+                    const stardD = new Date(newStartDate);
                     const endD = new Date(filterData.endDate);
                     _stardDate.setHours(0, 0, 0, 0);
                     _endDate.setHours(0, 0, 0, 0);
@@ -144,7 +144,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                         <div className="fl sm:mb-8 mb-6 justify-center sm:flex-row flex-col">
                             <NoteDate
                                 refToClick={dateDashRef}
-                                date={filterData.startDate}
+                                date={newStartDate}
                                 setDate={filterDataSetters.setStartDate}
                                 inputClassname="border-2 border-solid border-cyan-100 px-2 rounded-md"
                                 isStartDate={true}
@@ -160,7 +160,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                                 isStartDate={false}
                             />
                         </div>
-                        {getDateOptions(filterData.veryStartDate).map((option) => {
+                        {getDateOptions(Number(localStorage.getItem('oldestNoteDate') || 1)).map((option) => {
                             return (
                                 <FilterModalOption
                                     key={option.name + '_date_option'}

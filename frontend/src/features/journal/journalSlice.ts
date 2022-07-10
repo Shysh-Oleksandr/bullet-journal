@@ -8,7 +8,8 @@ import { dateDiffInDays, getInitialNote } from './../../utils/functions';
 export interface IJournalState {
     notes: INote[];
     loading: boolean;
-    showFilteredNotes?: boolean;
+    isSidebarShown?: boolean;
+    isFilterBarShown?: boolean;
     error: string;
     success: string;
 }
@@ -16,12 +17,19 @@ export interface IJournalState {
 const initialState: IJournalState = {
     notes: [],
     loading: true,
-    showFilteredNotes: false,
+    isSidebarShown: (document.documentElement.clientWidth > 767 && localStorage.getItem('isSidebarShown') === 'true') || false,
+    isFilterBarShown: (document.documentElement.clientWidth > 425 && localStorage.getItem('isFilterBarShown') === 'true') || false,
     error: '',
     success: ''
 };
 
-export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', async (user: IUser) => {
+export interface IFilterNotes {
+    user: IUser;
+    filter?: (notes: INote[]) => INote[];
+    sort?: (notes: INote[]) => INote[];
+}
+
+export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', async ({ user, filter, sort }: IFilterNotes) => {
     const response = await axios({
         method: 'GET',
         url: `${config.server.url}/notes/${user._id}`
@@ -29,47 +37,12 @@ export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', asy
 
     if (response.status === 200 || response.status === 304) {
         let notes = response.data.notes as INote[];
-        const endNotes: INote[] = notes
-            .filter((note) => dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 >= 2)
-            .map((note) => {
-                const copyNote = JSON.parse(JSON.stringify(note));
-                copyNote.isEndNote = true;
-                const startDate = copyNote.startDate;
-                copyNote.startDate = copyNote.endDate;
-                copyNote.endDate = startDate;
-                return copyNote;
-            });
-        notes = [...notes, ...endNotes].filter((note) => note.startDate <= new Date().getTime());
         notes.push(getInitialNote(user));
-        notes.sort((x, y) => y.startDate - x.startDate);
-        return notes;
-    } else {
-        return [];
-    }
-});
-
-export interface IFilterNotes {
-    user: IUser;
-    title: string;
-    filter: (notes: INote[]) => INote[];
-    sort: (notes: INote[]) => INote[];
-}
-
-export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async ({ user, title, filter, sort }: IFilterNotes) => {
-    const titleParams = `title=${title}`;
-
-    const response = await axios({
-        method: 'GET',
-        url: `${config.server.url}/notes/query/${user._id}?${titleParams}`
-    });
-
-    if (response.status === 200 || response.status === 304) {
-        let notes = response.data.notes as INote[];
-        title === '' && notes.push(getInitialNote(user));
-        notes = filter(notes);
+        notes = filter ? filter(notes) : notes;
         const endNotes: INote[] = notes
             .filter((note) => dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 >= 2)
             .map((note) => {
+                // Adding end date notes.
                 const copyNote = JSON.parse(JSON.stringify(note));
                 copyNote.isEndNote = true;
                 const startDate = copyNote.startDate;
@@ -78,8 +51,8 @@ export const filterNotes = createAsyncThunk('journal/filterNotesStatus', async (
                 return copyNote;
             });
         notes = [...notes, ...endNotes].filter((note) => note.startDate <= new Date().getTime());
-        // notes.sort((x, y) => y.startDate - x.startDate);
-        notes = sort(notes);
+
+        notes = sort ? sort(notes) : notes.sort((x, y) => y.startDate - x.startDate);
         return notes;
     } else {
         return [];
@@ -97,6 +70,14 @@ export const journalSlice = createSlice({
         setError: (state, { payload }: PayloadAction<string>) => {
             state.error = payload;
         },
+        setShowSidebar: (state, { payload }: PayloadAction<boolean>) => {
+            state.isSidebarShown = payload;
+            localStorage.setItem('isSidebarShown', payload.toString());
+        },
+        setShowFilterBar: (state, { payload }: PayloadAction<boolean>) => {
+            state.isFilterBarShown = payload;
+            localStorage.setItem('isFilterBarShown', payload.toString());
+        },
         setSuccess: (state, { payload }: PayloadAction<string>) => {
             state.success = payload;
         }
@@ -109,26 +90,22 @@ export const journalSlice = createSlice({
         builder.addCase(fetchAllNotes.fulfilled, (state, action) => {
             state.notes = action.payload;
             state.loading = false;
+
+            // Set new oldest note date, if we have new one.
+            const storagedOldestDate = localStorage.getItem('oldestNoteDate');
+            const oldestNoteDate = action.payload.at(-1)?.startDate;
+
+            if (!storagedOldestDate || storagedOldestDate === '' || (oldestNoteDate && oldestNoteDate !== Number(storagedOldestDate))) {
+                localStorage.setItem('oldestNoteDate', oldestNoteDate?.toString() || '');
+            }
         });
         builder.addCase(fetchAllNotes.rejected, (state, action) => {
             state.loading = false;
             state.error = 'Unable to retreive notes.';
         });
-        // Filter notes
-        builder.addCase(filterNotes.pending, (state, action) => {
-            // state.loading = true;
-        });
-        builder.addCase(filterNotes.fulfilled, (state, action) => {
-            state.notes = action.payload;
-            // state.loading = false;
-        });
-        builder.addCase(filterNotes.rejected, (state, action) => {
-            // state.loading = false;
-            state.error = 'Unable to retreive notes.';
-        });
     }
 });
 
-export const { setNotes, setError, setSuccess } = journalSlice.actions;
+export const { setNotes, setError, setSuccess, setShowFilterBar, setShowSidebar } = journalSlice.actions;
 
 export default journalSlice.reducer;

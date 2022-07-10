@@ -6,7 +6,6 @@ import firebaseAdmin from 'firebase-admin';
 import serviceAccountJson from './config/serviceAccountKey.json';
 import userRoutes from './routes/user';
 import noteRoutes from './routes/note';
-import path from 'path';
 
 const router = express();
 
@@ -66,10 +65,6 @@ router.use((req, res, next) => {
     res.status(404).json({
         message: error.message
     });
-});
-
-router.get('/', (req, res) => {
-    res.send('Hello from Express!');
 });
 
 /** Listen */

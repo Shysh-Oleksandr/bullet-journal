@@ -1,19 +1,13 @@
-import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
+import { IoMdMenu } from 'react-icons/io';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
-import { fetchAllNotes, setError } from '../../features/journal/journalSlice';
+import { fetchAllNotes, setShowSidebar } from '../../features/journal/journalSlice';
 import { useDebounce, useOnClickOutside, useWindowSize } from '../../hooks';
-import { getInitialNote } from '../../utils/functions';
-import Loading from '../UI/Loading';
 import { useAppDispatch } from './../../app/hooks';
-import config from './../../config/config';
-import INote from './../../interfaces/note';
 import NoteSidebarPreview from './NoteSidebarPreview';
-import { IoMdMenu } from 'react-icons/io';
-import { updateUserData } from '../../features/user/userSlice';
 
 interface SidebarProps {
     sidebarRef: React.MutableRefObject<HTMLDivElement>;
@@ -21,59 +15,29 @@ interface SidebarProps {
 
 const Sidebar = ({ sidebarRef }: SidebarProps) => {
     const { user } = useAppSelector((store) => store.user);
-    const { notes } = useAppSelector((store) => store.journal);
+    const { notes, isSidebarShown } = useAppSelector((store) => store.journal);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredNotes, setFilteredNotes] = useState<INote[]>([]);
-    const [isSearching, setIsSearching] = useState(false);
     const debouncedSearchTerm = useDebounce(searchQuery, 600);
     const isEditPage = window.location.pathname.includes('edit');
-    useOnClickOutside(sidebarRef, () => dispatch(updateUserData({ oldUser: user, newUserData: { isSidebarShown: false } })));
+    const [width] = useWindowSize();
+
+    useOnClickOutside(sidebarRef, () => width < 768 && dispatch(setShowSidebar(false)));
 
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(fetchAllNotes(user));
-        filterNotes(debouncedSearchTerm);
+        isEditPage && dispatch(fetchAllNotes({ user }));
     }, []);
-
-    useEffect(() => {
-        filterNotes(debouncedSearchTerm);
-    }, [debouncedSearchTerm]);
-
-    const filterNotes = async (title: string) => {
-        setIsSearching(true);
-
-        try {
-            const response = await axios({
-                method: 'GET',
-                url: `${config.server.url}/notes/query/${user._id}?title=${title}`
-            });
-
-            if (response.status === 200 || response.status === 304) {
-                let notes = response.data.notes as INote[];
-                title === '' && notes.push(getInitialNote(user));
-                notes.sort((x, y) => y.startDate - x.startDate);
-                setFilteredNotes(notes);
-            }
-        } catch (error: any) {
-            dispatch(setError(error.message));
-        } finally {
-            setIsSearching(false);
-        }
-    };
 
     return (
         <div
             ref={sidebarRef}
             className={`h-full fixed top-0 left-0 z-50 duration-500 ${
-                user.isSidebarShown ? 'translate-x-0' : '-translate-x-full'
+                isSidebarShown ? 'translate-x-0' : '-translate-x-full'
             } xs:w-[24rem] w-[100%] transition-all z-[2000] ease-in-out bg-cyan-900 overflow-x-hidden text-white text-left text-xl`}
         >
             <div className="fl sm:h-[65px] h-[50px] sticky top-0 left-0 bg-cyan-900 z-[200]">
-                <button
-                    onClick={() => dispatch(updateUserData({ oldUser: user, newUserData: { isSidebarShown: !user.isSidebarShown } }))}
-                    className={`text-4xl transition-colors md:hidden absolute left-4 top-1/2 -translate-y-1/2 hover:text-cyan-100`}
-                >
+                <button onClick={() => dispatch(setShowSidebar(!isSidebarShown))} className={`text-4xl transition-colors md:hidden absolute left-4 top-1/2 -translate-y-1/2 hover:text-cyan-100`}>
                     <IoMdMenu />
                 </button>
                 <Link
@@ -114,17 +78,15 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
                     </span>
                     New note
                 </Link>
-                {isSearching ? (
-                    <Loading scaleSize={1.5} className="mt-20" />
-                ) : isEditPage || debouncedSearchTerm !== '' ? (
-                    filteredNotes.map((note) => {
-                        return note.isEndNote ? null : <NoteSidebarPreview note={note} key={note._id} />;
-                    })
-                ) : (
-                    notes.map((note) => {
-                        return note.isEndNote ? null : <NoteSidebarPreview note={note} key={note._id} />;
-                    })
-                )}
+                {isEditPage || debouncedSearchTerm !== ''
+                    ? notes
+                          .filter((note) => note.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()))
+                          .map((note) => {
+                              return note.isEndNote ? null : <NoteSidebarPreview note={note} key={note._id} />;
+                          })
+                    : notes.map((note) => {
+                          return note.isEndNote ? null : <NoteSidebarPreview note={note} key={note._id} />;
+                      })}
             </div>
         </div>
     );

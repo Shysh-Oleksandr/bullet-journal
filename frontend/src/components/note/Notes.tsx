@@ -9,9 +9,8 @@ import NoteForm from './NoteForm';
 import NotePreview from './NotePreview';
 
 const Notes = () => {
-    const { notes, loading } = useAppSelector((store) => store.journal);
+    const { notes, loading, isSidebarShown, isFilterBarShown } = useAppSelector((store) => store.journal);
     const [showFullAddForm, setShowFullAddForm] = useState<boolean>(false);
-    const { user } = useAppSelector((store) => store.user);
     const filterBarRef = useRef() as MutableRefObject<HTMLDivElement>;
     const [width] = useWindowSize();
 
@@ -19,16 +18,24 @@ const Notes = () => {
         setTimeout(() => {
             window.dispatchEvent(new Event('resize'));
         }, 500);
-    }, [user.isSidebarShown, user.isFilterBarShown]);
+    }, [isSidebarShown, isFilterBarShown]);
 
-    if (loading) {
-        return <Loading scaleSize={2} className="mt-20" />;
-    }
+    // if (loading) {
+    //     return (
+    //         <div
+    //             className={`${isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'}`}
+    //             style={{ paddingTop: isFilterBarShown ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 20 : 112) : 30 }}
+    //         >
+    //             <FilterBar filterBarRef={filterBarRef} setShowFullAddForm={setShowFullAddForm} />
+    //             <Loading scaleSize={2} className="mt-20" />;
+    //         </div>
+    //     );
+    // }
 
     return (
         <div
-            style={{ paddingTop: user.isFilterBarShown ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 20 : 112) : 30 }}
-            className={`notes ${user.isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} transition-all duration-500 relative`}
+            style={{ paddingTop: isFilterBarShown ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 20 : 112) : 30 }}
+            className={`notes ${isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} transition-all duration-500 relative`}
         >
             <FilterBar filterBarRef={filterBarRef} setShowFullAddForm={setShowFullAddForm} />
 
@@ -44,9 +51,13 @@ const Notes = () => {
                 </button>
                 <NoteForm showFullAddForm={showFullAddForm} setShowFullAddForm={setShowFullAddForm} isShort={true} />
             </div>
-            {notes.map((note, index) => {
-                return <NotePreview note={note} key={`${note._id}${note.isEndNote && 'endNote'}`} previousNote={index === 0 ? null : notes[index - 1]} />;
-            })}
+            {loading ? (
+                <Loading scaleSize={2} className="mt-20" />
+            ) : (
+                notes.map((note, index) => {
+                    return <NotePreview note={note} key={`${note._id}${note.isEndNote && 'endNote'}`} previousNote={index === 0 ? null : notes[index - 1]} />;
+                })
+            )}
         </div>
     );
 };
