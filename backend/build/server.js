@@ -57,14 +57,5 @@ router.use((req, res, next) => {
         message: error.message
     });
 });
-router.get('/', (req, res) => {
-    res.send('Hello from Express!');
-});
-// "heroku-postbuild": "cd frontend && npm install && npm run build"
-// Deployment Middleware
-// router.use(express.static(path.join(__dirname, '/frontend/build')));
-// router.get('*', (req, res) => {
-//     res.sendFile(path.join(__dirname, '/frontend/build', 'index.html'));
-// });
 /** Listen */
 router.listen(config_1.default.server.port, () => logging_1.default.info(`Server is running ${config_1.default.server.host}:${config_1.default.server.port}`));

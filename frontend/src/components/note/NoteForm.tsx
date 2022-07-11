@@ -223,7 +223,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     if (isLoading) {
         return (
-            <div className={`transition-all duration-500 ${isShort ? '' : `${isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`}`}>
+            <div className={`transition-all duration-500 ${isShort ? '' : `${isSidebarShown && width > 1024 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`}`}>
                 <Loading scaleSize={2} className="mt-20" />
             </div>
         );
@@ -231,7 +231,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     return (
         <div
-            className={`transition-all duration-500 ${isShort ? '' : `${isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`} ${
+            className={`transition-all duration-500 ${isShort ? '' : `${isSidebarShown && width > 1024 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`} ${
                 isShort && !showFullAddForm ? 'max-h-16 overflow-hidden mb-4' : 'max-h-[300rem]'
             }`}
         >

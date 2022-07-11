@@ -20,22 +20,10 @@ const Notes = () => {
         }, 500);
     }, [isSidebarShown, isFilterBarShown]);
 
-    // if (loading) {
-    //     return (
-    //         <div
-    //             className={`${isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'}`}
-    //             style={{ paddingTop: isFilterBarShown ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 20 : 112) : 30 }}
-    //         >
-    //             <FilterBar filterBarRef={filterBarRef} setShowFullAddForm={setShowFullAddForm} />
-    //             <Loading scaleSize={2} className="mt-20" />;
-    //         </div>
-    //     );
-    // }
-
     return (
         <div
             style={{ paddingTop: isFilterBarShown ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 20 : 112) : 30 }}
-            className={`notes ${isSidebarShown && width > 767 ? 'small-padding-x' : 'padding-x'} transition-all duration-500 relative`}
+            className={`notes ${isSidebarShown && width > 1024 ? 'small-padding-x' : 'padding-x'} transition-all duration-500 relative`}
         >
             <FilterBar filterBarRef={filterBarRef} setShowFullAddForm={setShowFullAddForm} />
 

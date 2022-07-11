@@ -21,7 +21,7 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
     const isEditPage = window.location.pathname.includes('edit');
     const [width] = useWindowSize();
 
-    useOnClickOutside(sidebarRef, () => width < 768 && dispatch(setShowSidebar(false)));
+    useOnClickOutside(sidebarRef, () => width < 1024 && dispatch(setShowSidebar(false)));
 
     const dispatch = useAppDispatch();
 
@@ -37,12 +37,12 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
             } xs:w-[24rem] w-[100%] transition-all z-[2000] ease-in-out bg-cyan-900 overflow-x-hidden text-white text-left text-xl`}
         >
             <div className="fl sm:h-[65px] h-[50px] sticky top-0 left-0 bg-cyan-900 z-[200]">
-                <button onClick={() => dispatch(setShowSidebar(!isSidebarShown))} className={`text-4xl transition-colors md:hidden absolute left-4 top-1/2 -translate-y-1/2 hover:text-cyan-100`}>
+                <button onClick={() => dispatch(setShowSidebar(!isSidebarShown))} className={`text-4xl transition-colors lg:hidden absolute left-4 top-1/2 -translate-y-1/2 hover:text-cyan-100`}>
                     <IoMdMenu />
                 </button>
                 <Link
                     to={'/'}
-                    className="md:text-3xl text-2xl md:ml-0 ml-12 w-[24rem] whitespace-nowrap overflow-hidden text-ellipsis font-semibold px-4 block break-all bg-cyan-900 hover:text-cyan-100 transition-colors"
+                    className="lg:text-3xl text-2xl lg:ml-0 ml-12 w-[24rem] whitespace-nowrap overflow-hidden text-ellipsis font-semibold px-4 block break-all bg-cyan-900 hover:text-cyan-100 transition-colors"
                 >
                     {user.name.split(' ')[0]}'s Journal
                 </Link>

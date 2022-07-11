@@ -12,15 +12,17 @@ export interface IJournalState {
     isFilterBarShown?: boolean;
     error: string;
     success: string;
+    oldestNoteDate: number;
 }
 
 const initialState: IJournalState = {
     notes: [],
     loading: true,
-    isSidebarShown: (document.documentElement.clientWidth > 767 && localStorage.getItem('isSidebarShown') === 'true') || false,
+    isSidebarShown: (document.documentElement.clientWidth > 1023 && localStorage.getItem('isSidebarShown') === 'true') || false,
     isFilterBarShown: (document.documentElement.clientWidth > 425 && localStorage.getItem('isFilterBarShown') === 'true') || false,
     error: '',
-    success: ''
+    success: '',
+    oldestNoteDate: 0
 };
 
 export interface IFilterNotes {
@@ -37,6 +39,7 @@ export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', asy
 
     if (response.status === 200 || response.status === 304) {
         let notes = response.data.notes as INote[];
+        const oldestNoteDate = notes.sort((x, y) => y.startDate - x.startDate).at(-1)?.startDate;
         notes.push(getInitialNote(user));
         notes = filter ? filter(notes) : notes;
         const endNotes: INote[] = notes
@@ -53,9 +56,9 @@ export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', asy
         notes = [...notes, ...endNotes].filter((note) => note.startDate <= new Date().getTime());
 
         notes = sort ? sort(notes) : notes.sort((x, y) => y.startDate - x.startDate);
-        return notes;
+        return { notes: notes, oldestNoteDate: oldestNoteDate };
     } else {
-        return [];
+        return { notes: [] };
     }
 });
 
@@ -88,16 +91,9 @@ export const journalSlice = createSlice({
             state.loading = true;
         });
         builder.addCase(fetchAllNotes.fulfilled, (state, action) => {
-            state.notes = action.payload;
+            state.notes = action.payload.notes;
             state.loading = false;
-
-            // Set new oldest note date, if we have new one.
-            const storagedOldestDate = localStorage.getItem('oldestNoteDate');
-            const oldestNoteDate = action.payload.at(-1)?.startDate;
-
-            if (!storagedOldestDate || storagedOldestDate === '' || (oldestNoteDate && oldestNoteDate !== Number(storagedOldestDate))) {
-                localStorage.setItem('oldestNoteDate', oldestNoteDate?.toString() || '');
-            }
+            if (!state.oldestNoteDate) state.oldestNoteDate = action.payload.oldestNoteDate ? action.payload.oldestNoteDate : state.oldestNoteDate;
         });
         builder.addCase(fetchAllNotes.rejected, (state, action) => {
             state.loading = false;
