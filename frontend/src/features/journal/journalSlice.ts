@@ -18,7 +18,7 @@ export interface IJournalState {
 const initialState: IJournalState = {
     notes: [],
     loading: true,
-    isSidebarShown: (document.documentElement.clientWidth > 767 && localStorage.getItem('isSidebarShown') === 'true') || false,
+    isSidebarShown: (document.documentElement.clientWidth > 1023 && localStorage.getItem('isSidebarShown') === 'true') || false,
     isFilterBarShown: (document.documentElement.clientWidth > 425 && localStorage.getItem('isFilterBarShown') === 'true') || false,
     error: '',
     success: '',
