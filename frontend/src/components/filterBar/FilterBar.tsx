@@ -17,12 +17,14 @@ interface FilterBarProps {
 
 const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const { user } = useAppSelector((store) => store.user);
+    const { oldestNoteDate } = useAppSelector((store) => store.journal);
     const { isFilterBarShown } = useAppSelector((store) => store.journal);
     const dispatch = useAppDispatch();
     const [wasReset, setWasReset] = useState(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [sortType, setSortType] = useState<SortOptions>(SortOptions.NEWEST);
-    const [startDate, setStartDate] = useState<number>(1);
+    const [startDate, setStartDate] = useState<number>(oldestNoteDate);
+
     const [endDate, setEndDate] = useState<number>(new Date().getTime());
     const allTypes = getAllLabels(defaultNoteTypes, user.customNoteTypes);
     const allCategories = getAllLabels([], user.customNoteCategories);
@@ -32,7 +34,7 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const [importanceMin, setImportanceMin] = useState<number>(1);
     const [importanceMax, setImportanceMax] = useState<number>(10);
 
-    const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showNoCategory, wasReset };
+    const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showNoCategory, wasReset, oldestNoteDate };
     const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportanceMin, setImportanceMax, setShowNoCategory };
     const debouncedSearchTerm: string = useDebounce(searchQuery, 500);
     const debouncedSortType = useDebounce(sortType, 500);
@@ -109,6 +111,10 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     useEffect(() => {
         dispatch(fetchAllNotes({ user, filter, sort }));
     }, [debouncedSortType, debouncedStartDate, debouncedEndDate, debouncedType, debouncedCategory, debouncedImportanceMin, debouncedImportanceMax, debouncedSearchTerm, debouncedShowNoCategory]);
+
+    useEffect(() => {
+        setStartDate(oldestNoteDate);
+    }, [oldestNoteDate]);
 
     return (
         <div
