@@ -30,17 +30,19 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const allCategories = getAllLabels([], user.customNoteCategories);
     const [type, setType] = useState<string[]>(allTypes);
     const [category, setCategory] = useState<string[]>(allCategories);
-    const [showNoCategory, setShowNoCategory] = useState<boolean>(true);
+    const [showAnyCategory, setShowAnyCategory] = useState<boolean>(true);
+    const [showAnyType, setShowAnyType] = useState<boolean>(true);
     const [importanceMin, setImportanceMin] = useState<number>(1);
     const [importanceMax, setImportanceMax] = useState<number>(10);
 
-    const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showNoCategory, wasReset, oldestNoteDate };
-    const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportanceMin, setImportanceMax, setShowNoCategory };
+    const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showAnyCategory, wasReset, oldestNoteDate, showAnyType };
+    const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportanceMin, setImportanceMax, setShowAnyCategory, setShowAnyType };
     const debouncedSearchTerm: string = useDebounce(searchQuery, 500);
     const debouncedSortType = useDebounce(sortType, 500);
     const debouncedStartDate = useDebounce(startDate, 500);
     const debouncedEndDate = useDebounce(endDate, 500);
-    const debouncedShowNoCategory = useDebounce(showNoCategory, 500);
+    const debouncedShowAnyCategory = useDebounce(showAnyCategory, 500);
+    const debouncedShowAnyType = useDebounce(showAnyType, 500);
     const debouncedType: string[] = useDebounce(type, 500);
     const debouncedCategory: string[] = useDebounce(category, 500);
     const debouncedImportanceMin = useDebounce(importanceMin, 500);
@@ -84,8 +86,8 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const filter = (notes: INote[]) => {
         const filteredNotes = notes.filter((note) => {
             const titleFilter = note.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-            const typeFilter = debouncedType.includes(note.type);
-            const categoryFilter = note.category?.split(SEPARATOR).some((r) => debouncedCategory.includes(r)) || (showNoCategory && !note.category);
+            const typeFilter = showAnyType ? true : debouncedType.includes(note.type);
+            const categoryFilter = showAnyCategory ? true : note.category?.split(SEPARATOR).some((r) => debouncedCategory.includes(r));
             const dateFilter = note.startDate >= debouncedStartDate && note.startDate <= getLastPeriodDate(-1, debouncedEndDate);
             const importanceFilter = note.rating >= importanceMin && note.rating <= importanceMax;
 
@@ -101,7 +103,8 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
         setEndDate(new Date().getTime());
         setType(allTypes);
         setCategory(allCategories);
-        setShowNoCategory(true);
+        setShowAnyCategory(true);
+        setShowAnyType(true);
         setImportanceMin(1);
         setImportanceMax(10);
 
@@ -110,7 +113,18 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
 
     useEffect(() => {
         dispatch(fetchAllNotes({ user, filter, sort }));
-    }, [debouncedSortType, debouncedStartDate, debouncedEndDate, debouncedType, debouncedCategory, debouncedImportanceMin, debouncedImportanceMax, debouncedSearchTerm, debouncedShowNoCategory]);
+    }, [
+        debouncedSortType,
+        debouncedStartDate,
+        debouncedEndDate,
+        debouncedType,
+        debouncedCategory,
+        debouncedImportanceMin,
+        debouncedImportanceMax,
+        debouncedSearchTerm,
+        debouncedShowAnyCategory,
+        debouncedShowAnyType
+    ]);
 
     useEffect(() => {
         setStartDate(oldestNoteDate);

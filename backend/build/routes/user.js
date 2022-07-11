@@ -7,8 +7,9 @@ const extractFirebaseInfo_1 = __importDefault(require("./../middleware/extractFi
 const user_1 = __importDefault(require("../controllers/user"));
 const router = express_1.default.Router();
 router.get('/validate', extractFirebaseInfo_1.default, user_1.default.validate);
-router.get('/read/userID', user_1.default.read);
+router.get('/read/:userID', user_1.default.read);
 router.post('/create', extractFirebaseInfo_1.default, user_1.default.create);
 router.post('/login', extractFirebaseInfo_1.default, user_1.default.login);
+router.patch('/update/:userID', user_1.default.update);
 router.get('/', user_1.default.readAll);
 module.exports = router;

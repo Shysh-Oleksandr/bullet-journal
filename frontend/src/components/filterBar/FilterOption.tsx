@@ -22,7 +22,8 @@ interface FilterOptionProps {
         category: string[];
         importanceMin: number;
         importanceMax: number;
-        showNoCategory: boolean;
+        showAnyCategory: boolean;
+        showAnyType: boolean;
         wasReset: boolean;
         oldestNoteDate: number;
     };
@@ -34,7 +35,8 @@ interface FilterOptionProps {
         setCategory: React.Dispatch<React.SetStateAction<string[]>>;
         setImportanceMin: React.Dispatch<React.SetStateAction<number>>;
         setImportanceMax: React.Dispatch<React.SetStateAction<number>>;
-        setShowNoCategory: React.Dispatch<React.SetStateAction<boolean>>;
+        setShowAnyCategory: React.Dispatch<React.SetStateAction<boolean>>;
+        setShowAnyType: React.Dispatch<React.SetStateAction<boolean>>;
     };
 }
 
@@ -86,11 +88,15 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                     setOptionsChosen(filterData.type.includes(label) ? filterData.type.length - 1 : filterData.type.length + 1);
                     filterDataSetters.setType((prevType) => (!prevType.includes(label) ? [...prevType, label] : prevType.filter((chosenLabel) => chosenLabel !== label)));
                 };
+                const toggleShowAnyTypes = (label: string, checked: boolean | undefined) => {
+                    filterDataSetters.setShowAnyType(checked!);
+                };
                 const types: string[] = getAllLabels(defaultNoteTypes, user.customNoteTypes);
                 setOptionsChosen(filterData.type.length);
 
                 content = (
                     <div>
+                        <FilterModalOption checkedAtStart={filterData.showAnyType} onchange={toggleShowAnyTypes} text="Any types" />
                         {types.map((type) => {
                             return <FilterModalOption onchange={checkLabel} checkedAtStart={filterData.type.includes(type)} text={type} key={type + '_type'} />;
                         })}
@@ -103,15 +109,15 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                     setOptionsChosen(filterData.category.includes(label) ? filterData.category.length - 1 : filterData.category.length + 1);
                     filterDataSetters.setCategory((prevCategory) => (!prevCategory.includes(label) ? [...prevCategory, label] : prevCategory.filter((chosenLabel) => chosenLabel !== label)));
                 };
-                const toggleShowNoCategories = (label: string, checked: boolean | undefined) => {
-                    filterDataSetters.setShowNoCategory(checked!);
+                const toggleShowAnyCategories = (label: string, checked: boolean | undefined) => {
+                    filterDataSetters.setShowAnyCategory(checked!);
                 };
                 const categories: string[] = getAllLabels([], user.customNoteCategories);
                 setOptionsChosen(filterData.category.length);
 
                 content = (
                     <div>
-                        <FilterModalOption checkedAtStart={filterData.showNoCategory} onchange={toggleShowNoCategories} text="No categories" />
+                        <FilterModalOption checkedAtStart={filterData.showAnyCategory} onchange={toggleShowAnyCategories} text="Any categories" />
                         {categories.map((category) => {
                             return <FilterModalOption onchange={checkLabel} checkedAtStart={filterData.category.includes(category)} text={category} key={category + '_category'} />;
                         })}

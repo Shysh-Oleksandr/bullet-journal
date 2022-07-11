@@ -11,7 +11,7 @@ const EditPage = () => {
     const [width] = useWindowSize();
 
     return (
-        <div className="fl">
+        <div>
             <Sidebar sidebarRef={sidebarRef} />
             <div style={{ marginLeft: isSidebarShown && width > 1024 ? (sidebarRef.current ? sidebarRef.current.offsetWidth : 336) : 0 }} className="transition-all duration-500 ease-in-out">
                 <Navbar />
