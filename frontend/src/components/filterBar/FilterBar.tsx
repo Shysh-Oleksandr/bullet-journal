@@ -130,6 +130,18 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
         setStartDate(oldestNoteDate);
     }, [oldestNoteDate]);
 
+    useEffect(() => {
+        if (!type.includes(allTypes.at(-1) || '')) {
+            setType((prev) => [...prev, allTypes.at(-1) || '']);
+        }
+    }, [user.customNoteTypes]);
+
+    useEffect(() => {
+        if (!category.includes(allCategories.at(-1) || '')) {
+            setCategory((prev) => [...prev, allCategories.at(-1) || '']);
+        }
+    }, [user.customNoteCategories]);
+
     return (
         <div
             ref={filterBarRef}

@@ -7,7 +7,11 @@ import { setShowSidebar } from '../features/journal/journalSlice';
 import { logout } from '../features/user/userSlice';
 import { useWindowSize } from '../hooks';
 
-const Navbar = () => {
+interface NavbarProps {
+    topRef?: React.MutableRefObject<HTMLDivElement>;
+}
+
+const Navbar = ({ topRef }: NavbarProps) => {
     const dispatch = useAppDispatch();
     const { isSidebarShown } = useAppSelector((store) => store.journal);
     const [width] = useWindowSize();
@@ -25,7 +29,11 @@ const Navbar = () => {
             <button onClick={() => dispatch(setShowSidebar(!isSidebarShown))} className={`text-4xl transition-colors absolute left-4 top-1/2 -translate-y-1/2 hover:text-cyan-100`}>
                 <IoMdMenu />
             </button>
-            <Link to={'/'} className="md:text-3xl text-2xl font-bold cursor-pointer transition-colors hover:text-cyan-100">
+            <Link
+                to={'/'}
+                onClick={() => topRef && topRef.current.scrollIntoView({ behavior: 'smooth' })}
+                className="md:text-3xl text-2xl font-bold cursor-pointer transition-colors hover:text-cyan-100"
+            >
                 <span className="sm:block hidden md:ml-4">Bullet Journal</span>
                 <img className="sm:hidden block ml-9 w-9 h-9 transition-opacity hover:opacity-90" src="/favicon.png" alt="Journal logo" />
             </Link>

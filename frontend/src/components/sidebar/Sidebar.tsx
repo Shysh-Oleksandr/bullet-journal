@@ -11,9 +11,10 @@ import NoteSidebarPreview from './NoteSidebarPreview';
 
 interface SidebarProps {
     sidebarRef: React.MutableRefObject<HTMLDivElement>;
+    topRef?: React.MutableRefObject<HTMLDivElement>;
 }
 
-const Sidebar = ({ sidebarRef }: SidebarProps) => {
+const Sidebar = ({ sidebarRef, topRef }: SidebarProps) => {
     const { user } = useAppSelector((store) => store.user);
     const { notes, isSidebarShown } = useAppSelector((store) => store.journal);
     const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +43,7 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
                 </button>
                 <Link
                     to={'/'}
+                    onClick={() => topRef && topRef.current.scrollIntoView({ behavior: 'smooth' })}
                     className="lg:text-3xl text-2xl lg:ml-0 ml-12 w-[24rem] whitespace-nowrap overflow-hidden text-ellipsis font-semibold px-4 block break-all bg-cyan-900 hover:text-cyan-100 transition-colors"
                 >
                     {user.name.split(' ')[0]}'s Journal
