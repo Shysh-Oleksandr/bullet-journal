@@ -25,6 +25,7 @@ interface NoteLabelInputProps {
 const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor }: NoteLabelInputProps) => {
     const [focused, setFocused] = useState(false);
     const labelInputRef = useRef<HTMLInputElement>(null);
+    const labelAddRef = useRef<HTMLButtonElement>(null);
 
     const { user } = useAppSelector((store) => store.user);
     const [userCustomNoteLabels, setUserCustomNoteLabels] = useState<string>(isCustomTypes ? user.customNoteTypes || '' : user.customNoteCategories || '');
@@ -40,6 +41,23 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor }: NoteLa
 
     useEffect(() => {
         setAvailableLabels([...availableLabels, ...removedLabels]);
+    }, []);
+
+    useEffect(() => {
+        const keyDownHandler = (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                if (document.activeElement === labelInputRef.current) {
+                    labelAddRef.current?.click();
+                }
+            }
+        };
+
+        document.addEventListener('keydown', keyDownHandler);
+
+        return () => {
+            document.removeEventListener('keydown', keyDownHandler);
+        };
     }, []);
 
     useEffect(() => {
@@ -238,6 +256,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor }: NoteLa
             </ul>
             {focused && (
                 <button
+                    ref={labelAddRef}
                     onMouseDown={(e) => e.preventDefault()}
                     type="button"
                     className="absolute sm:right-0 -right-2 top-1/2 py-2 px-2 -translate-y-1/2 text-2xl hover:text-cyan-500 text-cyan-400 transition-colors"
