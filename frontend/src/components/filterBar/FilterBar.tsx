@@ -26,10 +26,10 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const [startDate, setStartDate] = useState<number>(oldestNoteDate);
 
     const [endDate, setEndDate] = useState<number>(new Date().getTime());
-    const allTypes = getAllLabels(defaultNoteTypes, user.customNoteTypes);
-    const allCategories = getAllLabels([], user.customNoteCategories);
-    const [type, setType] = useState<string[]>(allTypes);
-    const [category, setCategory] = useState<string[]>(allCategories);
+    const allTypes = getAllLabels(true, user.customNoteTypes);
+    const allCategories = getAllLabels(false, user.customNoteCategories);
+    const [type, setType] = useState<string[]>(allTypes.map((label) => label.name));
+    const [category, setCategory] = useState<string[]>(allCategories.map((label) => label.name));
     const [showAnyCategory, setShowAnyCategory] = useState<boolean>(true);
     const [showAnyType, setShowAnyType] = useState<boolean>(true);
     const [importanceMin, setImportanceMin] = useState<number>(1);
@@ -101,8 +101,8 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
         setSearchQuery('');
         setSortType(SortOptions.NEWEST);
         setEndDate(new Date().getTime());
-        setType(allTypes);
-        setCategory(allCategories);
+        setType(allTypes.map((label) => label.name));
+        setCategory(allCategories.map((label) => label.name));
         setShowAnyCategory(true);
         setShowAnyType(true);
         setImportanceMin(1);
@@ -131,14 +131,14 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     }, [oldestNoteDate]);
 
     useEffect(() => {
-        if (!type.includes(allTypes.at(-1) || '')) {
-            setType((prev) => [...prev, allTypes.at(-1) || '']);
+        if (!type.includes(allTypes.map((label) => label.name).at(-1) || '')) {
+            setType((prev) => [...prev, allTypes.map((label) => label.name).at(-1) || '']);
         }
     }, [user.customNoteTypes]);
 
     useEffect(() => {
-        if (!category.includes(allCategories.at(-1) || '')) {
-            setCategory((prev) => [...prev, allCategories.at(-1) || '']);
+        if (!category.includes(allCategories.map((label) => label.name).at(-1) || '')) {
+            setCategory((prev) => [...prev, allCategories.map((label) => label.name).at(-1) || '']);
         }
     }, [user.customNoteCategories]);
 

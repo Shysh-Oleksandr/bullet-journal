@@ -282,11 +282,11 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                 </div>
                 <div className="flex-between border-bottom my-3">
                     <div className="relative sm:mr-4 mr-2 sm:basis-auto basis-1/2">
-                        <NoteLabelInput label={type} setLabel={setType} isCustomTypes={true} />
+                        <NoteLabelInput setNoteColor={setColor} label={type} setLabel={setType} isCustomTypes={true} />
                         <InputLabel htmlFor="noteTypeInput" text="Type" />
                     </div>
                     <div className="relative sm:basis-3/4 basis-1/2">
-                        <NoteLabelInput label={category} setLabel={setCategory} isCustomTypes={false} />
+                        <NoteLabelInput setNoteColor={setColor} label={category} setLabel={setCategory} isCustomTypes={false} />
                         <InputLabel htmlFor="noteCategoryInput" text="Categories" />
                     </div>
                 </div>

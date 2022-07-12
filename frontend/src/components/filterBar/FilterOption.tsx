@@ -91,7 +91,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 const toggleShowAnyTypes = (label: string, checked: boolean | undefined) => {
                     filterDataSetters.setShowAnyType(checked!);
                 };
-                const types: string[] = getAllLabels(defaultNoteTypes, user.customNoteTypes);
+                const types: string[] = getAllLabels(true, user.customNoteTypes).map((label) => label.name);
                 setOptionsChosen(filterData.type.length);
 
                 content = (
@@ -112,7 +112,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 const toggleShowAnyCategories = (label: string, checked: boolean | undefined) => {
                     filterDataSetters.setShowAnyCategory(checked!);
                 };
-                const categories: string[] = getAllLabels([], user.customNoteCategories);
+                const categories: string[] = getAllLabels(false, user.customNoteCategories).map((label) => label.name);
                 setOptionsChosen(filterData.category.length);
 
                 content = (
