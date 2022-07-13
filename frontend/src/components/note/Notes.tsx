@@ -5,7 +5,7 @@ import { useWindowSize } from '../../hooks';
 import '../../styles/note.scss';
 import Loading from '../UI/Loading';
 import FilterBar from './../filterBar/FilterBar';
-import NoteForm from './NoteForm';
+import NoteForm from './noteForm/NoteForm';
 import NotePreview from './NotePreview';
 import INote from './../../interfaces/note';
 

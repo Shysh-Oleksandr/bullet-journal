@@ -1,9 +1,7 @@
 import axios from 'axios';
-import { ContentState, convertToRaw, EditorState } from 'draft-js';
-import draftToHtml from 'draftjs-to-html';
+import { ContentState, EditorState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
 import React, { useEffect, useState } from 'react';
-import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { BsDashLg } from 'react-icons/bs';
 import { IoIosColorPalette } from 'react-icons/io';
@@ -11,21 +9,23 @@ import { MdDelete } from 'react-icons/md';
 import { RiSave3Fill } from 'react-icons/ri';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import TextareaAutosize from 'react-textarea-autosize';
-import { useAppSelector } from '../../app/hooks';
-import config from '../../config/config';
-import logging from '../../config/logging';
-import { fetchAllNotes, setError, setSuccess } from '../../features/journal/journalSlice';
-import INote from '../../interfaces/note';
-import DeleteModal from '../UI/DeleteModal.';
-import Loading from '../UI/Loading';
-import { useAppDispatch } from './../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
+import config from '../../../config/config';
+import logging from '../../../config/logging';
+import { fetchAllNotes, setError, setSuccess } from '../../../features/journal/journalSlice';
+import { useWindowSize } from '../../../hooks';
+import INote from '../../../interfaces/note';
+import { INITIAL_NOTE_ID } from '../../../utils/functions';
+import DeleteModal from '../../UI/DeleteModal.';
+import Loading from '../../UI/Loading';
 import InputLabel from './InputLabel';
-import NoteBody from './NoteBody';
+import NoteContentEditor from './NoteContentEditor';
 import NoteDate from './NoteDate';
-import NoteLabelInput from './NoteLabelInput';
-import SaveButton from './SaveButton';
+import NoteFormPreview from './NoteFormPreview';
 import NoteImportanceInput from './NoteImportanceInput';
-import { useWindowSize } from '../../hooks';
+import NoteLabelInput from './NoteLabelInput';
+import OtherNotes from './OtherNotes';
+import SaveButton from './SaveButton';
 
 interface NoteFormProps {
     isShort?: boolean;
@@ -45,6 +45,8 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     const [type, setType] = useState<string>('Note');
     const [category, setCategory] = useState<string>('');
     const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
+    const [prevNote, setPrevNote] = useState<INote | null>(null);
+    const [nextNote, setNextNote] = useState<INote | null>(null);
 
     const [modal, setModal] = useState<boolean>(false);
     const [saving, setSaving] = useState<boolean>(false);
@@ -52,7 +54,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const { user } = useAppSelector((store) => store.user);
-    const { isSidebarShown } = useAppSelector((store) => store.journal);
+    const { notes, isSidebarShown } = useAppSelector((store) => store.journal);
     const params = useParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -88,16 +90,17 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         }
     }, [location]);
 
-    const onEditorStateChange = (newState: EditorState) => {
-        const newContent = draftToHtml(convertToRaw(newState.getCurrentContent()));
-        setEditorState(newState);
-        setContent(newContent);
-
-        const regex = /(?<=src=")(.*)(?=" alt)/g;
-        const images = newContent.match(regex);
-
-        images && setImage(images[0]);
-    };
+    useEffect(() => {
+        if (isShort) return;
+        const filteredNotes = notes.filter((note) => !note.isEndNote);
+        const currNoteIndex = filteredNotes.map((note) => note._id).indexOf(_id);
+        if (currNoteIndex !== -1) {
+            const _prevNote: INote | null = currNoteIndex - 1 >= 0 ? filteredNotes[currNoteIndex - 1] : null;
+            const _nextNote: INote | null = currNoteIndex + 1 < filteredNotes.length ? filteredNotes[currNoteIndex + 1] : null;
+            setPrevNote(_prevNote?._id === INITIAL_NOTE_ID ? null : _prevNote);
+            setNextNote(_nextNote?._id === INITIAL_NOTE_ID ? null : _nextNote);
+        }
+    }, [notes, _id]);
 
     const getNote = async (id: string) => {
         try {
@@ -182,6 +185,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     resetState();
                 } else {
                     setId(response.data.note._id);
+                    navigate(`/edit/${response.data.note._id}`);
                 }
                 dispatch(setSuccess(`Note ${isCreating ? 'added' : 'updated'}.`));
             } else {
@@ -290,37 +294,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                         <InputLabel htmlFor="noteCategoryInput" text="Categories" />
                     </div>
                 </div>
-                <div>
-                    <Editor
-                        placeholder="Write your note here..."
-                        editorState={editorState}
-                        toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm z-[150] sticky sm:top-[65px] top-[50px] left-0"
-                        wrapperClassName="mt-8"
-                        editorClassName={`${
-                            isShort ? 'min-h-[15vh]' : 'min-h-[45vh]'
-                        } h-auto  cursor-text border-cyan-100 transition-all border-2 rounded-sm border-solid focus-within:border-[3px] focus-within:border-cyan-200 px-3 text-[1.25rem] !leading-[100%]`}
-                        toolbar={
-                            isShort
-                                ? {
-                                      options: ['inline', 'fontSize', 'textAlign', 'history', 'embedded', 'emoji', 'image'],
-                                      inline: { inDropdown: true },
-                                      textAlign: { inDropdown: true },
-                                      link: { inDropdown: true },
-                                      history: { inDropdown: true }
-                                  }
-                                : width < 640
-                                ? {
-                                      options: ['inline', 'fontSize', 'textAlign', 'history', 'embedded', 'emoji', 'image'],
-                                      inline: { inDropdown: true },
-                                      textAlign: { inDropdown: true },
-                                      link: { inDropdown: true },
-                                      history: { inDropdown: true }
-                                  }
-                                : {}
-                        }
-                        onEditorStateChange={onEditorStateChange}
-                    />
-                </div>
+                <NoteContentEditor setEditorState={setEditorState} setContent={setContent} setImage={setImage} editorState={editorState} isShort={isShort} />
                 <div>
                     <SaveButton
                         className={`bg-cyan-600 hover:bg-cyan-700 ${isShort ? 'mt-2 py-2' : 'mt-4'}`}
@@ -337,16 +311,9 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                         <SaveButton className="bg-red-600 hover:bg-red-700 mt-2" onclick={() => setModal(true)} disabled={false} type="button" icon={<MdDelete className="mr-2" />} text="Delete" />
                     )}
                 </div>
+                {!isShort && _id && <OtherNotes prevNote={prevNote} nextNote={nextNote} />}
             </form>
-            <div className="text-left mt-4">
-                <h4 className="sm:text-2xl text-xl mb-1">Preview</h4>
-                {isShort && (
-                    <div className="text-[#267491] text-xl">
-                        <h4>{new Date(startDate).toDateString()}</h4>
-                    </div>
-                )}
-                <NoteBody className={isShort ? 'note__body my-8' : ''} note={{ _id, title, startDate, endDate, content, image, color, rating, category, type, author: '' }} />
-            </div>
+            <NoteFormPreview isShort={isShort} startDate={startDate} note={{ _id, title, startDate, endDate, content, image, color, rating, category, type, author: '' }} />
             {_id !== '' && modal && <DeleteModal deleteNote={deleteNote} deleting={deleting} modal={modal} setModal={setModal} />}
         </div>
     );

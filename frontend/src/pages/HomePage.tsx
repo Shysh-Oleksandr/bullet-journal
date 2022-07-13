@@ -1,6 +1,5 @@
 import React, { MutableRefObject, useRef } from 'react';
 import { useAppSelector } from '../app/hooks';
-import Notes from '../components/note/Notes';
 import Pagination from '../components/pagination/Pagination';
 import Sidebar from '../components/sidebar/Sidebar';
 import { useWindowSize } from '../hooks';

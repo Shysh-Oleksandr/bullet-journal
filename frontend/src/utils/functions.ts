@@ -36,7 +36,6 @@ export const getInitialNote = (author: IUser): INote => {
     };
 };
 
-// "_SEP_Thought_COL_#fa83ce_SEP_Lifetime_COL_#aa841e_SEP_New_SEP_Training_SEP_Work_SEP_Turntable"
 export function getCustomLabels(customLabels: string | undefined): ICustomNoteLabel[] {
     const res =
         customLabels?.split(SEPARATOR).map((label) => {

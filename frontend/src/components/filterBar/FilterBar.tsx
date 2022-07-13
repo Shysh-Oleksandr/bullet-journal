@@ -153,7 +153,12 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
                 {filterOptions.map((option) => {
                     return <FilterOption setShowFullAddForm={setShowFullAddForm} option={option} key={option.name} filterData={filterData} filterDataSetters={filterDataSetters} />;
                 })}
-                <FilterSearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                <FilterSearchInput
+                    inputClassName="filter-search-input rounded-lg py-3 h-full min-w-[12rem] pr-8  hover:text-white focus-within:text-white focus-within:bg-cyan-600 hover:bg-cyan-600 focus-within:placeholder:text-white hover:placeholder:text-white"
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    className="mx-3 mt-2"
+                />
             </div>
             <span
                 onClick={() => dispatch(setShowFilterBar(!isFilterBarShown))}

@@ -111,6 +111,10 @@ h6 {
     @apply border-b-2 border-solid border-cyan-100 transition-all focus-within:border-b-[3px] focus-within:border-cyan-200;
 }
 
+.custom-border {
+    @apply border-solid border-cyan-100 transition-all focus-within:border-cyan-200;
+}
+
 .border-bottom-md {
     @apply md:border-b-2 border-solid border-cyan-100 transition-all md:focus-within:border-b-[3px] focus-within:border-cyan-200;
 }
@@ -276,4 +280,12 @@ h6 {
 .rdw-embedded-modal {
     left: auto !important;
     right: 0 !important;
+}
+
+.other-note-btn:hover h4 {
+    @apply text-cyan-800;
+}
+
+.other-note-btn:hover h5 {
+    @apply text-cyan-900;
 }

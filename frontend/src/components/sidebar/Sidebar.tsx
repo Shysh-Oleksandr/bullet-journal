@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { AiOutlineSearch } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
 import { IoMdMenu } from 'react-icons/io';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import { fetchAllNotes, setShowSidebar } from '../../features/journal/journalSlice';
 import { useDebounce, useOnClickOutside, useWindowSize } from '../../hooks';
+import FilterSearchInput from '../filterBar/FilterSearchInput';
 import { useAppDispatch } from './../../app/hooks';
 import NoteSidebarPreview from './NoteSidebarPreview';
 
@@ -50,28 +50,14 @@ const Sidebar = ({ sidebarRef, topRef }: SidebarProps) => {
                 </Link>
             </div>
             <div className="relative flex-between bg-cyan-800">
-                <div className="relative w-[90%]">
-                    <input
-                        type="text"
-                        className="mx-4 w-full text-lg text-cyan-800 shadow-lg my-3 rounded-2xl pl-9 pr-3 py-1 border-solid transition-all border-cyan-500 focus:border-b-[3px] hover:bg-cyan-50"
-                        placeholder="Search note"
-                        value={searchQuery}
-                        id="seach-query-input"
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <label htmlFor="seach-query-input" className="absolute left-6 top-1/2 -translate-y-1/2 text-xl text-cyan-800">
-                        <AiOutlineSearch />
-                    </label>
-                    <label
-                        htmlFor="seach-query-input"
-                        onClick={() => setSearchQuery('')}
-                        className={`filter-search-delete text-2xl absolute right-0 top-1/2 rotate-45 text-cyan-600 -translate-y-1/2 transition-all cursor-pointer duration-[250ms] ${
-                            searchQuery.length > 0 ? 'opacity-100' : 'opacity-0 invisible'
-                        }`}
-                    >
-                        {<BsPlusLg />}
-                    </label>
-                </div>
+                <FilterSearchInput
+                    searchQuery={searchQuery}
+                    isSidebar={true}
+                    labelClassName="text-cyan-800 left-6 text-2xl"
+                    deleteClassName="text-cyan-800 !right-6"
+                    setSearchQuery={setSearchQuery}
+                    inputClassName="mx-4 text-cyan-800 shadow-lg my-3 rounded-2xl pl-9 pr-9 py-1 border-solid transition-all border-cyan-500 focus:border-b-[3px] hover:bg-cyan-50"
+                />
             </div>
             <div>
                 <Link to={'/edit'} className="text-xl new-note py-4 px-4 bg-cyan-500 font-semibold mb-[2px] flex items-center cursor-pointer duration-300 transition-colors hover:bg-cyan-600">

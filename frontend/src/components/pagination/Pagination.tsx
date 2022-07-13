@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MdArrowBackIos, MdArrowForwardIos } from 'react-icons/md';
+import { MdArrowForwardIos } from 'react-icons/md';
 import ReactPaginate from 'react-paginate';
 import { useAppSelector } from '../../app/hooks';
 import INote from '../../interfaces/note';

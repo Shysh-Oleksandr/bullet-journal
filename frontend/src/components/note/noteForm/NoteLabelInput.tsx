@@ -3,17 +3,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
 import { IoIosColorPalette } from 'react-icons/io';
-import { useAppSelector } from '../../app/hooks';
-import config from '../../config/config';
-import { setError, setSuccess } from '../../features/journal/journalSlice';
-import { updateUser } from '../../features/user/userSlice';
-import IUser from '../../interfaces/user';
-import { COLOR_SEPARATOR, defaultNoteTypes, ICustomNoteLabel, SEPARATOR } from '../../utils/data';
-import { getCustomLabels, getNewCustomNoteLabelName } from '../../utils/functions';
-import { useAppDispatch } from './../../app/hooks';
-import { updateUserData } from './../../features/user/userSlice';
-import { getAllLabels } from './../../utils/functions';
-import { noteColors } from './../../utils/data';
+import { useAppSelector } from '../../../app/hooks';
+import config from '../../../config/config';
+import { setError, setSuccess } from '../../../features/journal/journalSlice';
+import { updateUser } from '../../../features/user/userSlice';
+import IUser from '../../../interfaces/user';
+import { COLOR_SEPARATOR, defaultNoteTypes, ICustomNoteLabel, SEPARATOR } from '../../../utils/data';
+import { getCustomLabels, getNewCustomNoteLabelName } from '../../../utils/functions';
+import { useAppDispatch } from '../../../app/hooks';
+import { updateUserData } from '../../../features/user/userSlice';
+import { getAllLabels } from '../../../utils/functions';
+import { noteColors } from '../../../utils/data';
 
 interface NoteLabelInputProps {
     setLabel: React.Dispatch<React.SetStateAction<string>>;
