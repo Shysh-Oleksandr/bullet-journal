@@ -3,6 +3,7 @@ import { ContentState, EditorState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
 import React, { useEffect, useState } from 'react';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import { AiFillLock, AiFillStar, AiFillUnlock } from 'react-icons/ai';
 import { BsDashLg } from 'react-icons/bs';
 import { IoIosColorPalette } from 'react-icons/io';
 import { MdDelete } from 'react-icons/md';
@@ -44,6 +45,8 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     const [rating, setRating] = useState<number>(1);
     const [type, setType] = useState<string>('Note');
     const [category, setCategory] = useState<string>('');
+    const [isLocked, setIsLocked] = useState<boolean>(false);
+    const [isStarred, setIsStarred] = useState<boolean>(false);
     const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
     const [prevNote, setPrevNote] = useState<INote | null>(null);
     const [nextNote, setNextNote] = useState<INote | null>(null);
@@ -125,6 +128,8 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     setRating(note.rating);
                     setType(note.type);
                     setCategory(note.category || '');
+                    setIsLocked(note.isLocked || false);
+                    setIsStarred(note.isStarred || false);
 
                     const contentBlock = htmlToDraft(note.content || '');
                     const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
@@ -175,6 +180,8 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     content,
                     type,
                     category,
+                    isLocked,
+                    isStarred,
                     author: user._id
                 }
             });
@@ -225,6 +232,16 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         }
     };
 
+    const handleStarredClick = () => {
+        setIsStarred(!isStarred);
+        dispatch(setSuccess(`Note was ${isStarred ? 'removed from' : 'added to'} the star list.`));
+    };
+
+    const handleLockedClick = () => {
+        setIsLocked(!isLocked);
+        dispatch(setSuccess(`Note was ${isLocked ? 'unlocked' : 'locked'}.`));
+    };
+
     if (isLoading) {
         return (
             <div className={`transition-all duration-500 ${isShort ? '' : `${isSidebarShown && width > 1024 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`}`}>
@@ -243,16 +260,28 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                 onClick={() => setShowFullAddForm && setShowFullAddForm(true)}
                 className={`bg-white rounded-sm shadow-xl ${isShort ? 'pb-4 pt-2 px-8' : 'md:pt-3 sm:pt-2 pt-[6px] md:pb-6 sm:pb-4 pb-3 md:mt-12 sm:mt-8 mt-6 md:px-10 sm:px-6 px-4'}`}
             >
-                <TextareaAutosize
-                    spellCheck={false}
-                    maxRows={5}
-                    disabled={saving}
-                    placeholder="Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className={`border-bottom font-medium w-full resize-none overflow-hidden ${isShort ? 'py-2 text-2xl' : 'md:py-4 sm:py-3 py-[6px] md:text-3xl sm:text-2xl text-xl'}`}
-                    required={true}
-                />
+                <div className="fl border-bottom">
+                    {!isShort && _id !== '' && (
+                        <div className="fl text-gray-400 text-3xl mr-3">
+                            <span onClick={handleStarredClick} className={`cursor-pointer transition-colors hover:text-cyan-600 mr-1 ${isStarred ? 'text-cyan-500' : ''}`}>
+                                <AiFillStar />
+                            </span>
+                            <span onClick={handleLockedClick} className={`cursor-pointer transition-colors hover:text-gray-600 ${isLocked ? 'text-gray-700' : ''}`}>
+                                {isLocked ? <AiFillLock /> : <AiFillUnlock />}
+                            </span>
+                        </div>
+                    )}
+                    <TextareaAutosize
+                        spellCheck={false}
+                        maxRows={5}
+                        disabled={saving}
+                        placeholder="Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className={`font-medium w-full text-cyan-900 resize-none overflow-hidden ${isShort ? 'py-2 text-2xl' : 'md:py-4 sm:py-3 py-[6px] md:text-3xl sm:text-2xl text-xl'}`}
+                        required={true}
+                    />
+                </div>
                 <div className="flex-between md:flex-row flex-col border-bottom-md mb-6">
                     <div className="fl xs:h-11 border-bottom-sm md:w-auto w-full md:justify-start xs:justify-between justify-center xs:flex-row flex-col">
                         <NoteDate date={startDate} isStartDate={true} setDate={setStartDate} inputClassname="border-bottom-xs w-full fl justify-center" />

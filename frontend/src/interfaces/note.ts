@@ -12,6 +12,8 @@ export default interface INote {
     category?: string;
     rating: number;
     isEndNote?: boolean;
+    isLocked?: boolean;
+    isStarred?: boolean;
     _id: string;
     // milestones: IMilestone[];
 }

@@ -229,6 +229,10 @@ h6 {
     transform: rotateZ(90deg);
 }
 
+.starred-btn:hover .star {
+    transform: rotateZ(145deg);
+}
+
 .filter-option.focused .filter-arrow {
     color: #fff;
     animation-name: rotate-filter-arrow-on;
