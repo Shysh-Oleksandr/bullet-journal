@@ -4,9 +4,49 @@ import { BiCalendarAlt, BiCategory } from 'react-icons/bi';
 import { IoIosJournal } from 'react-icons/io';
 import { MdSort } from 'react-icons/md';
 
-export const defaultNoteTypes: string[] = ['Note', 'Event', 'Diary', 'Habit'];
+export interface ICustomNoteLabel {
+    name: string;
+    color?: string;
+}
+export const defaultNoteTypes: ICustomNoteLabel[] = [
+    {
+        name: 'Note',
+        color: '#04a9c6'
+    },
+    {
+        name: 'Event',
+        color: '#FEC0CE'
+    },
+    {
+        name: 'Diary',
+        color: '#4A2545'
+    },
+    {
+        name: 'Habit',
+        color: '#16AF84'
+    }
+];
+
+export const noteColors: string[] = [
+    '#E89005',
+    '#E70E02',
+    '#1B998B',
+    '#FFFD82',
+    '#2D3047',
+    '#FCDE9C',
+    '#C4D6B0',
+    '#FFFFFF',
+    '#D2D7DF',
+    '#BDBBB0',
+    '#8A897C',
+    '#E365C1',
+    '#101419',
+    '#ADD9F4',
+    '#4F518C'
+];
 
 export const SEPARATOR = '_SEP_';
+export const COLOR_SEPARATOR = '_COL_';
 
 export interface IFilterOption {
     name: string;
@@ -108,7 +148,8 @@ export enum SortOptions {
     IMPORTANCE = 'importance',
     TYPE = 'type',
     CATEGORY = 'categories',
-    ALPHABETICAL = 'alphabetically'
+    ALPHABETICAL = 'alphabetically',
+    CONTENT = 'content'
 }
 
 export const sortOptions = [
@@ -131,6 +172,10 @@ export const sortOptions = [
     {
         name: 'By categories',
         sortType: SortOptions.CATEGORY
+    },
+    {
+        name: 'By content',
+        sortType: SortOptions.CONTENT
     },
     {
         name: 'Alphabetically',

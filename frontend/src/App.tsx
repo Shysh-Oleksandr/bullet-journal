@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import AuthRoute from './components/AuthRoute';
+import AuthRoute from './components/auth/AuthRoute';
+import Alert from './components/UI/Alert';
 import Loading from './components/UI/Loading';
-import Navbar from './components/Navbar';
 import logging from './config/logging';
 import routes from './config/routes';
 import { login, logout } from './features/user/userSlice';
 import { Validate } from './modules/auth';
-import Alert from './components/UI/Alert';
-import { setError, setSuccess } from './features/journal/journalSlice';
 
 function App() {
     const [isLoading, setIsLoading] = useState<boolean>(true);

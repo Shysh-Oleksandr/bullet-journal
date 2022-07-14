@@ -5,11 +5,16 @@ import { useWindowSize } from '../../hooks';
 import '../../styles/note.scss';
 import Loading from '../UI/Loading';
 import FilterBar from './../filterBar/FilterBar';
-import NoteForm from './NoteForm';
+import NoteForm from './noteForm/NoteForm';
 import NotePreview from './NotePreview';
+import INote from './../../interfaces/note';
 
-const Notes = () => {
-    const { notes, loading, isSidebarShown, isFilterBarShown } = useAppSelector((store) => store.journal);
+interface NotesProps {
+    notes: INote[];
+}
+
+const Notes = ({ notes }: NotesProps) => {
+    const { loading, isSidebarShown, isFilterBarShown } = useAppSelector((store) => store.journal);
     const [showFullAddForm, setShowFullAddForm] = useState<boolean>(false);
     const filterBarRef = useRef() as MutableRefObject<HTMLDivElement>;
     const [width] = useWindowSize();

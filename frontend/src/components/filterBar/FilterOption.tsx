@@ -4,12 +4,12 @@ import { IoIosArrowDown } from 'react-icons/io';
 import { useAppSelector } from '../../app/hooks';
 import { useOnClickOutside } from '../../hooks';
 import { getAllLabels } from '../../utils/functions';
-import InputLabel from '../note/InputLabel';
-import NoteDate from '../note/NoteDate';
-import NoteImportanceInput from '../note/NoteImportanceInput';
-import { defaultNoteTypes, FilterOptions, getDateOptions, IFilterOption, importanceFilterOptions, SortOptions, sortOptions } from './../../utils/data';
+import { FilterOptions, getDateOptions, IFilterOption, importanceFilterOptions, SortOptions, sortOptions } from './../../utils/data';
 import FilterModal from './FilterModal';
 import FilterModalOption from './FilterModalOption';
+import NoteDate from './../note/noteForm/NoteDate';
+import NoteImportanceInput from './../note/noteForm/NoteImportanceInput';
+import InputLabel from './../note/noteForm/InputLabel';
 
 interface FilterOptionProps {
     option: IFilterOption;
@@ -91,7 +91,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 const toggleShowAnyTypes = (label: string, checked: boolean | undefined) => {
                     filterDataSetters.setShowAnyType(checked!);
                 };
-                const types: string[] = getAllLabels(defaultNoteTypes, user.customNoteTypes);
+                const types: string[] = getAllLabels(true, user.customNoteTypes).map((label) => label.name);
                 setOptionsChosen(filterData.type.length);
 
                 content = (
@@ -112,7 +112,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 const toggleShowAnyCategories = (label: string, checked: boolean | undefined) => {
                     filterDataSetters.setShowAnyCategory(checked!);
                 };
-                const categories: string[] = getAllLabels([], user.customNoteCategories);
+                const categories: string[] = getAllLabels(false, user.customNoteCategories).map((label) => label.name);
                 setOptionsChosen(filterData.category.length);
 
                 content = (
@@ -242,9 +242,9 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 isModalOpened ? '!bg-cyan-600 !text-white !shadow-lg focused' : ''
             } hover:bg-cyan-600 hover:text-white hover:shadow-lg`}
         >
-            <div className="fl">
+            <div className="fl flex-1">
                 <span className="text-2xl mr-2">{<option.icon />}</span>
-                <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis text-left xs:w-[115px]">
+                <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis text-left xs:max-w-[80%] flex-1">
                     {option.name}
                     {optionsChosen !== undefined && ` (${optionsChosen})`}
                 </h4>

@@ -4,6 +4,7 @@ import { SEPARATOR } from '../../utils/data';
 import { getDifferentColor, sanitizedData } from '../../utils/functions';
 import NoteInfo from './NoteInfo';
 import { dateDiffInDays } from './../../utils/functions';
+import { AiFillStar } from 'react-icons/ai';
 
 interface NoteBodyProps {
     onMouseEnter?: () => void;
@@ -41,6 +42,7 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
                 )}
                 <div className={`mt-2 text-lg flex-between ${noteTime >= 2 ? 'mr-16' : ''}`}>
                     <div>
+                        {note.isStarred && <NoteInfo text={<AiFillStar className="text-[1.9rem] inline-block text-center pb-1" />} color={note.color} />}
                         <NoteInfo text={`${note.rating}/10`} color={note.color} className="tracking-widest" />
                         <NoteInfo text={note.type} color={note.color} />
                         {noteCategories?.map((category) => {

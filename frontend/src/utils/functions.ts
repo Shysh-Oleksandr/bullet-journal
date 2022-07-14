@@ -2,7 +2,7 @@ import DOMPurify from 'dompurify';
 import tinycolor from 'tinycolor2';
 import IUser from '../interfaces/user';
 import INote from '../interfaces/note';
-import { SEPARATOR } from './data';
+import { COLOR_SEPARATOR, defaultNoteTypes, ICustomNoteLabel, SEPARATOR } from './data';
 
 export function shadeColor(color: string, amount: number) {
     return '#' + color.replace(/^#/, '').replace(/../g, (color) => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
@@ -18,6 +18,10 @@ export const getDifferentColor = (color: string, amount: number = 20) => {
 
 export const INITIAL_NOTE_ID = '111';
 
+export const getNewCustomNoteLabelName = (chosenLabel: ICustomNoteLabel, hasColor: boolean = true) => {
+    return `${SEPARATOR}${chosenLabel.name}${hasColor ? COLOR_SEPARATOR : ''}${hasColor ? chosenLabel.color || '' : ''}`;
+};
+
 export const getInitialNote = (author: IUser): INote => {
     return {
         _id: INITIAL_NOTE_ID,
@@ -32,12 +36,21 @@ export const getInitialNote = (author: IUser): INote => {
     };
 };
 
-export function getCustomLabels(customLabels: string | undefined): string[] {
-    return customLabels?.split(SEPARATOR) || [];
+export function getCustomLabels(customLabels: string | undefined): ICustomNoteLabel[] {
+    const res =
+        customLabels?.split(SEPARATOR).map((label) => {
+            const [labelName, labelColor] = label.split(COLOR_SEPARATOR);
+            return {
+                name: labelName,
+                color: labelColor
+            };
+        }) || [];
+    return res;
 }
 
-export function getAllLabels(defaultLabels: string[], customLabels: string | undefined, additionalLabels?: string[]): string[] {
-    return [...defaultLabels, ...(additionalLabels || []), ...getCustomLabels(customLabels)].filter((label) => label !== '');
+export function getAllLabels(isTypes: boolean, customLabels: string | undefined, additionalLabels?: ICustomNoteLabel[]): ICustomNoteLabel[] {
+    const allLabels = [...(isTypes ? defaultNoteTypes : []), ...(additionalLabels || []), ...getCustomLabels(customLabels)].filter((label) => label.name !== '');
+    return allLabels;
 }
 
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -55,4 +68,11 @@ export const areArraysEqual = (firstArray: any[], secondArray: any[]) => {
     return firstArray.every(function (element) {
         return secondArray.includes(element);
     });
+};
+
+export const getContentWords = (content: string) => {
+    return content
+        .trim()
+        .split(/\s+/)
+        .filter((row) => row.trim() !== '<p></p>').length;
 };

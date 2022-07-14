@@ -5,8 +5,8 @@ import { fetchAllNotes, setShowFilterBar } from '../../features/journal/journalS
 import { useDebounce } from '../../hooks';
 import { useAppDispatch } from './../../app/hooks';
 import INote from './../../interfaces/note';
-import { defaultNoteTypes, filterOptions, getLastPeriodDate, SEPARATOR, SortOptions } from './../../utils/data';
-import { getAllLabels } from './../../utils/functions';
+import { filterOptions, getLastPeriodDate, SEPARATOR, SortOptions } from './../../utils/data';
+import { getAllLabels, getContentWords } from './../../utils/functions';
 import FilterOption from './FilterOption';
 import FilterSearchInput from './FilterSearchInput';
 
@@ -26,10 +26,10 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const [startDate, setStartDate] = useState<number>(oldestNoteDate);
 
     const [endDate, setEndDate] = useState<number>(new Date().getTime());
-    const allTypes = getAllLabels(defaultNoteTypes, user.customNoteTypes);
-    const allCategories = getAllLabels([], user.customNoteCategories);
-    const [type, setType] = useState<string[]>(allTypes);
-    const [category, setCategory] = useState<string[]>(allCategories);
+    const allTypes = getAllLabels(true, user.customNoteTypes);
+    const allCategories = getAllLabels(false, user.customNoteCategories);
+    const [type, setType] = useState<string[]>(allTypes.map((label) => label.name));
+    const [category, setCategory] = useState<string[]>(allCategories.map((label) => label.name));
     const [showAnyCategory, setShowAnyCategory] = useState<boolean>(true);
     const [showAnyType, setShowAnyType] = useState<boolean>(true);
     const [importanceMin, setImportanceMin] = useState<number>(1);
@@ -72,6 +72,8 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
                     } else {
                         return 1;
                     }
+                case SortOptions.CONTENT:
+                    return getContentWords(y.content || '') - getContentWords(x.content || '');
 
                 case SortOptions.ALPHABETICAL:
                     return x.title.localeCompare(y.title);
@@ -91,7 +93,7 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
             const dateFilter = note.startDate >= debouncedStartDate && note.startDate <= getLastPeriodDate(-1, debouncedEndDate);
             const importanceFilter = note.rating >= importanceMin && note.rating <= importanceMax;
 
-            return titleFilter && typeFilter && categoryFilter && dateFilter && importanceFilter;
+            return titleFilter && typeFilter && categoryFilter && importanceFilter && dateFilter;
         });
 
         return filteredNotes;
@@ -101,8 +103,8 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
         setSearchQuery('');
         setSortType(SortOptions.NEWEST);
         setEndDate(new Date().getTime());
-        setType(allTypes);
-        setCategory(allCategories);
+        setType(allTypes.map((label) => label.name));
+        setCategory(allCategories.map((label) => label.name));
         setShowAnyCategory(true);
         setShowAnyType(true);
         setImportanceMin(1);
@@ -130,6 +132,20 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
         setStartDate(oldestNoteDate);
     }, [oldestNoteDate]);
 
+    // Choosing new added type.
+    useEffect(() => {
+        if (!type.includes(allTypes.map((label) => label.name).at(-1) || '')) {
+            setType((prev) => [...prev, allTypes.map((label) => label.name).at(-1) || '']);
+        }
+    }, [user.customNoteTypes]);
+
+    // Choosing new added category.
+    useEffect(() => {
+        if (!category.includes(allCategories.map((label) => label.name).at(-1) || '')) {
+            setCategory((prev) => [...prev, allCategories.map((label) => label.name).at(-1) || '']);
+        }
+    }, [user.customNoteCategories]);
+
     return (
         <div
             ref={filterBarRef}
@@ -141,7 +157,12 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
                 {filterOptions.map((option) => {
                     return <FilterOption setShowFullAddForm={setShowFullAddForm} option={option} key={option.name} filterData={filterData} filterDataSetters={filterDataSetters} />;
                 })}
-                <FilterSearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                <FilterSearchInput
+                    inputClassName="filter-search-input rounded-lg py-3 h-full min-w-[12rem] pr-8  hover:text-white focus-within:text-white focus-within:bg-cyan-600 hover:bg-cyan-600 focus-within:placeholder:text-white hover:placeholder:text-white"
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    className="mx-3 mt-2"
+                />
             </div>
             <span
                 onClick={() => dispatch(setShowFilterBar(!isFilterBarShown))}
