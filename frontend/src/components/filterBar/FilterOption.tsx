@@ -7,7 +7,7 @@ import { getAllLabels } from '../../utils/functions';
 import InputLabel from '../note/noteForm/InputLabel';
 import NoteDate from '../note/noteForm/NoteDate';
 import NoteImportanceInput from '../note/noteForm/NoteImportanceInput';
-import { defaultNoteTypes, FilterOptions, getDateOptions, IFilterOption, importanceFilterOptions, SortOptions, sortOptions } from './../../utils/data';
+import { FilterOptions, getDateOptions, IFilterOption, importanceFilterOptions, SortOptions, sortOptions } from './../../utils/data';
 import FilterModal from './FilterModal';
 import FilterModalOption from './FilterModalOption';
 
@@ -242,9 +242,9 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 isModalOpened ? '!bg-cyan-600 !text-white !shadow-lg focused' : ''
             } hover:bg-cyan-600 hover:text-white hover:shadow-lg`}
         >
-            <div className="fl">
+            <div className="fl flex-1">
                 <span className="text-2xl mr-2">{<option.icon />}</span>
-                <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis text-left xs:max-w-[80%]">
+                <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis text-left xs:max-w-[80%] flex-1">
                     {option.name}
                     {optionsChosen !== undefined && ` (${optionsChosen})`}
                 </h4>

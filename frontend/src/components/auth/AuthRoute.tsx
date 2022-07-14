@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAppSelector } from '../app/hooks';
-import logging from '../config/logging';
+import { useAppSelector } from '../../app/hooks';
+import logging from '../../config/logging';
 import { Navigate } from 'react-router-dom';
 
 interface IAuthRouteProps {

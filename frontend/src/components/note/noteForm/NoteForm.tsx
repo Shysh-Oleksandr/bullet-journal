@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { ContentState, EditorState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { AiFillLock, AiFillStar, AiFillUnlock } from 'react-icons/ai';
 import { BsDashLg } from 'react-icons/bs';
-import { IoIosColorPalette, IoMdCheckmark } from 'react-icons/io';
+import { IoIosColorPalette } from 'react-icons/io';
 import { MdDelete } from 'react-icons/md';
 import { RiSave3Fill } from 'react-icons/ri';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -289,7 +289,9 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         >
             <form
                 onClick={() => setShowFullAddForm && setShowFullAddForm(true)}
-                className={`bg-white rounded-sm shadow-xl ${isShort ? 'pb-4 pt-2 px-8' : 'md:pt-3 sm:pt-2 pt-[6px] md:pb-6 sm:pb-4 pb-3 md:mt-12 sm:mt-8 mt-6 md:px-10 sm:px-6 px-4'}`}
+                className={`bg-white rounded-sm shadow-xl ${
+                    isShort ? 'pb-4 pt-2 px-8' : 'md:pt-3 sm:pt-2 pt-[6px] md:pb-6 sm:pb-4 pb-3 md:mt-12 sm:mt-8 mt-6 xlg:px-10 lg:px-4 md:px-10 sm:px-6 px-4'
+                }`}
             >
                 <div className="fl border-bottom relative z-10">
                     {!isShort && _id !== '' && (
@@ -317,15 +319,15 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     {!isShort && _id !== '' && <NoteSavingIndicator saving={saving} />}
                 </div>
                 <div className="fl lg:flex-row flex-col border-bottom-lg-show mb-6">
-                    <div className="fl xs:h-11 border-bottom-lg lg:w-auto w-full lg:justify-start xs:justify-between justify-center xs:flex-row flex-col lg:border-r-2 lg:pr-4">
+                    <div className="fl xs:h-11 border-bottom-lg lg:w-auto w-full lg:justify-start xs:justify-between justify-center xs:flex-row flex-col lg:border-r-2 xlg:pr-4">
                         <NoteDate disabled={saving || isLocked} date={startDate} isStartDate={true} setDate={setStartDate} inputClassname="border-bottom-xs w-full fl justify-center" />
-                        <BsDashLg className="lg:mx-6 mx-3 xs:block hidden xs:text-4xl text-xl" />
+                        <BsDashLg className="xlg:mx-6 lg:mx-1 mx-3 xs:block hidden xs:text-4xl text-xl" />
                         <NoteDate disabled={saving || isLocked} date={endDate} isStartDate={false} setDate={setEndDate} inputClassname="xs:mt-0 mt-3" />
                     </div>
                     <div className="fl border-bottom-lg lg:mt-0 mt-5 w-full justify-between lg:px-0 xs:px-4">
-                        <div className="lg:ml-4 lg:mr-4 sm:ml-2 mr-4 flex-shrink-0 text-lg text-cyan-600 whitespace-nowrap">{words} words</div>
-                        <div className="fl custom-border lg:border-l-2 pl-8">
-                            <div className="relative fl lg:mr-3 mr-1 h-11">
+                        <div className="xlg:mx-4 lg:mx-1 sm:ml-2 mr-4 flex-shrink-0 text-lg text-cyan-600 whitespace-nowrap">{words} words</div>
+                        <div className="fl custom-border lg:border-l-2 xlg:pl-8 lg:pl-1">
+                            <div className="relative fl xlg:mr-3 mr-1 h-11">
                                 <NoteImportanceInput disabled={saving || isLocked} importance={rating} setImportance={setRating} inputId="noteRatingInput" />
                                 <label htmlFor="noteRatingInput" className="cursor-pointer text-3xl px-1 text-[#6aaac2] py-2">
                                     /10
@@ -333,7 +335,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                                 <InputLabel htmlFor="noteRatingInput" text="Importance" />
                             </div>
                             <div className="relative fl h-11">
-                                <label style={{ color: color }} htmlFor="noteColorInput" className="cursor-pointer text-3xl lg:px-4 px-3 text-[#6aaac2] py-2">
+                                <label style={{ color: color }} htmlFor="noteColorInput" className="cursor-pointer text-3xl xlg:px-4 lg:px-1 px-3 text-[#6aaac2] py-2">
                                     <IoIosColorPalette />
                                 </label>
                                 <input
@@ -385,7 +387,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                         />
                     )}
                 </div>
-                {!isShort && _id && <OtherNotes prevNote={prevNote} nextNote={nextNote} />}
+                {!isShort && _id && (prevNote || nextNote) && <OtherNotes prevNote={prevNote} nextNote={nextNote} />}
             </form>
             <NoteFormPreview isShort={isShort} startDate={startDate} note={{ _id, title, startDate, endDate, content, image, color, rating, category, type, isStarred, author: '' }} />
             {_id !== '' && modal && <DeleteModal deleteNote={deleteNote} deleting={deleting} modal={modal} setModal={setModal} />}

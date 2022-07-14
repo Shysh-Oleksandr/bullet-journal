@@ -93,7 +93,7 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
             const dateFilter = note.startDate >= debouncedStartDate && note.startDate <= getLastPeriodDate(-1, debouncedEndDate);
             const importanceFilter = note.rating >= importanceMin && note.rating <= importanceMax;
 
-            return titleFilter && typeFilter && categoryFilter && dateFilter && importanceFilter;
+            return titleFilter && typeFilter && categoryFilter && importanceFilter && dateFilter;
         });
 
         return filteredNotes;

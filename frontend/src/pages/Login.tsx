@@ -1,16 +1,16 @@
-import React from 'react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
-import { Authenticate, SignInWithSocialMedia as SocialMediaPopup } from '../modules/auth';
-import logging from '../config/logging';
-import InfoMessage from '../components/UI/InfoMessage';
-import { BsGoogle } from 'react-icons/bs';
-import { Providers } from '../config/firebase';
-import Loading from '../components/UI/Loading';
-import CenterPiece from '../components/CenterPiece';
+import React, { useState } from 'react';
+import { BsGithub, BsGoogle } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../app/hooks';
+import CenterPiece from '../components/auth/CenterPiece';
+import LoginBtn from '../components/auth/LoginBtn';
+import InfoMessage from '../components/UI/InfoMessage';
+import Loading from '../components/UI/Loading';
+import { Providers } from '../config/firebase';
+import logging from '../config/logging';
 import { login } from '../features/user/userSlice';
+import { Authenticate, SignInWithSocialMedia as SocialMediaPopup } from '../modules/auth';
 
 const LoginPage = () => {
     const [authenticating, setAuthenticating] = useState<boolean>(false);
@@ -30,10 +30,9 @@ const LoginPage = () => {
                 logging.info(result);
 
                 let user = result.user;
-
                 if (user) {
                     let uid = user.uid;
-                    let name = user.displayName;
+                    let name = user.displayName || result.additionalUserInfo?.username;
 
                     if (name) {
                         try {
@@ -72,18 +71,24 @@ const LoginPage = () => {
         <CenterPiece>
             <div className="flex flex-col items-center justify-center">
                 <div className="bg-white md:px-12 sm:px-8 px-4 py-8 lg:w-[40vw] md:w-[55vw] sm:w-[65vw] w-[90vw] rounded-lg shadow-xl">
-                    <div className="sm:text-5xl text-4xl font-semibold text-center my-4">{isLogin ? 'Login' : 'Sign Up'}</div>
+                    <div className="sm:text-5xl text-4xl font-semibold text-center mt-4 mb-8">{isLogin ? 'Login' : 'Sign Up'}</div>
                     <div className="text-center">
-                        <button
-                            disabled={authenticating}
-                            onClick={() => SignInWithSocialMedia(Providers.google)}
-                            className="flex items-center justify-center mx-auto shadow-lg my-6 w-full sm:px-10 px-4 font-bold py-3 rounded-lg bg-orange-600 transition-all text-white text-2xl cursor-pointer hover:bg-orange-700 hover:shadow-xl disabled:shadow-xl disabled:cursor-default disabled:bg-orange-900"
-                        >
-                            <span className="mr-4">
-                                <BsGoogle />
-                            </span>
-                            <span className="sm:text-2xl text-xl">Sign {isLogin ? 'In' : 'Up'} with Google</span>
-                        </button>
+                        <LoginBtn
+                            className="disabled:bg-orange-900 bg-orange-600  hover:bg-orange-700"
+                            authenticating={authenticating}
+                            isLogin={isLogin}
+                            icon={<BsGoogle />}
+                            onclick={() => SignInWithSocialMedia(Providers.google)}
+                            providerName="Google"
+                        />
+                        <LoginBtn
+                            className="disabled:bg-gray-900 bg-gray-600  hover:bg-gray-700"
+                            authenticating={authenticating}
+                            isLogin={isLogin}
+                            icon={<BsGithub />}
+                            onclick={() => SignInWithSocialMedia(Providers.github)}
+                            providerName="Github"
+                        />
                         <InfoMessage message={error} isError={true} />
                         {authenticating && <Loading />}
                     </div>
