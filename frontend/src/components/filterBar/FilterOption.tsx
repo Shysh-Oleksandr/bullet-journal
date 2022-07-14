@@ -4,12 +4,12 @@ import { IoIosArrowDown } from 'react-icons/io';
 import { useAppSelector } from '../../app/hooks';
 import { useOnClickOutside } from '../../hooks';
 import { getAllLabels } from '../../utils/functions';
-import InputLabel from '../note/noteForm/InputLabel';
-import NoteDate from '../note/noteForm/NoteDate';
-import NoteImportanceInput from '../note/noteForm/NoteImportanceInput';
 import { FilterOptions, getDateOptions, IFilterOption, importanceFilterOptions, SortOptions, sortOptions } from './../../utils/data';
 import FilterModal from './FilterModal';
 import FilterModalOption from './FilterModalOption';
+import NoteDate from './../note/noteForm/NoteDate';
+import NoteImportanceInput from './../note/noteForm/NoteImportanceInput';
+import InputLabel from './../note/noteForm/InputLabel';
 
 interface FilterOptionProps {
     option: IFilterOption;
