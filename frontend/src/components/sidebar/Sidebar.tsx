@@ -49,7 +49,10 @@ const Sidebar = ({ sidebarRef, topRef }: SidebarProps) => {
                 </button>
                 <Link
                     to={'/'}
-                    onClick={() => topRef && topRef.current.scrollIntoView({ behavior: 'smooth' })}
+                    onClick={() => {
+                        topRef && topRef.current.scrollIntoView({ behavior: 'smooth' });
+                        width < 1024 && dispatch(setShowSidebar(false));
+                    }}
                     className="lg:text-3xl text-2xl lg:ml-0 ml-12 w-[24rem] whitespace-nowrap overflow-hidden text-ellipsis font-semibold px-4 block break-all bg-cyan-900 hover:text-cyan-100 transition-colors"
                 >
                     {user.name.split(' ')[0]}'s Journal
@@ -68,7 +71,7 @@ const Sidebar = ({ sidebarRef, topRef }: SidebarProps) => {
             <div>
                 <Link
                     to={'/edit'}
-                    onClick={() => dispatch(setShowSidebar(false))}
+                    onClick={() => width < 1024 && dispatch(setShowSidebar(false))}
                     className="text-xl new-note py-5 px-4 bg-cyan-500 font-semibold flex items-center cursor-pointer duration-300 transition-colors hover:bg-cyan-600"
                 >
                     <span className="mr-3 plus text-2xl transition-all duration-300">

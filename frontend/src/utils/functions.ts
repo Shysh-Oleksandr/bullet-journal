@@ -69,3 +69,10 @@ export const areArraysEqual = (firstArray: any[], secondArray: any[]) => {
         return secondArray.includes(element);
     });
 };
+
+export const getContentWords = (content: string) => {
+    return content
+        .trim()
+        .split(/\s+/)
+        .filter((row) => row.trim() !== '<p></p>').length;
+};

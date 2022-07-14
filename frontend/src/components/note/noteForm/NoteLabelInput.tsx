@@ -19,10 +19,11 @@ interface NoteLabelInputProps {
     setLabel: React.Dispatch<React.SetStateAction<string>>;
     label: string;
     isCustomTypes: boolean;
+    disabled?: boolean;
     setNoteColor: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor }: NoteLabelInputProps) => {
+const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor, disabled }: NoteLabelInputProps) => {
     const [focused, setFocused] = useState(false);
     const labelInputRef = useRef<HTMLInputElement>(null);
     const labelAddRef = useRef<HTMLButtonElement>(null);
@@ -136,6 +137,8 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor }: NoteLa
     };
 
     const deleteLabel = (labelToDelete: ICustomNoteLabel) => {
+        if (disabled) return;
+
         isCustomTypes ? label === labelToDelete.name && setLabel(defaultNoteTypes[0].name) : label.split(SEPARATOR)[1] === labelToDelete.name && setLabel('');
 
         !isCustomTypes &&
@@ -148,6 +151,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor }: NoteLa
     };
 
     const chooseLabel = (chosenLabel: ICustomNoteLabel) => {
+        if (disabled) return;
         if (isCustomTypes) {
             setLabel(chosenLabel.name);
         } else {
@@ -180,6 +184,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor }: NoteLa
                 ref={labelInputRef}
                 value={isCustomTypes ? label : label.replace(SEPARATOR, '').replaceAll(SEPARATOR, ', ')}
                 required={true}
+                disabled={disabled === undefined ? false : disabled}
                 onChange={(e) => setLabel(e.target.value)}
             />
             <label
@@ -195,6 +200,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor }: NoteLa
                 type="color"
                 id={isCustomTypes ? 'noteCustomTypeColorInput' : 'noteCustomCategoryColorInput'}
                 className="hidden"
+                disabled={disabled === undefined ? false : disabled}
                 value={color}
                 onChange={(e) => {
                     setColor(e.target.value);

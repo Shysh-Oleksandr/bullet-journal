@@ -148,7 +148,8 @@ export enum SortOptions {
     IMPORTANCE = 'importance',
     TYPE = 'type',
     CATEGORY = 'categories',
-    ALPHABETICAL = 'alphabetically'
+    ALPHABETICAL = 'alphabetically',
+    CONTENT = 'content'
 }
 
 export const sortOptions = [
@@ -171,6 +172,10 @@ export const sortOptions = [
     {
         name: 'By categories',
         sortType: SortOptions.CATEGORY
+    },
+    {
+        name: 'By content',
+        sortType: SortOptions.CONTENT
     },
     {
         name: 'Alphabetically',

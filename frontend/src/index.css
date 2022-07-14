@@ -119,8 +119,16 @@ h6 {
     @apply md:border-b-2 border-solid border-cyan-100 transition-all md:focus-within:border-b-[3px] focus-within:border-cyan-200;
 }
 
+.border-bottom-lg {
+    @apply lg:border-b-0 border-b-2 border-solid border-cyan-100 transition-all lg:focus-within:border-b-0 focus-within:border-b-[3px] focus-within:border-cyan-200;
+}
+
+.border-bottom-lg-show {
+    @apply lg:border-b-2 border-b-0 border-solid border-cyan-100 transition-all lg:focus-within:border-b-[3px] focus-within:border-b-0 focus-within:border-cyan-200;
+}
+
 .border-bottom-sm {
-    @apply md:border-b-0 border-b-2 border-solid border-cyan-100 transition-all md:focus-within:border-b-0 focus-within:border-b-[3px] focus-within:border-cyan-200;
+    @apply sm:border-b-0 border-b-2 border-solid border-cyan-100 transition-all sm:focus-within:border-b-0 focus-within:border-b-[3px] focus-within:border-cyan-200;
 }
 
 .border-bottom-xs {

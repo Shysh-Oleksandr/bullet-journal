@@ -5,8 +5,8 @@ import { fetchAllNotes, setShowFilterBar } from '../../features/journal/journalS
 import { useDebounce } from '../../hooks';
 import { useAppDispatch } from './../../app/hooks';
 import INote from './../../interfaces/note';
-import { defaultNoteTypes, filterOptions, getLastPeriodDate, SEPARATOR, SortOptions } from './../../utils/data';
-import { getAllLabels } from './../../utils/functions';
+import { filterOptions, getLastPeriodDate, SEPARATOR, SortOptions } from './../../utils/data';
+import { getAllLabels, getContentWords } from './../../utils/functions';
 import FilterOption from './FilterOption';
 import FilterSearchInput from './FilterSearchInput';
 
@@ -72,6 +72,8 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
                     } else {
                         return 1;
                     }
+                case SortOptions.CONTENT:
+                    return getContentWords(y.content || '') - getContentWords(x.content || '');
 
                 case SortOptions.ALPHABETICAL:
                     return x.title.localeCompare(y.title);
@@ -130,12 +132,14 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
         setStartDate(oldestNoteDate);
     }, [oldestNoteDate]);
 
+    // Choosing new added type.
     useEffect(() => {
         if (!type.includes(allTypes.map((label) => label.name).at(-1) || '')) {
             setType((prev) => [...prev, allTypes.map((label) => label.name).at(-1) || '']);
         }
     }, [user.customNoteTypes]);
 
+    // Choosing new added category.
     useEffect(() => {
         if (!category.includes(allCategories.map((label) => label.name).at(-1) || '')) {
             setCategory((prev) => [...prev, allCategories.map((label) => label.name).at(-1) || '']);

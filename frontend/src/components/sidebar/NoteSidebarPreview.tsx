@@ -6,6 +6,7 @@ import NoteInfo from './../note/NoteInfo';
 import { AiFillStar } from 'react-icons/ai';
 import { useAppDispatch } from './../../app/hooks';
 import { setShowSidebar } from '../../features/journal/journalSlice';
+import { useWindowSize } from '../../hooks';
 
 interface NoteSidebarPreviewProps {
     note: INote;
@@ -17,13 +18,14 @@ const NoteSidebarPreview = ({ note }: NoteSidebarPreviewProps) => {
     const params = useParams();
     const currentNoteOpenedId = params.noteID;
     const dispatch = useAppDispatch();
+    const [width] = useWindowSize();
 
     return (
         <div
             onClick={() => {
                 if (isInitialNote) return;
                 navigate(`/edit/${note._id}`);
-                dispatch(setShowSidebar(false));
+                width < 1024 && dispatch(setShowSidebar(false));
             }}
             className={`sm:pt-2 pt-1 sm:pb-1 pb-[2px] px-4 ${
                 currentNoteOpenedId === note._id ? '!bg-cyan-700' : 'bg-cyan-800'

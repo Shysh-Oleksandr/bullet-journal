@@ -244,7 +244,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
         >
             <div className="fl">
                 <span className="text-2xl mr-2">{<option.icon />}</span>
-                <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis text-left xs:w-[115px]">
+                <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis text-left xs:max-w-[80%]">
                     {option.name}
                     {optionsChosen !== undefined && ` (${optionsChosen})`}
                 </h4>
