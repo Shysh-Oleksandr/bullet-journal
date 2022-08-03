@@ -6,6 +6,7 @@ import firebaseAdmin from 'firebase-admin';
 import serviceAccountJson from './config/serviceAccountKey.json';
 import userRoutes from './routes/user';
 import noteRoutes from './routes/note';
+import customLabelRoutes from './routes/customLabel';
 
 const router = express();
 
@@ -57,6 +58,7 @@ router.use((req, res, next) => {
 /** Routes */
 router.use('/users', userRoutes);
 router.use('/notes', noteRoutes);
+router.use('/customlabels', customLabelRoutes);
 
 /** Error handling */
 router.use((req, res, next) => {

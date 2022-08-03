@@ -53,7 +53,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     const [prevNote, setPrevNote] = useState<INote | null>(null);
     const [nextNote, setNextNote] = useState<INote | null>(null);
 
-    const debouncedDelay = 3000;
+    const debouncedDelay = 2000;
 
     const debouncedTitle = useDebounce(title, debouncedDelay);
     const debouncedStartDate = useDebounce(startDate, debouncedDelay);
@@ -226,7 +226,6 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         } finally {
             setTimeout(() => {
                 setSaving(false);
-                _id !== '' && setEditorState((prevEditorState: EditorState) => EditorState.moveFocusToEnd(prevEditorState));
             }, 500);
         }
     };
@@ -364,7 +363,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                         <InputLabel htmlFor="noteCategoryInput" text="Categories" />
                     </div>
                 </div>
-                <NoteContentEditor disabled={saving || isLocked} setEditorState={setEditorState} setContent={setContent} setImage={setImage} editorState={editorState} isShort={isShort} />
+                <NoteContentEditor disabled={isLocked} setEditorState={setEditorState} setContent={setContent} setImage={setImage} editorState={editorState} isShort={isShort} />
                 <div>
                     <SaveButton
                         className={`bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-900 ${isShort ? 'mt-2 py-2' : 'mt-4'}`}
