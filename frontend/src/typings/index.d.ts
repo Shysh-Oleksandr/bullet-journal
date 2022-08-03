@@ -1,1 +1,1 @@
-declare module 'react-draft-wysiwyg';
+// declare module 'react-draft-wysiwyg';

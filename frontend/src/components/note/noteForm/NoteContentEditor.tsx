@@ -9,7 +9,6 @@ interface NoteContentEditorProps {
     setImage: (value: React.SetStateAction<string>) => void;
     editorState: EditorState;
     disabled?: boolean;
-
     isShort?: boolean;
 }
 
@@ -42,9 +41,9 @@ const NoteContentEditor = ({ setEditorState, setContent, setImage, editorState, 
               history: { inDropdown: true }
           }
         : {};
-
     return (
         <Editor
+            key={'Editor'}
             placeholder="Write your note here..."
             editorState={editorState}
             toolbarClassName="toolbarClassName border-cyan-100 border-2 rounded-sm z-[150] sticky sm:top-[65px] top-[50px] left-0"

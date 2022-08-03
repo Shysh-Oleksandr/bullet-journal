@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { ContentState, EditorState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { AiFillLock, AiFillStar, AiFillUnlock } from 'react-icons/ai';
 import { BsDashLg } from 'react-icons/bs';
@@ -52,16 +53,18 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     const [prevNote, setPrevNote] = useState<INote | null>(null);
     const [nextNote, setNextNote] = useState<INote | null>(null);
 
-    const debouncedTitle = useDebounce(title, 2000);
-    const debouncedStartDate = useDebounce(startDate, 2000);
-    const debouncedEndDate = useDebounce(endDate, 2000);
-    const debouncedContent = useDebounce(content, 2000);
-    const debouncedColor = useDebounce(color, 2000);
-    const debouncedRating = useDebounce(rating, 2000);
-    const debouncedType = useDebounce(type, 2000);
-    const debouncedCategory = useDebounce(category, 2000);
-    const debouncedIsLocked = useDebounce(isLocked, 2000);
-    const debouncedIsStarred = useDebounce(isStarred, 2000);
+    const debouncedDelay = 3000;
+
+    const debouncedTitle = useDebounce(title, debouncedDelay);
+    const debouncedStartDate = useDebounce(startDate, debouncedDelay);
+    const debouncedEndDate = useDebounce(endDate, debouncedDelay);
+    const debouncedContent = useDebounce(content, debouncedDelay);
+    const debouncedColor = useDebounce(color, debouncedDelay);
+    const debouncedRating = useDebounce(rating, debouncedDelay);
+    const debouncedType = useDebounce(type, debouncedDelay);
+    const debouncedCategory = useDebounce(category, debouncedDelay);
+    const debouncedIsLocked = useDebounce(isLocked, debouncedDelay);
+    const debouncedIsStarred = useDebounce(isStarred, debouncedDelay);
 
     const [modal, setModal] = useState<boolean>(false);
     const [saving, setSaving] = useState<boolean>(false);
@@ -76,7 +79,6 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [width] = useWindowSize();
-    const firstRender = useRef(0);
 
     const resetState = () => {
         setId('');
@@ -90,6 +92,8 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         setType('Note');
         setCategory('');
         setEditorState(EditorState.createEmpty());
+        setIsLocked(false);
+        setIsStarred(false);
     };
 
     useEffect(() => {
@@ -168,6 +172,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     const saveNote = async (method: string, url: string, isCreating: boolean, showMessage: boolean = true) => {
         const _startDate = new Date(startDate);
+
         const _endDate = new Date(endDate);
         _startDate.setHours(0, 0, 0, 0);
         _endDate.setHours(0, 0, 0, 0);
@@ -221,6 +226,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         } finally {
             setTimeout(() => {
                 setSaving(false);
+                _id !== '' && setEditorState((prevEditorState: EditorState) => EditorState.moveFocusToEnd(prevEditorState));
             }, 500);
         }
     };
@@ -265,12 +271,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     useEffect(() => {
         if (isShort) return;
-        // Ignore first 7 renders.
-        if (firstRender.current < 7) {
-            firstRender.current++;
-        } else {
-            _id !== '' && editNote(false);
-        }
+        _id !== '' && editNote(false);
     }, [debouncedTitle, debouncedStartDate, debouncedEndDate, debouncedContent, debouncedColor, debouncedRating, debouncedType, debouncedCategory, debouncedIsLocked, debouncedIsStarred]);
 
     if (isLoading) {
