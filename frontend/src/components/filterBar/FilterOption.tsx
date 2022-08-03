@@ -2,14 +2,14 @@ import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { BsDashLg } from 'react-icons/bs';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAppSelector } from '../../app/hooks';
-import { useOnClickOutside } from '../../hooks';
-import { getAllLabels } from '../../utils/functions';
+import { useFetchData, useOnClickOutside } from '../../hooks';
 import { FilterOptions, getDateOptions, IFilterOption, importanceFilterOptions, SortOptions, sortOptions } from './../../utils/data';
 import FilterModal from './FilterModal';
 import FilterModalOption from './FilterModalOption';
 import NoteDate from './../note/noteForm/NoteDate';
 import NoteImportanceInput from './../note/noteForm/NoteImportanceInput';
 import InputLabel from './../note/noteForm/InputLabel';
+import ICustomLabel from '../../interfaces/customLabel';
 
 interface FilterOptionProps {
     option: IFilterOption;
@@ -26,6 +26,8 @@ interface FilterOptionProps {
         showAnyType: boolean;
         wasReset: boolean;
         oldestNoteDate: number;
+        allTypes: ICustomLabel[];
+        allCategories: ICustomLabel[];
     };
     filterDataSetters: {
         setSortType: React.Dispatch<React.SetStateAction<SortOptions>>;
@@ -91,14 +93,13 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 const toggleShowAnyTypes = (label: string, checked: boolean | undefined) => {
                     filterDataSetters.setShowAnyType(checked!);
                 };
-                const types: string[] = getAllLabels(true, user.customNoteTypes).map((label) => label.name);
                 setOptionsChosen(filterData.type.length);
 
                 content = (
                     <div>
                         <FilterModalOption checkedAtStart={filterData.showAnyType} onchange={toggleShowAnyTypes} text="Any types" />
-                        {types.map((type) => {
-                            return <FilterModalOption onchange={checkLabel} checkedAtStart={filterData.type.includes(type)} text={type} key={type + '_type'} />;
+                        {filterData.allTypes.map((type) => {
+                            return <FilterModalOption onchange={checkLabel} checkedAtStart={filterData.type.includes(type.labelName)} text={type.labelName} key={type._id} />;
                         })}
                     </div>
                 );
@@ -112,14 +113,13 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 const toggleShowAnyCategories = (label: string, checked: boolean | undefined) => {
                     filterDataSetters.setShowAnyCategory(checked!);
                 };
-                const categories: string[] = getAllLabels(false, user.customNoteCategories).map((label) => label.name);
                 setOptionsChosen(filterData.category.length);
 
                 content = (
                     <div>
                         <FilterModalOption checkedAtStart={filterData.showAnyCategory} onchange={toggleShowAnyCategories} text="Any categories" />
-                        {categories.map((category) => {
-                            return <FilterModalOption onchange={checkLabel} checkedAtStart={filterData.category.includes(category)} text={category} key={category + '_category'} />;
+                        {filterData.allCategories.map((category) => {
+                            return <FilterModalOption onchange={checkLabel} checkedAtStart={filterData.category.includes(category.labelName)} text={category.labelName} key={category._id} />;
                         })}
                     </div>
                 );

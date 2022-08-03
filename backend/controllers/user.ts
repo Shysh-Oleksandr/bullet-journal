@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import logging from '../config/logging';
 import User from '../models/user';
+import CustomLabel from '../models/customLabel';
 
 const validate = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Token validated, returning user...');
@@ -28,11 +29,21 @@ const create = (req: Request, res: Response, next: NextFunction) => {
     let { uid, name } = req.body;
     let fire_token = res.locals.fire_token;
 
+    const newUserId = new mongoose.Types.ObjectId();
+
     const user = new User({
-        _id: new mongoose.Types.ObjectId(),
+        _id: newUserId,
         uid,
         name
     });
+
+    // const customLabel = new CustomLabel({
+    //     labelName: 'Note',
+    //     color: '#04a9c6',
+    //     isCategoryLabel: false,
+    //     user: newUserId
+    // });
+    // customLabel.save();
 
     return user
         .save()

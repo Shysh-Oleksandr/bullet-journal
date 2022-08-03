@@ -31,27 +31,27 @@ export const getInitialNote = (author: IUser): INote => {
         endDate: new Date(author.createdAt || new Date()).getTime(),
         content: 'That day I registered an account on the Bullet Journal website.',
         color: '#04a9c6',
-        type: 'Event',
+        type: defaultNoteTypes[1],
         rating: 1
     };
 };
 
-export function getCustomLabels(customLabels: string | undefined): ICustomNoteLabel[] {
-    const res =
-        customLabels?.split(SEPARATOR).map((label) => {
-            const [labelName, labelColor] = label.split(COLOR_SEPARATOR);
-            return {
-                name: labelName,
-                color: labelColor
-            };
-        }) || [];
-    return res;
-}
+// export function getCustomLabels(customLabels: string | undefined): ICustomNoteLabel[] {
+//     const res =
+//         customLabels?.split(SEPARATOR).map((label) => {
+//             const [labelName, labelColor] = label.split(COLOR_SEPARATOR);
+//             return {
+//                 name: labelName,
+//                 color: labelColor
+//             };
+//         }) || [];
+//     return res;
+// }
 
-export function getAllLabels(isTypes: boolean, customLabels: string | undefined, additionalLabels?: ICustomNoteLabel[]): ICustomNoteLabel[] {
-    const allLabels = [...(isTypes ? defaultNoteTypes : []), ...(additionalLabels || []), ...getCustomLabels(customLabels)].filter((label) => label.name !== '');
-    return allLabels;
-}
+// export function getAllLabels(isTypes: boolean, customLabels: string | undefined, additionalLabels?: ICustomNoteLabel[]): ICustomNoteLabel[] {
+//     const allLabels = [...(isTypes ? defaultNoteTypes : []), ...(additionalLabels || []), ...getCustomLabels(customLabels)].filter((label) => label.name !== '');
+//     return allLabels;
+// }
 
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 

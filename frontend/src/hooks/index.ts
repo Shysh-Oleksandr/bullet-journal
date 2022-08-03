@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useEffect, useLayoutEffect, useState } from 'react';
 
 export function useDebounce(value: any, delay: number) {
@@ -54,4 +55,37 @@ export function useOnClickOutside(ref, handler) {
         // ... passing it into this hook.
         [ref, handler]
     );
+}
+
+export function useFetchData<T>(method: string = 'GET', url: string, name: string): [T[], boolean] {
+    const [items, setItems] = useState<T[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    async function fetchData() {
+        setLoading(true);
+        try {
+            const response = await axios({
+                method: method,
+                url: url
+            });
+
+            if (response.status === 200 || response.status === 304) {
+                let data = response.data[name] as T[];
+
+                setItems(data);
+            } else {
+                console.log("Can't get items");
+            }
+        } catch (error) {
+            console.log('Catch: ' + error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    return [items, loading];
 }

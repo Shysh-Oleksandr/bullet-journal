@@ -7,38 +7,39 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import config from '../../../config/config';
 import { setError, setSuccess } from '../../../features/journal/journalSlice';
 import { updateUser, updateUserData } from '../../../features/user/userSlice';
+import { useFetchData } from '../../../hooks';
 import IUser from '../../../interfaces/user';
 import { COLOR_SEPARATOR, defaultNoteTypes, ICustomNoteLabel, noteColors, SEPARATOR } from '../../../utils/data';
-import { getAllLabels, getCustomLabels, getNewCustomNoteLabelName } from '../../../utils/functions';
+import { getNewCustomNoteLabelName } from '../../../utils/functions';
+import ICustomLabel from './../../../interfaces/customLabel';
 
 interface NoteLabelInputProps {
-    setLabel: React.Dispatch<React.SetStateAction<string>>;
-    label: string;
+    setLabel: React.Dispatch<React.SetStateAction<ICustomLabel>> | React.Dispatch<React.SetStateAction<ICustomLabel[]>>;
+    label: ICustomLabel;
     isCustomTypes: boolean;
     disabled?: boolean;
     setNoteColor: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor, disabled }: NoteLabelInputProps) => {
+    const { user } = useAppSelector((store) => store.user);
+    const [customLabels, loadingCustomLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${user._id}`, 'customLabels');
+    const currentCustomLabels = isCustomTypes ? customLabels.filter((label) => !label.isCategoryLabel) : customLabels.filter((label) => label.isCategoryLabel);
     const [focused, setFocused] = useState(false);
     const labelInputRef = useRef<HTMLInputElement>(null);
     const labelAddRef = useRef<HTMLButtonElement>(null);
+    const [inputLabel, setInputLabel] = useState(label.labelName); // CAT
 
-    const { user } = useAppSelector((store) => store.user);
     const [userCustomNoteLabels, setUserCustomNoteLabels] = useState<string>(isCustomTypes ? user.customNoteTypes || '' : user.customNoteCategories || '');
-    const [availableLabels, setAvailableLabels] = useState<ICustomNoteLabel[]>(isCustomTypes ? getAllLabels(true, userCustomNoteLabels) : getCustomLabels(userCustomNoteLabels));
-    const [removedLabels, setRemovedLabels] = useState<ICustomNoteLabel[]>(
-        getCustomLabels(label).filter((category) => !availableLabels.map((label) => label.name).includes(category.name) && category.name !== '')
-    );
-    const [previousLabel, setPreviousLabel] = useState(label);
+    // const [availableLabels, setAvailableLabels] = useState<ICustomNoteLabel[]>(isCustomTypes ? getAllLabels(true, userCustomNoteLabels) : getCustomLabels(userCustomNoteLabels));
+    // const [removedLabels, setRemovedLabels] = useState<ICustomNoteLabel[]>(
+    //     getCustomLabels(label).filter((category) => !availableLabels.map((label) => label.name).includes(category.name) && category.name !== '')
+    // );
+    const [previousLabel, setPreviousLabel] = useState<string>(label.labelName);
     const [color, setColor] = useState<string>(noteColors[Math.floor(Math.random() * noteColors.length)]);
     const labelName = isCustomTypes ? 'type' : 'category';
     const dispatch = useAppDispatch();
     let addedLabel = '';
-
-    useEffect(() => {
-        setAvailableLabels([...availableLabels, ...removedLabels]);
-    }, []);
 
     useEffect(() => {
         const keyDownHandler = (event) => {
@@ -57,114 +58,93 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor, disabled
         };
     }, []);
 
-    useEffect(() => {
-        getUser(user._id);
-    }, [userCustomNoteLabels]);
-
-    const getUser = async (id: string) => {
-        try {
-            const response = await axios({
-                method: 'GET',
-                url: `${config.server.url}/users/read/${id}`
-            });
-
-            if (response.status === 200 || response.status === 304) {
-                let user = response.data.user as IUser;
-                dispatch(updateUser(user));
-            } else {
-                dispatch(setError('Unable to retrieve user ' + id));
-            }
-        } catch (error: any) {
-            dispatch(setError(error.message));
-        }
-    };
-
     const onFocus = () => {
         setFocused(true);
-        setPreviousLabel(label);
-        setLabel('');
+        setPreviousLabel(label.labelName);
+        setInputLabel('');
     };
     const onBlur = () => {
         setFocused(false);
         const labelInputText = labelInputRef.current?.value;
 
         setTimeout(() => {
-            if (labelInputText?.trim() === '' || ![...availableLabels, addedLabel].includes(labelInputText!)) {
-                setLabel(previousLabel);
+            if (labelInputText?.trim() === '') {
+                // || ![...availableLabels, addedLabel].includes(labelInputText!)
+                setInputLabel(previousLabel);
             }
         }, 0);
     };
 
-    const updateUserCustomLabels = (newCustomNoteLabels: string, isAdding: boolean, changedLabel: string) => {
-        const newUserData = isCustomTypes
-            ? {
-                  customNoteTypes: newCustomNoteLabels
-              }
-            : {
-                  customNoteCategories: newCustomNoteLabels
-              };
-        dispatch(updateUserData({ oldUser: user, newUserData }));
-        setUserCustomNoteLabels(newCustomNoteLabels);
-        setAvailableLabels(isCustomTypes ? getAllLabels(true, newCustomNoteLabels, removedLabels) : getAllLabels(false, newCustomNoteLabels, removedLabels));
+    // const updateUserCustomLabels = (newCustomNoteLabels: string, isAdding: boolean, changedLabel: string) => {
+    //     const newUserData = isCustomTypes
+    //         ? {
+    //               customNoteTypes: newCustomNoteLabels
+    //           }
+    //         : {
+    //               customNoteCategories: newCustomNoteLabels
+    //           };
+    //     dispatch(updateUserData({ oldUser: user, newUserData }));
+    //     setUserCustomNoteLabels(newCustomNoteLabels);
+    //     setAvailableLabels(isCustomTypes ? getAllLabels(true, newCustomNoteLabels, removedLabels) : getAllLabels(false, newCustomNoteLabels, removedLabels));
 
-        dispatch(setSuccess(isAdding ? `New ${labelName} "${changedLabel}" added.` : `The ${labelName} "${changedLabel}" has been deleted.`));
-    };
+    //     dispatch(setSuccess(isAdding ? `New ${labelName} "${changedLabel}" added.` : `The ${labelName} "${changedLabel}" has been deleted.`));
+    // };
 
-    const addNewLabel = () => {
-        let newLabel = labelInputRef.current!.value;
-        const isNew: boolean = !availableLabels.map((label) => label.name).includes(newLabel);
+    // const addNewLabel = () => {
+    //     let newLabel = labelInputRef.current!.value;
+    //     const isNew: boolean = !availableLabels.map((label) => label.name).includes(newLabel);
 
-        if (newLabel.trim() === '') {
-            dispatch(setError(`Note ${labelName} cannot be empty.`));
-        } else if (!isNew) {
-            dispatch(setError(`Note ${labelName} "${newLabel}" already exists.`));
-        } else {
-            addedLabel = newLabel;
-            labelInputRef.current?.blur();
+    //     if (newLabel.trim() === '') {
+    //         dispatch(setError(`Note ${labelName} cannot be empty.`));
+    //     } else if (!isNew) {
+    //         dispatch(setError(`Note ${labelName} "${newLabel}" already exists.`));
+    //     } else {
+    //         addedLabel = newLabel;
+    //         labelInputRef.current?.blur();
 
-            setLabel(() => {
-                return isCustomTypes ? newLabel : `${previousLabel === '' ? '' : previousLabel}${getNewCustomNoteLabelName({ name: newLabel, color: color }).split(COLOR_SEPARATOR)[0]}`;
-            });
+    //         setLabel(() => {
+    //             return isCustomTypes ? newLabel : `${previousLabel === '' ? '' : previousLabel}${getNewCustomNoteLabelName({ name: newLabel, color: color }).split(COLOR_SEPARATOR)[0]}`;
+    //         });
 
-            const newCustomNoteLabels = `${userCustomNoteLabels || ''}${getNewCustomNoteLabelName({ name: newLabel, color: color })}`;
+    //         const newCustomNoteLabels = `${userCustomNoteLabels || ''}${getNewCustomNoteLabelName({ name: newLabel, color: color })}`;
 
-            updateUserCustomLabels(newCustomNoteLabels, true, newLabel);
-        }
-    };
+    //         updateUserCustomLabels(newCustomNoteLabels, true, newLabel);
+    //     }
+    // };
 
-    const deleteLabel = (labelToDelete: ICustomNoteLabel) => {
-        if (disabled) return;
+    // const deleteLabel = (labelToDelete: ICustomNoteLabel) => {
+    //     if (disabled) return;
 
-        isCustomTypes ? label === labelToDelete.name && setLabel(defaultNoteTypes[0].name) : label.split(SEPARATOR)[1] === labelToDelete.name && setLabel('');
+    //     isCustomTypes ? label === labelToDelete.name && setLabel(defaultNoteTypes[0].name) : label.split(SEPARATOR)[1] === labelToDelete.name && setLabel('');
 
-        !isCustomTypes &&
-            getCustomLabels(label)
-                .map((label) => label.name)
-                .includes(labelToDelete.name) &&
-            setLabel((prevLabel) => prevLabel.replace(`${getNewCustomNoteLabelName(labelToDelete, !!labelToDelete.color).split(COLOR_SEPARATOR)[0]}`, ''));
-        const newCustomNoteLabels = userCustomNoteLabels.replace(`${getNewCustomNoteLabelName(labelToDelete, !!labelToDelete.color)}`, '');
-        updateUserCustomLabels(newCustomNoteLabels, false, labelToDelete.name);
-    };
+    //     !isCustomTypes &&
+    //         getCustomLabels(label)
+    //             .map((label) => label.name)
+    //             .includes(labelToDelete.name) &&
+    //         setLabel((prevLabel) => prevLabel.replace(`${getNewCustomNoteLabelName(labelToDelete, !!labelToDelete.color).split(COLOR_SEPARATOR)[0]}`, ''));
+    //     const newCustomNoteLabels = userCustomNoteLabels.replace(`${getNewCustomNoteLabelName(labelToDelete, !!labelToDelete.color)}`, '');
+    //     updateUserCustomLabels(newCustomNoteLabels, false, labelToDelete.name);
+    // };
 
-    const chooseLabel = (chosenLabel: ICustomNoteLabel) => {
-        if (disabled) return;
-        if (isCustomTypes) {
-            setLabel(chosenLabel.name);
-        } else {
-            // Check if we should choose or remove category.
-            const isChoosing = !getCustomLabels(label)
-                .map((label) => label.name)
-                .includes(chosenLabel.name);
-            // Adding category.
-            if (isChoosing) {
-                setLabel((prevLabel) => `${prevLabel}${getNewCustomNoteLabelName(chosenLabel).split(COLOR_SEPARATOR)[0]}`);
-            }
-            // Removing category.
-            else {
-                setLabel((prevLabel) => prevLabel.replace(`${getNewCustomNoteLabelName(chosenLabel).split(COLOR_SEPARATOR)[0]}`, ''));
-            }
-        }
-    };
+    // const chooseLabel = (chosenLabel: ICustomNoteLabel) => {
+    //     if (disabled) return;
+    //     if (isCustomTypes) {
+    //         setLabel(chosenLabel.name);
+    //     } else {
+    //         // Check if we should choose or remove category.
+    //         const isChoosing = !getCustomLabels(label)
+    //             .map((label) => label.name)
+    //             .includes(chosenLabel.name);
+    //         // Adding category.
+    //         if (isChoosing) {
+    //             setLabel((prevLabel) => `${prevLabel}${getNewCustomNoteLabelName(chosenLabel).split(COLOR_SEPARATOR)[0]}`);
+    //         }
+    //         // Removing category.
+    //         else {
+    //             setLabel((prevLabel) => prevLabel.replace(`${getNewCustomNoteLabelName(chosenLabel).split(COLOR_SEPARATOR)[0]}`, ''));
+    //         }
+    //     }
+    // };
 
     return (
         <div className="relative categories-form">
@@ -178,10 +158,10 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor, disabled
                 } sm:pr-8 pr-5 py-1 h-11 rounded-t-sm text-[#6aaac2]`}
                 placeholder={`Enter a new ${labelName}...`}
                 ref={labelInputRef}
-                value={isCustomTypes ? label : label.replace(SEPARATOR, '').replaceAll(SEPARATOR, ', ')}
+                value={inputLabel}
                 required={true}
                 disabled={disabled === undefined ? false : disabled}
-                onChange={(e) => setLabel(e.target.value)}
+                onChange={(e) => setInputLabel(e.target.value)}
             />
             <label
                 style={{ color: color }}
@@ -209,43 +189,35 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor, disabled
                     isCustomTypes ? 'left-0' : 'right-0'
                 } overflow-hidden sm:-translate-x-1/2 sm:w-full w-[70vw] transition-all duration-300 absolute bg-cyan-600 bottom-0 translate-y-full z-[200] text-white`}
             >
-                {availableLabels.map((availableLabel) => {
-                    if (availableLabel.name.trim() === '') return null;
+                {currentCustomLabels.map((customLabel) => {
+                    if (customLabel.labelName.trim() === '') return null;
 
                     return (
                         <li
                             className={`relative block whitespace-nowrap overflow-hidden text-ellipsis px-8 py-2 text-lg tracking-wide transition-all cursor-pointer ${
-                                (
-                                    isCustomTypes
-                                        ? availableLabel.name === label
-                                        : getCustomLabels(label)
-                                              .map((label) => label.name)
-                                              .includes(availableLabel.name)
-                                )
-                                    ? 'bg-cyan-500 font-semibold'
-                                    : ''
+                                false ? 'bg-cyan-500 font-semibold' : ''
                             } hover:bg-cyan-700`}
-                            key={availableLabel.name}
-                            onClick={() => chooseLabel(availableLabel)}
+                            key={customLabel.labelName}
+                            // onClick={() => chooseLabel(customLabel)}
                         >
-                            {availableLabel.name}
-                            {availableLabel.color && (
+                            {customLabel.labelName}
+                            {customLabel.color && (
                                 <button
                                     type="button"
-                                    style={{ backgroundColor: availableLabel.color }}
+                                    style={{ backgroundColor: customLabel.color }}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setNoteColor(availableLabel.color!);
+                                        setNoteColor(customLabel.color!);
                                     }}
                                     className="absolute z-10 left-2 top-1/2 -translate-y-1/2 cursor-pointer block w-8 h-8 rounded-full border-solid border-2 shadow-sm border-white transition-all hover:border-cyan-200 hover:shadow-md"
                                 ></button>
                             )}
-                            {!defaultNoteTypes.includes(availableLabel) && (
+                            {!defaultNoteTypes.map((type) => type.labelName).includes(customLabel.labelName) && (
                                 <button
                                     type="button"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        deleteLabel(availableLabel);
+                                        // deleteLabel(customLabel);
                                     }}
                                     className="absolute right-2 top-1/2 rounded-md -translate-y-1/2 text-xl p-[5px] transition-colors bg-cyan-800 hover:bg-cyan-900"
                                 >
@@ -262,7 +234,7 @@ const NoteLabelInput = ({ label, setLabel, isCustomTypes, setNoteColor, disabled
                     onMouseDown={(e) => e.preventDefault()}
                     type="button"
                     className="absolute sm:right-0 -right-2 top-1/2 py-2 px-2 -translate-y-1/2 text-2xl hover:text-cyan-500 text-cyan-400 transition-colors"
-                    onClick={addNewLabel}
+                    // onClick={addNewLabel}
                 >
                     <AiOutlineArrowRight />
                 </button>

@@ -3,27 +3,41 @@ import { AiOutlineStar } from 'react-icons/ai';
 import { BiCalendarAlt, BiCategory } from 'react-icons/bi';
 import { IoIosJournal } from 'react-icons/io';
 import { MdSort } from 'react-icons/md';
+import ICustomLabel from '../interfaces/customLabel';
+import { DEFAULT_USER } from '../interfaces/user';
 
 export interface ICustomNoteLabel {
     name: string;
     color?: string;
 }
-export const defaultNoteTypes: ICustomNoteLabel[] = [
+export const defaultNoteTypes: ICustomLabel[] = [
     {
-        name: 'Note',
-        color: '#04a9c6'
+        labelName: 'Note',
+        color: '#04a9c6',
+        user: DEFAULT_USER,
+        isCategoryLabel: false,
+        _id: '111'
     },
     {
-        name: 'Event',
-        color: '#FEC0CE'
+        labelName: 'Event',
+        color: '#FEC0CE',
+        user: DEFAULT_USER,
+        isCategoryLabel: false,
+        _id: '222'
     },
     {
-        name: 'Diary',
-        color: '#4A2545'
+        labelName: 'Diary',
+        color: '#4A2545',
+        user: DEFAULT_USER,
+        isCategoryLabel: false,
+        _id: '333'
     },
     {
-        name: 'Habit',
-        color: '#16AF84'
+        labelName: 'Habit',
+        color: '#16AF84',
+        user: DEFAULT_USER,
+        isCategoryLabel: false,
+        _id: '444'
     }
 ];
 

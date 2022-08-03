@@ -19,8 +19,6 @@ interface NoteBodyProps {
 }
 
 const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName, className, contentClassName, note, showImage }: NoteBodyProps) => {
-    const noteCategories = note.category?.split(SEPARATOR);
-
     const noteTime = dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1;
 
     return (
@@ -44,10 +42,9 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
                     <div>
                         {note.isStarred && <NoteInfo text={<AiFillStar className="text-[1.9rem] inline-block text-center pb-1" />} color={note.color} />}
                         <NoteInfo text={`${note.rating}/10`} color={note.color} className="tracking-widest" />
-                        <NoteInfo text={note.type} color={note.color} />
-                        {noteCategories?.map((category) => {
-                            if (category.trim() === '') return null;
-                            return <NoteInfo text={category} key={category} color={note.color} />;
+                        <NoteInfo text={note.type.labelName} color={note.color} />
+                        {note.category?.map((category) => {
+                            return <NoteInfo text={category.labelName} key={category._id} color={note.color} />;
                         })}
                     </div>
                     {noteTime >= 2 && (

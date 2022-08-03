@@ -1,3 +1,4 @@
+import ICustomLabel from './customLabel';
 import IUser from './user';
 
 export default interface INote {
@@ -8,8 +9,8 @@ export default interface INote {
     content?: string;
     color: string;
     image?: string;
-    type: string;
-    category?: string;
+    type: ICustomLabel;
+    category?: ICustomLabel[];
     rating: number;
     isEndNote?: boolean;
     isLocked?: boolean;

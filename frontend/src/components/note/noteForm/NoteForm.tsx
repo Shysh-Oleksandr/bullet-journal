@@ -16,7 +16,9 @@ import config from '../../../config/config';
 import logging from '../../../config/logging';
 import { fetchAllNotes, setError, setSuccess } from '../../../features/journal/journalSlice';
 import { useDebounce, useWindowSize } from '../../../hooks';
+import ICustomLabel from '../../../interfaces/customLabel';
 import INote from '../../../interfaces/note';
+import { defaultNoteTypes } from '../../../utils/data';
 import { getContentWords, INITIAL_NOTE_ID } from '../../../utils/functions';
 import DeleteModal from '../../UI/DeleteModal.';
 import Loading from '../../UI/Loading';
@@ -45,8 +47,8 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     const [image, setImage] = useState<string>('');
     const [color, setColor] = useState<string>('#04a9c6');
     const [rating, setRating] = useState<number>(1);
-    const [type, setType] = useState<string>('Note');
-    const [category, setCategory] = useState<string>('');
+    const [type, setType] = useState<ICustomLabel>(defaultNoteTypes[0]);
+    const [category, setCategory] = useState<ICustomLabel[]>([]);
     const [isLocked, setIsLocked] = useState<boolean>(false);
     const [isStarred, setIsStarred] = useState<boolean>(false);
     const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
@@ -89,8 +91,8 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         setImage('');
         setColor('#04a9c6');
         setRating(1);
-        setType('Note');
-        setCategory('');
+        setType(defaultNoteTypes[0]);
+        setCategory([]);
         setEditorState(EditorState.createEmpty());
         setIsLocked(false);
         setIsStarred(false);
@@ -149,7 +151,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     setColor(note.color);
                     setRating(note.rating);
                     setType(note.type);
-                    setCategory(note.category || '');
+                    setCategory(note.category || []);
                     setIsLocked(note.isLocked || false);
                     setIsStarred(note.isStarred || false);
 
@@ -176,7 +178,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         const _endDate = new Date(endDate);
         _startDate.setHours(0, 0, 0, 0);
         _endDate.setHours(0, 0, 0, 0);
-        if (title === '' || type === '' || color === '' || !startDate || !endDate) {
+        if (title === '' || color === '' || !startDate || !endDate) {
             showMessage && dispatch(setError('Please fill out all required fields.'));
             showMessage && dispatch(setSuccess(''));
             return null;
@@ -359,7 +361,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                         <InputLabel htmlFor="noteTypeInput" text="Type" />
                     </div>
                     <div className="relative sm:basis-3/4 basis-1/2">
-                        <NoteLabelInput disabled={saving || isLocked} setNoteColor={setColor} label={category} setLabel={setCategory} isCustomTypes={false} />
+                        {/* <NoteLabelInput disabled={saving || isLocked} setNoteColor={setColor} label={category} setLabel={setCategory} isCustomTypes={false} /> */}
                         <InputLabel htmlFor="noteCategoryInput" text="Categories" />
                     </div>
                 </div>
