@@ -59,9 +59,6 @@ export const noteColors: string[] = [
     '#4F518C'
 ];
 
-export const SEPARATOR = '_SEP_';
-export const COLOR_SEPARATOR = '_COL_';
-
 export interface IFilterOption {
     name: string;
     icon: IconType;

@@ -1,6 +1,5 @@
 import React from 'react';
 import INote from '../../interfaces/note';
-import { SEPARATOR } from '../../utils/data';
 import { getDifferentColor, sanitizedData } from '../../utils/functions';
 import NoteInfo from './NoteInfo';
 import { dateDiffInDays } from './../../utils/functions';

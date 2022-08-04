@@ -27,10 +27,11 @@ import NoteContentEditor from './NoteContentEditor';
 import NoteDate from './NoteDate';
 import NoteFormPreview from './NoteFormPreview';
 import NoteImportanceInput from './NoteImportanceInput';
-import NoteLabelInput from './NoteLabelInput';
+import NoteTypeInput from './NoteTypeInput';
 import NoteSavingIndicator from './NoteSavingIndicator';
 import OtherNotes from './OtherNotes';
 import SaveButton from './SaveButton';
+import NoteCategoryInput from './NoteCategoryInput';
 
 interface NoteFormProps {
     isShort?: boolean;
@@ -361,11 +362,11 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                 </div>
                 <div className="flex-between border-bottom my-3">
                     <div className="relative sm:mr-4 mr-2 sm:basis-auto basis-1/2">
-                        <NoteLabelInput allLabels={allTypes} disabled={saving || isLocked} setNoteColor={setColor} label={type} setLabel={setType} isCustomTypes={true} />
+                        <NoteTypeInput disabled={saving || isLocked} setNoteColor={setColor} label={type} setLabel={setType} />
                         <InputLabel htmlFor="noteTypeInput" text="Type" />
                     </div>
                     <div className="relative sm:basis-3/4 basis-1/2">
-                        {/* <NoteLabelInput disabled={saving || isLocked} setNoteColor={setColor} label={category} setLabel={setCategory} isCustomTypes={false} /> */}
+                        <NoteCategoryInput disabled={saving || isLocked} setNoteColor={setColor} label={category} setLabel={setCategory} />
                         <InputLabel htmlFor="noteCategoryInput" text="Categories" />
                     </div>
                 </div>

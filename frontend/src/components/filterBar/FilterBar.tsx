@@ -7,7 +7,7 @@ import { useDebounce, useFetchData } from '../../hooks';
 import ICustomLabel from '../../interfaces/customLabel';
 import { useAppDispatch } from './../../app/hooks';
 import INote from './../../interfaces/note';
-import { filterOptions, getLastPeriodDate, SEPARATOR, SortOptions } from './../../utils/data';
+import { filterOptions, getLastPeriodDate, SortOptions } from './../../utils/data';
 import { getContentWords } from './../../utils/functions';
 import FilterOption from './FilterOption';
 import FilterSearchInput from './FilterSearchInput';

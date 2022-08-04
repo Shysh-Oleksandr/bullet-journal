@@ -1,8 +1,9 @@
 import DOMPurify from 'dompurify';
 import tinycolor from 'tinycolor2';
-import IUser from '../interfaces/user';
+import ICustomLabel from '../interfaces/customLabel';
 import INote from '../interfaces/note';
-import { COLOR_SEPARATOR, defaultNoteTypes, ICustomNoteLabel, SEPARATOR } from './data';
+import IUser from '../interfaces/user';
+import { defaultNoteTypes, noteColors } from './data';
 
 export function shadeColor(color: string, amount: number) {
     return '#' + color.replace(/^#/, '').replace(/../g, (color) => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
@@ -18,10 +19,6 @@ export const getDifferentColor = (color: string, amount: number = 20) => {
 
 export const INITIAL_NOTE_ID = '111';
 
-export const getNewCustomNoteLabelName = (chosenLabel: ICustomNoteLabel, hasColor: boolean = true) => {
-    return `${SEPARATOR}${chosenLabel.name}${hasColor ? COLOR_SEPARATOR : ''}${hasColor ? chosenLabel.color || '' : ''}`;
-};
-
 export const getInitialNote = (author: IUser): INote => {
     return {
         _id: INITIAL_NOTE_ID,
@@ -36,22 +33,14 @@ export const getInitialNote = (author: IUser): INote => {
     };
 };
 
-// export function getCustomLabels(customLabels: string | undefined): ICustomNoteLabel[] {
-//     const res =
-//         customLabels?.split(SEPARATOR).map((label) => {
-//             const [labelName, labelColor] = label.split(COLOR_SEPARATOR);
-//             return {
-//                 name: labelName,
-//                 color: labelColor
-//             };
-//         }) || [];
-//     return res;
-// }
+export const getCategoriesLabelName = (categories: ICustomLabel[]) => {
+    const categoriesLabelName: string = categories.map((category) => category.labelName).join(', ');
+    return categoriesLabelName;
+};
 
-// export function getAllLabels(isTypes: boolean, customLabels: string | undefined, additionalLabels?: ICustomNoteLabel[]): ICustomNoteLabel[] {
-//     const allLabels = [...(isTypes ? defaultNoteTypes : []), ...(additionalLabels || []), ...getCustomLabels(customLabels)].filter((label) => label.name !== '');
-//     return allLabels;
-// }
+export const getRandomColor = () => {
+    return noteColors[Math.floor(Math.random() * noteColors.length)];
+};
 
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 
