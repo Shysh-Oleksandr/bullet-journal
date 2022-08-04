@@ -85,7 +85,6 @@ export function useFetchData<T>(method: string = 'GET', url: string, name: strin
 
     useEffect(() => {
         fetchData();
-        console.log('fetch');
     }, [dependencies]);
 
     return [items, loading];

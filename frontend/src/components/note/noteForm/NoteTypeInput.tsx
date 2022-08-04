@@ -10,6 +10,7 @@ import { useFetchData } from '../../../hooks';
 import { defaultNoteTypes, noteColors } from '../../../utils/data';
 import ICustomLabel from '../../../interfaces/customLabel';
 import { getRandomColor } from './../../../utils/functions';
+import { useLocation } from 'react-router-dom';
 
 interface NoteLabelInputProps {
     setLabel: React.Dispatch<React.SetStateAction<ICustomLabel>>;
@@ -34,7 +35,7 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
     const [color, setColor] = useState<string>(getRandomColor());
     const labelName = 'type';
     const dispatch = useAppDispatch();
-    let addedLabel = '';
+    const [addedLabel, setAddedLabel] = useState('');
 
     useEffect(() => {
         const keyDownHandler = (event) => {
@@ -52,6 +53,10 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
             document.removeEventListener('keydown', keyDownHandler);
         };
     }, []);
+
+    useEffect(() => {
+        setInputLabel(label.labelName);
+    }, [label]);
 
     const onFocus = () => {
         setFocused(true);
@@ -92,7 +97,7 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
 
                 if (response.status === 201) {
                     dispatch(setSuccess(`New ${labelName} "${newLabel}" added.`));
-                    addedLabel = newLabel;
+                    setAddedLabel(newLabel);
                     setFetchLabels(!fetchLabels);
 
                     setLabel(response.data.customLabel);
@@ -181,7 +186,7 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
             <ul
                 className={`categories-list rounded-b-xl shadow-xl overflow-y-auto h-auto max-h-0 opacity-0 sm:left-1/2 left-0 overflow-hidden sm:-translate-x-1/2 sm:w-full w-[70vw] transition-all duration-300 absolute bg-cyan-600 bottom-0 translate-y-full z-[200] text-white`}
             >
-                {currentCustomLabels.map((customLabel) => {
+                {[...defaultNoteTypes, ...currentCustomLabels].map((customLabel) => {
                     if (customLabel.labelName.trim() === '') return null;
 
                     return (
@@ -198,6 +203,7 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
                                     type="button"
                                     style={{ backgroundColor: customLabel.color }}
                                     onClick={(e) => {
+                                        if (disabled) return;
                                         e.stopPropagation();
                                         setNoteColor(customLabel.color!);
                                     }}

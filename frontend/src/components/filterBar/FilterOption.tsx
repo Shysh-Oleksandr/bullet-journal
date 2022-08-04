@@ -246,7 +246,7 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
                 <span className="text-2xl mr-2">{<option.icon />}</span>
                 <h4 className="text-lg whitespace-nowrap overflow-hidden text-ellipsis text-left xs:max-w-[80%] flex-1">
                     {option.name}
-                    {optionsChosen !== undefined && ` (${optionsChosen})`}
+                    {optionsChosen !== undefined && optionsChosen !== 0 && ` (${optionsChosen})`}
                 </h4>
             </div>
             <span className={`text-2xl absolute right-2 top-4 text-cyan-500 filter-arrow transition-all duration-[250ms] ${isModalOpened ? 'opened' : 'closed'}`}>

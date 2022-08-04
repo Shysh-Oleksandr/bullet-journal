@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import logging from '../config/logging';
 import User from '../models/user';
-import CustomLabel from '../models/customLabel';
 
 const validate = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Token validated, returning user...');
@@ -36,14 +35,6 @@ const create = (req: Request, res: Response, next: NextFunction) => {
         uid,
         name
     });
-
-    // const customLabel = new CustomLabel({
-    //     labelName: 'Note',
-    //     color: '#04a9c6',
-    //     isCategoryLabel: false,
-    //     user: newUserId
-    // });
-    // customLabel.save();
 
     return user
         .save()

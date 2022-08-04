@@ -63,7 +63,7 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
                     return y.rating - x.rating;
 
                 case SortOptions.TYPE:
-                    return y.type.labelName.localeCompare(x.type.labelName);
+                    return y.type?.labelName.localeCompare(x.type?.labelName);
 
                 case SortOptions.CATEGORY:
                     const xCategory = x.category;
@@ -91,7 +91,7 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const filter = (notes: INote[]) => {
         const filteredNotes = notes.filter((note) => {
             const titleFilter = note.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-            const typeFilter = showAnyType ? true : debouncedType.includes(note.type.labelName);
+            const typeFilter = showAnyType ? true : debouncedType.includes(note.type?.labelName);
             const categoryFilter = showAnyCategory ? true : note.category?.map((c) => c.labelName).some((r) => debouncedCategory.includes(r));
             const dateFilter = note.startDate >= debouncedStartDate && note.startDate <= getLastPeriodDate(-1, debouncedEndDate);
             const importanceFilter = note.rating >= importanceMin && note.rating <= importanceMax;
@@ -106,10 +106,10 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
         setSearchQuery('');
         setSortType(SortOptions.NEWEST);
         setEndDate(new Date().getTime());
-        setType(allTypes.map((label) => label.labelName));
-        setCategory(allCategories.map((label) => label.labelName));
-        setShowAnyCategory(true);
+        setType([]);
+        setCategory([]);
         setShowAnyType(true);
+        setShowAnyCategory(true);
         setImportanceMin(1);
         setImportanceMax(10);
 

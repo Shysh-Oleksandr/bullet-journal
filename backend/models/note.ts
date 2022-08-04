@@ -9,7 +9,7 @@ const NoteSchema: Schema = new Schema({
     content: { type: String },
     color: { type: String },
     image: { type: String },
-    type: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomLabel' },
+    type: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomLabel', default: '62ebcd03900e40a41d16f883' },
     category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'CustomLabel' }],
     rating: { type: Number },
     isLocked: { type: Boolean },

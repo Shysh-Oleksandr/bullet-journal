@@ -77,9 +77,6 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     const { user } = useAppSelector((store) => store.user);
     const { notes, isSidebarShown } = useAppSelector((store) => store.journal);
-    const [customLabels, loadingCustomLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${user._id}`, 'customLabels');
-    const allTypes = customLabels.filter((label) => !label.isCategoryLabel);
-    const allCategories = customLabels.filter((label) => label.isCategoryLabel);
 
     const params = useParams();
     const location = useLocation();
@@ -155,7 +152,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     setImage(note.image || '');
                     setColor(note.color);
                     setRating(note.rating);
-                    setType(note.type);
+                    setType(note.type || defaultNoteTypes[0]);
                     setCategory(note.category || []);
                     setIsLocked(note.isLocked || false);
                     setIsStarred(note.isStarred || false);
@@ -206,7 +203,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     endDate,
                     image,
                     color,
-                    rating,
+                    rating: rating > 0 && rating <= 10 ? rating : 1,
                     content,
                     type,
                     category,

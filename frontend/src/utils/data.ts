@@ -14,30 +14,23 @@ export const defaultNoteTypes: ICustomLabel[] = [
     {
         labelName: 'Note',
         color: '#04a9c6',
-        user: DEFAULT_USER,
+        user: { ...DEFAULT_USER, _id: '62ebccb9900e40a41d16f86e' },
         isCategoryLabel: false,
-        _id: '111'
+        _id: '62ebcd03900e40a41d16f883'
     },
     {
         labelName: 'Event',
         color: '#FEC0CE',
-        user: DEFAULT_USER,
+        user: { ...DEFAULT_USER, _id: '62ebccb9900e40a41d16f86e' },
         isCategoryLabel: false,
-        _id: '222'
+        _id: '62ebcd5f900e40a41d16f8ae'
     },
     {
         labelName: 'Diary',
         color: '#4A2545',
-        user: DEFAULT_USER,
+        user: { ...DEFAULT_USER, _id: '62ebccb9900e40a41d16f86e' },
         isCategoryLabel: false,
-        _id: '333'
-    },
-    {
-        labelName: 'Habit',
-        color: '#16AF84',
-        user: DEFAULT_USER,
-        isCategoryLabel: false,
-        _id: '444'
+        _id: '62ebcd6b900e40a41d16f8b1'
     }
 ];
 

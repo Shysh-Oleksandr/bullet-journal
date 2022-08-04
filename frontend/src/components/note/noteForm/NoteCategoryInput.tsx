@@ -53,6 +53,10 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
         };
     }, []);
 
+    useEffect(() => {
+        setInputLabel(getCategoriesLabelName(label));
+    }, [label]);
+
     const onFocus = () => {
         setFocused(true);
         setPreviousLabel(getCategoriesLabelName(label));
@@ -137,7 +141,7 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
 
     const chooseLabel = (chosenLabel: ICustomLabel) => {
         if (disabled) return;
-        const isAdding = !label.includes(chosenLabel);
+        const isAdding = !label.map((l) => l._id).includes(chosenLabel._id);
         const newLabel = isAdding ? [...label, chosenLabel] : label.filter((label) => label._id !== chosenLabel._id);
         setLabel(newLabel);
         setInputLabel(getCategoriesLabelName(newLabel));
@@ -201,6 +205,7 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
                                     type="button"
                                     style={{ backgroundColor: customLabel.color }}
                                     onClick={(e) => {
+                                        if (disabled) return;
                                         e.stopPropagation();
                                         setNoteColor(customLabel.color!);
                                     }}
