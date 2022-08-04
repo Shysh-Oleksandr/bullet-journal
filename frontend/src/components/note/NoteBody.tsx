@@ -1,10 +1,10 @@
 import React from 'react';
 import INote from '../../interfaces/note';
-import { SEPARATOR } from '../../utils/data';
 import { getDifferentColor, sanitizedData } from '../../utils/functions';
 import NoteInfo from './NoteInfo';
 import { dateDiffInDays } from './../../utils/functions';
 import { AiFillStar } from 'react-icons/ai';
+import { defaultNoteTypes } from '../../utils/data';
 
 interface NoteBodyProps {
     onMouseEnter?: () => void;
@@ -19,8 +19,6 @@ interface NoteBodyProps {
 }
 
 const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName, className, contentClassName, note, showImage }: NoteBodyProps) => {
-    const noteCategories = note.category?.split(SEPARATOR);
-
     const noteTime = dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1;
 
     return (
@@ -35,19 +33,21 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
                 <h3 className={`sm:text-3xl text-2xl font-bold mb-1 cursor-auto ${titleClassName}`}>{note.title}</h3>
 
                 {note.content && !note.isEndNote && (
-                    <div
-                        dangerouslySetInnerHTML={{ __html: sanitizedData(note.content) }}
-                        className={`sm:px-2 px-1 break-words sm:text-[1.25rem] text-lg  min-h-[1.5rem] overflow-y-auto sm:!leading-6 !leading-5 max-h-32 h-auto ${contentClassName}`}
-                    ></div>
+                    <>
+                        <div
+                            dangerouslySetInnerHTML={{ __html: sanitizedData(note.content.length > 150 ? note.content.slice(0, 150).concat('...') : note.content) }}
+                            className={`sm:px-2 px-1 break-words sm:text-[1.25rem] text-lg min-h-[1.5rem] overflow-y-auto sm:!leading-6 !leading-5 max-h-32 h-auto ${contentClassName}`}
+                        ></div>
+                    </>
                 )}
                 <div className={`mt-2 text-lg flex-between ${noteTime >= 2 ? 'mr-16' : ''}`}>
                     <div>
                         {note.isStarred && <NoteInfo text={<AiFillStar className="text-[1.9rem] inline-block text-center pb-1" />} color={note.color} />}
                         <NoteInfo text={`${note.rating}/10`} color={note.color} className="tracking-widest" />
-                        <NoteInfo text={note.type} color={note.color} />
-                        {noteCategories?.map((category) => {
-                            if (category.trim() === '') return null;
-                            return <NoteInfo text={category} key={category} color={note.color} />;
+                        <NoteInfo text={note.type ? note.type.labelName : defaultNoteTypes[0].labelName} color={note.color} />
+                        {note.category?.map((category) => {
+                            if (!category) return null;
+                            return <NoteInfo text={category.labelName} key={category._id} color={note.color} />;
                         })}
                     </div>
                     {noteTime >= 2 && (

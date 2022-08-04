@@ -40,7 +40,8 @@ const read = (req: Request, res: Response, next: NextFunction) => {
     logging.info(`Incoming read for ${_id} ...`);
 
     return Note.findById(_id)
-        .populate('author')
+        .populate('type')
+        .populate('category')
         .then((note) => {
             if (note) {
                 return res.status(200).json({ note });
@@ -60,7 +61,8 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
     logging.info(`Incoming read all...`);
 
     return Note.find({ author: author_id })
-        .populate('author')
+        .populate('type')
+        .populate('category')
         .exec()
         .then((notes) => {
             return res.status(200).json({
@@ -82,6 +84,8 @@ const query = (req: Request, res: Response, next: NextFunction) => {
 
     const titleRegex = title ? new RegExp(title.toString(), 'i') : new RegExp('');
     return Note.find({ title: { $regex: titleRegex }, author: author_id })
+        .populate('type')
+        .populate('category')
         .exec()
         .then((notes) => {
             return res.status(200).json({

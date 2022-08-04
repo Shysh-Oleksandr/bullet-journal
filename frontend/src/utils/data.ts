@@ -3,27 +3,34 @@ import { AiOutlineStar } from 'react-icons/ai';
 import { BiCalendarAlt, BiCategory } from 'react-icons/bi';
 import { IoIosJournal } from 'react-icons/io';
 import { MdSort } from 'react-icons/md';
+import ICustomLabel from '../interfaces/customLabel';
+import { DEFAULT_USER } from '../interfaces/user';
 
 export interface ICustomNoteLabel {
     name: string;
     color?: string;
 }
-export const defaultNoteTypes: ICustomNoteLabel[] = [
+export const defaultNoteTypes: ICustomLabel[] = [
     {
-        name: 'Note',
-        color: '#04a9c6'
+        labelName: 'Note',
+        color: '#04a9c6',
+        user: { ...DEFAULT_USER, _id: '62ebccb9900e40a41d16f86e' },
+        isCategoryLabel: false,
+        _id: '62ebcd03900e40a41d16f883'
     },
     {
-        name: 'Event',
-        color: '#FEC0CE'
+        labelName: 'Event',
+        color: '#FEC0CE',
+        user: { ...DEFAULT_USER, _id: '62ebccb9900e40a41d16f86e' },
+        isCategoryLabel: false,
+        _id: '62ebcd5f900e40a41d16f8ae'
     },
     {
-        name: 'Diary',
-        color: '#4A2545'
-    },
-    {
-        name: 'Habit',
-        color: '#16AF84'
+        labelName: 'Diary',
+        color: '#4A2545',
+        user: { ...DEFAULT_USER, _id: '62ebccb9900e40a41d16f86e' },
+        isCategoryLabel: false,
+        _id: '62ebcd6b900e40a41d16f8b1'
     }
 ];
 
@@ -44,9 +51,6 @@ export const noteColors: string[] = [
     '#ADD9F4',
     '#4F518C'
 ];
-
-export const SEPARATOR = '_SEP_';
-export const COLOR_SEPARATOR = '_COL_';
 
 export interface IFilterOption {
     name: string;

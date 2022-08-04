@@ -11,6 +11,7 @@ const firebase_admin_1 = __importDefault(require("firebase-admin"));
 const serviceAccountKey_json_1 = __importDefault(require("./config/serviceAccountKey.json"));
 const user_1 = __importDefault(require("./routes/user"));
 const note_1 = __importDefault(require("./routes/note"));
+const customLabel_1 = __importDefault(require("./routes/customLabel"));
 const router = (0, express_1.default)();
 /** Connect to Firebase */
 let serviceAccount = serviceAccountKey_json_1.default;
@@ -50,6 +51,7 @@ router.use((req, res, next) => {
 /** Routes */
 router.use('/users', user_1.default);
 router.use('/notes', note_1.default);
+router.use('/customlabels', customLabel_1.default);
 /** Error handling */
 router.use((req, res, next) => {
     const error = new Error('Not found');

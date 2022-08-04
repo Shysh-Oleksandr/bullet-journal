@@ -1,5 +1,6 @@
 import { Document } from 'mongoose';
 import IUser from './user';
+import ICustomLabel from './customLabel';
 
 export default interface INote extends Document {
     title: string;
@@ -9,8 +10,8 @@ export default interface INote extends Document {
     content?: string;
     color: string;
     image?: string;
-    type: string;
-    category?: string;
+    type: ICustomLabel;
+    category?: ICustomLabel;
     rating: number;
     isEndNote?: boolean;
     isLocked?: boolean;

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAppSelector } from '../../app/hooks';
+import config from '../../config/config';
 import { fetchAllNotes, setShowFilterBar } from '../../features/journal/journalSlice';
-import { useDebounce } from '../../hooks';
+import { useDebounce, useFetchData } from '../../hooks';
+import ICustomLabel from '../../interfaces/customLabel';
 import { useAppDispatch } from './../../app/hooks';
 import INote from './../../interfaces/note';
-import { filterOptions, getLastPeriodDate, SEPARATOR, SortOptions } from './../../utils/data';
-import { getAllLabels, getContentWords } from './../../utils/functions';
+import { filterOptions, getLastPeriodDate, SortOptions } from './../../utils/data';
+import { getContentWords } from './../../utils/functions';
 import FilterOption from './FilterOption';
 import FilterSearchInput from './FilterSearchInput';
 
@@ -17,6 +19,9 @@ interface FilterBarProps {
 
 const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const { user } = useAppSelector((store) => store.user);
+    const [customLabels, loadingCustomLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${user._id}`, 'customLabels');
+    const allTypes = customLabels.filter((label) => !label.isCategoryLabel);
+    const allCategories = customLabels.filter((label) => label.isCategoryLabel);
     const { oldestNoteDate } = useAppSelector((store) => store.journal);
     const { isFilterBarShown } = useAppSelector((store) => store.journal);
     const dispatch = useAppDispatch();
@@ -26,16 +31,14 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const [startDate, setStartDate] = useState<number>(oldestNoteDate);
 
     const [endDate, setEndDate] = useState<number>(new Date().getTime());
-    const allTypes = getAllLabels(true, user.customNoteTypes);
-    const allCategories = getAllLabels(false, user.customNoteCategories);
-    const [type, setType] = useState<string[]>(allTypes.map((label) => label.name));
-    const [category, setCategory] = useState<string[]>(allCategories.map((label) => label.name));
+    const [type, setType] = useState<string[]>(allTypes.map((label) => label.labelName));
+    const [category, setCategory] = useState<string[]>(allCategories.map((label) => label.labelName));
     const [showAnyCategory, setShowAnyCategory] = useState<boolean>(true);
     const [showAnyType, setShowAnyType] = useState<boolean>(true);
     const [importanceMin, setImportanceMin] = useState<number>(1);
     const [importanceMax, setImportanceMax] = useState<number>(10);
 
-    const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showAnyCategory, wasReset, oldestNoteDate, showAnyType };
+    const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showAnyCategory, wasReset, oldestNoteDate, showAnyType, allTypes, allCategories };
     const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportanceMin, setImportanceMax, setShowAnyCategory, setShowAnyType };
     const debouncedSearchTerm: string = useDebounce(searchQuery, 500);
     const debouncedSortType = useDebounce(sortType, 500);
@@ -60,11 +63,11 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
                     return y.rating - x.rating;
 
                 case SortOptions.TYPE:
-                    return y.type.localeCompare(x.type);
+                    return y.type?.labelName.localeCompare(x.type?.labelName);
 
                 case SortOptions.CATEGORY:
-                    const xCategory = x.category?.split(SEPARATOR).filter((cat) => cat !== '');
-                    const yCategory = y.category?.split(SEPARATOR).filter((cat) => cat !== '');
+                    const xCategory = x.category;
+                    const yCategory = y.category;
                     if (xCategory && yCategory) {
                         return yCategory?.length - xCategory?.length;
                     } else if (xCategory) {
@@ -88,8 +91,8 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     const filter = (notes: INote[]) => {
         const filteredNotes = notes.filter((note) => {
             const titleFilter = note.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-            const typeFilter = showAnyType ? true : debouncedType.includes(note.type);
-            const categoryFilter = showAnyCategory ? true : note.category?.split(SEPARATOR).some((r) => debouncedCategory.includes(r));
+            const typeFilter = showAnyType ? true : debouncedType.includes(note.type?.labelName);
+            const categoryFilter = showAnyCategory ? true : note.category?.map((c) => c.labelName).some((r) => debouncedCategory.includes(r));
             const dateFilter = note.startDate >= debouncedStartDate && note.startDate <= getLastPeriodDate(-1, debouncedEndDate);
             const importanceFilter = note.rating >= importanceMin && note.rating <= importanceMax;
 
@@ -103,10 +106,10 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
         setSearchQuery('');
         setSortType(SortOptions.NEWEST);
         setEndDate(new Date().getTime());
-        setType(allTypes.map((label) => label.name));
-        setCategory(allCategories.map((label) => label.name));
-        setShowAnyCategory(true);
+        setType([]);
+        setCategory([]);
         setShowAnyType(true);
+        setShowAnyCategory(true);
         setImportanceMin(1);
         setImportanceMax(10);
 
@@ -134,15 +137,15 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
 
     // Choosing new added type.
     useEffect(() => {
-        if (!type.includes(allTypes.map((label) => label.name).at(-1) || '')) {
-            setType((prev) => [...prev, allTypes.map((label) => label.name).at(-1) || '']);
+        if (!type.includes(allTypes.map((label) => label.labelName).at(-1) || '')) {
+            setType((prev) => [...prev, allTypes.map((label) => label.labelName).at(-1) || '']);
         }
     }, [user.customNoteTypes]);
 
     // Choosing new added category.
     useEffect(() => {
-        if (!category.includes(allCategories.map((label) => label.name).at(-1) || '')) {
-            setCategory((prev) => [...prev, allCategories.map((label) => label.name).at(-1) || '']);
+        if (!category.includes(allCategories.map((label) => label.labelName).at(-1) || '')) {
+            setCategory((prev) => [...prev, allCategories.map((label) => label.labelName).at(-1) || '']);
         }
     }, [user.customNoteCategories]);
 

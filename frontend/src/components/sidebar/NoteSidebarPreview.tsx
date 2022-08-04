@@ -7,6 +7,7 @@ import { AiFillStar } from 'react-icons/ai';
 import { useAppDispatch } from './../../app/hooks';
 import { setShowSidebar } from '../../features/journal/journalSlice';
 import { useWindowSize } from '../../hooks';
+import { defaultNoteTypes } from '../../utils/data';
 
 interface NoteSidebarPreviewProps {
     note: INote;
@@ -36,7 +37,7 @@ const NoteSidebarPreview = ({ note }: NoteSidebarPreviewProps) => {
                 <h5 className="text-sm text-cyan-500">{new Date(note.startDate).toDateString()}</h5>
                 <div>
                     {note.isStarred && <NoteInfo className="!text-base !py-[1px] !px-[6px] mr-1" text={<AiFillStar className="text-[1.3rem] inline-block pb-1" />} color="#0e7490" />}
-                    <NoteInfo text={note.type} color="#0e7490" className="!text-base mr-0 !py-[1px] !px-[6px]" />
+                    <NoteInfo text={note.type ? note.type.labelName : defaultNoteTypes[0].labelName} color="#0e7490" className="!text-base mr-0 !py-[1px] !px-[6px]" />
                 </div>
             </div>
         </div>
