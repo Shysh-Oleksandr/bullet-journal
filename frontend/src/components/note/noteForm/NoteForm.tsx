@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import config from '../../../config/config';
 import logging from '../../../config/logging';
 import { fetchAllNotes, setError, setSuccess } from '../../../features/journal/journalSlice';
-import { useDebounce, useWindowSize } from '../../../hooks';
+import { useDebounce, useFetchData, useWindowSize } from '../../../hooks';
 import ICustomLabel from '../../../interfaces/customLabel';
 import INote from '../../../interfaces/note';
 import { defaultNoteTypes } from '../../../utils/data';
@@ -76,6 +76,10 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     const { user } = useAppSelector((store) => store.user);
     const { notes, isSidebarShown } = useAppSelector((store) => store.journal);
+    const [customLabels, loadingCustomLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${user._id}`, 'customLabels');
+    const allTypes = customLabels.filter((label) => !label.isCategoryLabel);
+    const allCategories = customLabels.filter((label) => label.isCategoryLabel);
+
     const params = useParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -137,7 +141,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
             });
 
             if (response.status === 200 || response.status === 304) {
-                if (user._id !== response.data.note.author._id) {
+                if (user._id !== response.data.note.author) {
                     logging.warn('This note is owned by someone else');
                     setId('');
                 } else {
@@ -357,7 +361,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                 </div>
                 <div className="flex-between border-bottom my-3">
                     <div className="relative sm:mr-4 mr-2 sm:basis-auto basis-1/2">
-                        <NoteLabelInput disabled={saving || isLocked} setNoteColor={setColor} label={type} setLabel={setType} isCustomTypes={true} />
+                        <NoteLabelInput allLabels={allTypes} disabled={saving || isLocked} setNoteColor={setColor} label={type} setLabel={setType} isCustomTypes={true} />
                         <InputLabel htmlFor="noteTypeInput" text="Type" />
                     </div>
                     <div className="relative sm:basis-3/4 basis-1/2">

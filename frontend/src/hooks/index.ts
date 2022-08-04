@@ -57,7 +57,7 @@ export function useOnClickOutside(ref, handler) {
     );
 }
 
-export function useFetchData<T>(method: string = 'GET', url: string, name: string): [T[], boolean] {
+export function useFetchData<T>(method: string = 'GET', url: string, name: string, dependencies: any = null): [T[], boolean] {
     const [items, setItems] = useState<T[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -85,7 +85,8 @@ export function useFetchData<T>(method: string = 'GET', url: string, name: strin
 
     useEffect(() => {
         fetchData();
-    }, []);
+        console.log('fetch');
+    }, [dependencies]);
 
     return [items, loading];
 }
