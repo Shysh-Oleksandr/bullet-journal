@@ -9,7 +9,7 @@ const config = {
         measurementId: 'G-SGNH6PWV8L'
     },
     server: {
-        url: 'http://localhost:8001' //http://localhost:8001 https://bulletjournalproject.herokuapp.com
+        url: 'https://bulletjournalproject.herokuapp.com' //http://localhost:8001 https://bulletjournalproject.herokuapp.com
     }
 };
 

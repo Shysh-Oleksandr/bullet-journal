@@ -27,8 +27,9 @@ const create = (req, res, next) => {
     logging_1.default.info('Attempting to register user...');
     let { uid, name } = req.body;
     let fire_token = res.locals.fire_token;
+    const newUserId = new mongoose_1.default.Types.ObjectId();
     const user = new user_1.default({
-        _id: new mongoose_1.default.Types.ObjectId(),
+        _id: newUserId,
         uid,
         name
     });
