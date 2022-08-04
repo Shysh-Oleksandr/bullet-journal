@@ -27,8 +27,6 @@ const LoginPage = () => {
 
         SocialMediaPopup(provider)
             .then(async (result) => {
-                logging.info(result);
-
                 let user = result.user;
                 if (user) {
                     let uid = user.uid;
@@ -36,7 +34,7 @@ const LoginPage = () => {
 
                     if (name) {
                         try {
-                            let fire_token = await user.getIdToken();
+                            let fire_token = await user.getIdToken(true);
 
                             Authenticate(uid, name, fire_token, (error, _user) => {
                                 if (error) {

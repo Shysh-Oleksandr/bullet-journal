@@ -301,3 +301,7 @@ h6 {
 .other-note-btn:hover h5 {
     @apply text-cyan-900;
 }
+
+.public-DraftStyleDefault-block {
+    @apply leading-6 !important;
+}

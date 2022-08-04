@@ -28,8 +28,10 @@ const create = (req: Request, res: Response, next: NextFunction) => {
     let { uid, name } = req.body;
     let fire_token = res.locals.fire_token;
 
+    const newUserId = new mongoose.Types.ObjectId();
+
     const user = new User({
-        _id: new mongoose.Types.ObjectId(),
+        _id: newUserId,
         uid,
         name
     });

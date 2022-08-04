@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { ContentState, EditorState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { AiFillLock, AiFillStar, AiFillUnlock } from 'react-icons/ai';
 import { BsDashLg } from 'react-icons/bs';
@@ -14,8 +15,10 @@ import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import config from '../../../config/config';
 import logging from '../../../config/logging';
 import { fetchAllNotes, setError, setSuccess } from '../../../features/journal/journalSlice';
-import { useDebounce, useWindowSize } from '../../../hooks';
+import { useDebounce, useFetchData, useWindowSize } from '../../../hooks';
+import ICustomLabel from '../../../interfaces/customLabel';
 import INote from '../../../interfaces/note';
+import { defaultNoteTypes } from '../../../utils/data';
 import { getContentWords, INITIAL_NOTE_ID } from '../../../utils/functions';
 import DeleteModal from '../../UI/DeleteModal.';
 import Loading from '../../UI/Loading';
@@ -24,10 +27,11 @@ import NoteContentEditor from './NoteContentEditor';
 import NoteDate from './NoteDate';
 import NoteFormPreview from './NoteFormPreview';
 import NoteImportanceInput from './NoteImportanceInput';
-import NoteLabelInput from './NoteLabelInput';
+import NoteTypeInput from './NoteTypeInput';
 import NoteSavingIndicator from './NoteSavingIndicator';
 import OtherNotes from './OtherNotes';
 import SaveButton from './SaveButton';
+import NoteCategoryInput from './NoteCategoryInput';
 
 interface NoteFormProps {
     isShort?: boolean;
@@ -44,24 +48,26 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     const [image, setImage] = useState<string>('');
     const [color, setColor] = useState<string>('#04a9c6');
     const [rating, setRating] = useState<number>(1);
-    const [type, setType] = useState<string>('Note');
-    const [category, setCategory] = useState<string>('');
+    const [type, setType] = useState<ICustomLabel>(defaultNoteTypes[0]);
+    const [category, setCategory] = useState<ICustomLabel[]>([]);
     const [isLocked, setIsLocked] = useState<boolean>(false);
     const [isStarred, setIsStarred] = useState<boolean>(false);
     const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
     const [prevNote, setPrevNote] = useState<INote | null>(null);
     const [nextNote, setNextNote] = useState<INote | null>(null);
 
-    const debouncedTitle = useDebounce(title, 2000);
-    const debouncedStartDate = useDebounce(startDate, 2000);
-    const debouncedEndDate = useDebounce(endDate, 2000);
-    const debouncedContent = useDebounce(content, 2000);
-    const debouncedColor = useDebounce(color, 2000);
-    const debouncedRating = useDebounce(rating, 2000);
-    const debouncedType = useDebounce(type, 2000);
-    const debouncedCategory = useDebounce(category, 2000);
-    const debouncedIsLocked = useDebounce(isLocked, 2000);
-    const debouncedIsStarred = useDebounce(isStarred, 2000);
+    const debouncedDelay = 2000;
+
+    const debouncedTitle = useDebounce(title, debouncedDelay);
+    const debouncedStartDate = useDebounce(startDate, debouncedDelay);
+    const debouncedEndDate = useDebounce(endDate, debouncedDelay);
+    const debouncedContent = useDebounce(content, debouncedDelay);
+    const debouncedColor = useDebounce(color, debouncedDelay);
+    const debouncedRating = useDebounce(rating, debouncedDelay);
+    const debouncedType = useDebounce(type, debouncedDelay);
+    const debouncedCategory = useDebounce(category, debouncedDelay);
+    const debouncedIsLocked = useDebounce(isLocked, debouncedDelay);
+    const debouncedIsStarred = useDebounce(isStarred, debouncedDelay);
 
     const [modal, setModal] = useState<boolean>(false);
     const [saving, setSaving] = useState<boolean>(false);
@@ -71,12 +77,12 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     const { user } = useAppSelector((store) => store.user);
     const { notes, isSidebarShown } = useAppSelector((store) => store.journal);
+
     const params = useParams();
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [width] = useWindowSize();
-    const firstRender = useRef(0);
 
     const resetState = () => {
         setId('');
@@ -87,9 +93,11 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         setImage('');
         setColor('#04a9c6');
         setRating(1);
-        setType('Note');
-        setCategory('');
+        setType(defaultNoteTypes[0]);
+        setCategory([]);
         setEditorState(EditorState.createEmpty());
+        setIsLocked(false);
+        setIsStarred(false);
     };
 
     useEffect(() => {
@@ -131,7 +139,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
             });
 
             if (response.status === 200 || response.status === 304) {
-                if (user._id !== response.data.note.author._id) {
+                if (user._id !== response.data.note.author) {
                     logging.warn('This note is owned by someone else');
                     setId('');
                 } else {
@@ -144,8 +152,8 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     setImage(note.image || '');
                     setColor(note.color);
                     setRating(note.rating);
-                    setType(note.type);
-                    setCategory(note.category || '');
+                    setType(note.type || defaultNoteTypes[0]);
+                    setCategory(note.category || []);
                     setIsLocked(note.isLocked || false);
                     setIsStarred(note.isStarred || false);
 
@@ -168,10 +176,11 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     const saveNote = async (method: string, url: string, isCreating: boolean, showMessage: boolean = true) => {
         const _startDate = new Date(startDate);
+
         const _endDate = new Date(endDate);
         _startDate.setHours(0, 0, 0, 0);
         _endDate.setHours(0, 0, 0, 0);
-        if (title === '' || type === '' || color === '' || !startDate || !endDate) {
+        if (title === '' || color === '' || !startDate || !endDate) {
             showMessage && dispatch(setError('Please fill out all required fields.'));
             showMessage && dispatch(setSuccess(''));
             return null;
@@ -194,7 +203,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                     endDate,
                     image,
                     color,
-                    rating,
+                    rating: rating > 0 && rating <= 10 ? rating : 1,
                     content,
                     type,
                     category,
@@ -265,12 +274,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
     useEffect(() => {
         if (isShort) return;
-        // Ignore first 7 renders.
-        if (firstRender.current < 7) {
-            firstRender.current++;
-        } else {
-            _id !== '' && editNote(false);
-        }
+        _id !== '' && editNote(false);
     }, [debouncedTitle, debouncedStartDate, debouncedEndDate, debouncedContent, debouncedColor, debouncedRating, debouncedType, debouncedCategory, debouncedIsLocked, debouncedIsStarred]);
 
     if (isLoading) {
@@ -355,15 +359,15 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                 </div>
                 <div className="flex-between border-bottom my-3">
                     <div className="relative sm:mr-4 mr-2 sm:basis-auto basis-1/2">
-                        <NoteLabelInput disabled={saving || isLocked} setNoteColor={setColor} label={type} setLabel={setType} isCustomTypes={true} />
+                        <NoteTypeInput disabled={saving || isLocked} setNoteColor={setColor} label={type} setLabel={setType} />
                         <InputLabel htmlFor="noteTypeInput" text="Type" />
                     </div>
                     <div className="relative sm:basis-3/4 basis-1/2">
-                        <NoteLabelInput disabled={saving || isLocked} setNoteColor={setColor} label={category} setLabel={setCategory} isCustomTypes={false} />
+                        <NoteCategoryInput disabled={saving || isLocked} setNoteColor={setColor} label={category} setLabel={setCategory} />
                         <InputLabel htmlFor="noteCategoryInput" text="Categories" />
                     </div>
                 </div>
-                <NoteContentEditor disabled={saving || isLocked} setEditorState={setEditorState} setContent={setContent} setImage={setImage} editorState={editorState} isShort={isShort} />
+                <NoteContentEditor disabled={isLocked} setEditorState={setEditorState} setContent={setContent} setImage={setImage} editorState={editorState} isShort={isShort} />
                 <div>
                     <SaveButton
                         className={`bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-900 ${isShort ? 'mt-2 py-2' : 'mt-4'}`}

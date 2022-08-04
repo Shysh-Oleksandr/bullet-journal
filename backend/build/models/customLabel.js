@@ -24,19 +24,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const NoteSchema = new mongoose_1.Schema({
-    title: { type: String },
-    author: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User' },
-    startDate: { type: Number },
-    endDate: { type: Number },
-    content: { type: String },
+const CustomLabelSchema = new mongoose_1.Schema({
+    labelName: { type: String },
     color: { type: String },
-    image: { type: String },
-    type: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'CustomLabel', default: '62ebcd03900e40a41d16f883' },
-    category: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: 'CustomLabel' }],
-    rating: { type: Number },
-    isLocked: { type: Boolean },
-    isStarred: { type: Boolean },
-    id: { type: String, unique: true }
+    isCategoryLabel: { type: Boolean },
+    user: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User' }
 });
-exports.default = mongoose_1.default.model('Note', NoteSchema);
+exports.default = mongoose_1.default.model('CustomLabel', CustomLabelSchema);

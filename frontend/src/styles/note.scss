@@ -50,12 +50,13 @@
 }
 
 .categories-list {
-    scrollbar-width: thin;
+    scrollbar-width: thin !important;
+    scrollbar-color: #04a9c6 !important;
 }
 
 /* width */
 ::-webkit-scrollbar {
-    width: 7px;
+    width: 5px;
 }
 
 /* Track */
