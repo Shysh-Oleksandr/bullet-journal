@@ -3,14 +3,10 @@
     "version": "1.0.0",
     "description": "",
     "main": "server.ts",
-    "engines": {
-        "node": "v16.14.0",
-        "npm": "8.3.1"
-    },
     "scripts": {
         "start": "node build/server.js",
         "build": "tsc --build",
-        "postinstall": "npm run build"
+        "postinstall": "yarn build"
     },
     "keywords": [],
     "author": "",
