@@ -9,7 +9,7 @@ const config = {
         measurementId: 'G-SGNH6PWV8L'
     },
     server: {
-        url: 'https://bullet-journal-3q4s.onrender.com' //http://localhost:8001
+        url: 'http://localhost:8001' //'https://bullet-journal-3q4s.onrender.com' //http://localhost:8001
     }
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { MdArrowForwardIos } from 'react-icons/md';
 import ReactPaginate from 'react-paginate';
 import { useAppSelector } from '../../app/hooks';
@@ -50,4 +50,4 @@ const Pagination = ({ items }: PaginationProps) => {
     );
 };
 
-export default Pagination;
+export default memo(Pagination);

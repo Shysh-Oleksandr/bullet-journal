@@ -12,14 +12,13 @@ export const SignInWithSocialMedia = (provider: firebase.auth.AuthProvider) =>
             .catch((error) => reject(error));
     });
 
-export const Authenticate = async (uid: string, name: string, fire_token: string, callback: (error: string | null, user: IUser | null) => void) => {
+export const Authenticate = async (uid: string, fire_token: string, callback: (error: string | null, user: IUser | null) => void) => {
     try {
         const response = await axios({
             method: 'POST',
             url: `${config.server.url}/users/login`,
             data: {
                 uid,
-                name
             },
             headers: { Authorization: `Bearer ${fire_token}` }
         });

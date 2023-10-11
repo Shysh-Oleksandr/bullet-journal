@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import AuthRoute from './components/auth/AuthRoute';
@@ -10,81 +10,84 @@ import { login, logout } from './features/user/userSlice';
 import { Validate } from './modules/auth';
 
 function App() {
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const dispatch = useAppDispatch();
-    const { error, success } = useAppSelector((store) => store.journal);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const dispatch = useAppDispatch();
+  const { error, success } = useAppSelector((store) => store.journal);
 
-    useEffect(() => {
+  /**
+   * Check to see if we have a token.
+   * If we do, verify it with the backend.
+   * If not, we are logged out initially.
+   */
+  const checkLocalStorageForCredentials = useCallback(
+    () => {
+      const fire_token = localStorage.getItem('fire_token');
+
+      if (fire_token === null) {
+        dispatch(logout());
         setTimeout(() => {
-            checkLocalStorageForCredentials();
+          setIsLoading(false);
         }, 100);
-    }, []);
-
-    /**
-     * Check to see if we have a token.
-     * If we do, verify it with the backend.
-     * If not, we are logged out initially.
-     */
-    function checkLocalStorageForCredentials() {
-        const fire_token = localStorage.getItem('fire_token');
-
-        if (fire_token === null) {
+      } else {
+        return Validate(fire_token, (error, user) => {
+          if (error) {
+            logging.error(error);
             dispatch(logout());
             setTimeout(() => {
-                setIsLoading(false);
+              setIsLoading(false);
             }, 100);
-        } else {
-            return Validate(fire_token, (error, user) => {
-                if (error) {
-                    logging.error(error);
-                    dispatch(logout());
-                    setTimeout(() => {
-                        setIsLoading(false);
-                    }, 100);
-                } else if (user) {
-                    dispatch(login({ user, fire_token }));
-                    setTimeout(() => {
-                        setIsLoading(false);
-                    }, 100);
-                }
-            });
-        }
-    }
+          } else if (user) {
+            dispatch(login({ user, fire_token }));
+            setTimeout(() => {
+              setIsLoading(false);
+            }, 100);
+          }
+        });
+      }
+    },
+    [dispatch],
+  )
 
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center w-full h-full">
-                <Loading scaleSize={2} />
-            </div>
-        );
-    }
+  useEffect(() => {
+    setTimeout(() => {
+      checkLocalStorageForCredentials();
+    }, 100);
+  }, [checkLocalStorageForCredentials]);
 
+  if (isLoading) {
     return (
-        <Router>
-            <div className="app text-center w-full h-full">
-                <Routes>
-                    {routes.map((route, index) => {
-                        if (route.auth) {
-                            return (
-                                <Route
-                                    key={index}
-                                    path={route.path}
-                                    element={
-                                        <AuthRoute>
-                                            <route.component {...route.props} />
-                                        </AuthRoute>
-                                    }
-                                />
-                            );
-                        }
-                        return <Route key={index} path={route.path} element={<route.component {...route.props} />} />;
-                    })}
-                </Routes>
-                <Alert message={error} isError={true} anotherMessage={success} />
-                <Alert message={success} isError={false} anotherMessage={error} />
-            </div>
-        </Router>
+      <div className="flex justify-center items-center w-full h-full">
+        <Loading scaleSize={2} />
+      </div>
     );
+  }
+
+  return (
+    <Router>
+      <div className="app text-center w-full h-full">
+        <Routes>
+          {routes.map((route, index) => {
+            if (route.auth) {
+              return (
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={
+                    <AuthRoute>
+                      <route.component {...route.props} />
+                    </AuthRoute>
+                  }
+                />
+              );
+            }
+            return <Route key={index} path={route.path} element={<route.component {...route.props} />} />;
+          })}
+        </Routes>
+        <Alert message={error} isError={true} anotherMessage={success} />
+        <Alert message={success} isError={false} anotherMessage={error} />
+      </div>
+    </Router>
+  );
 }
 
 export default App;

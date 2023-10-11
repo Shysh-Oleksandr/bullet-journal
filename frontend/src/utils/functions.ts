@@ -1,9 +1,7 @@
 import DOMPurify from 'dompurify';
 import tinycolor from 'tinycolor2';
 import ICustomLabel from '../interfaces/customLabel';
-import INote from '../interfaces/note';
-import IUser from '../interfaces/user';
-import { defaultNoteTypes, noteColors } from './data';
+import { noteColors } from './data';
 
 export function shadeColor(color: string, amount: number) {
     return '#' + color.replace(/^#/, '').replace(/../g, (color) => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
@@ -15,22 +13,6 @@ export const getDifferentColor = (color: string, amount: number = 20) => {
     const tinyColor = tinycolor(color);
 
     return tinyColor.isLight() ? shadeColor(color, amount * -1) : shadeColor(color, amount);
-};
-
-export const INITIAL_NOTE_ID = '111';
-
-export const getInitialNote = (author: IUser): INote => {
-    return {
-        _id: INITIAL_NOTE_ID,
-        title: 'Started using Bullet Journal',
-        author: author,
-        startDate: new Date(author.createdAt || new Date()).getTime(),
-        endDate: new Date(author.createdAt || new Date()).getTime(),
-        content: 'That day I registered an account on the Bullet Journal website.',
-        color: '#04a9c6',
-        type: defaultNoteTypes[1],
-        rating: 1
-    };
 };
 
 export const getCategoriesLabelName = (categories: ICustomLabel[]) => {

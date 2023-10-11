@@ -18,7 +18,7 @@ const create = (req: Request, res: Response, next: NextFunction) => {
         content,
         color,
         image,
-        type,
+        type: type ?? null,
         category,
         rating
     });

@@ -8,7 +8,7 @@ interface ILoadingProps {
 const Loading = ({ scaleSize, className }: ILoadingProps) => {
     return (
         <div className={`flex justify-center items-center w-full h-full ${className}`}>
-            <div style={{ transform: `scale(${scaleSize || 1})` }} className="stage z-50">
+            <div style={{ transform: `scale(${scaleSize || 1})` }} className="stage z-50 !py-16">
                 <div className="dot-revolution"></div>
             </div>
         </div>
