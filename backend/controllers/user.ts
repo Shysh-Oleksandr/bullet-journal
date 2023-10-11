@@ -2,6 +2,10 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import logging from '../config/logging';
 import User from '../models/user';
+import noteController from '../controllers/note';
+import customLabelController from '../controllers/customLabel';
+import { DEFAULT_NOTES } from '../interfaces/note';
+import { DEFAULT_LABELS } from '../interfaces/customLabel';
 
 const validate = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Token validated, returning user...');
@@ -40,7 +44,31 @@ const create = (req: Request, res: Response, next: NextFunction) => {
         .save()
         .then((newUser) => {
             logging.info(`New user ${uid} created...`);
-            return res.status(201).json({ user: newUser, fire_token });
+
+            const userId = newUserId.toString();
+
+            logging.info(`Attempting to create default custom labels...`);
+            Promise.all(DEFAULT_LABELS.map((labelData) => customLabelController.createDefaultLabel(labelData, userId)))
+                .then((createdLabels) => {
+                    logging.info(`All default custom labels created...`);
+
+                    logging.info(`Attempting to create default notes...`);
+                    const noteTypeId = createdLabels ? createdLabels[0].toString() : null;
+
+                    Promise.all(DEFAULT_NOTES.map((noteData) => noteController.createDefaultNote(noteData, userId, noteTypeId, [])))
+                        .then(() => {
+                            logging.info(`All default notes created. Returning the new user...`);
+                            return res.status(201).json({ user: newUser, fire_token });
+                        })
+                        .catch((error) => {
+                            logging.error(error);
+                            return res.status(500).json({ error });
+                        });
+                })
+                .catch((error) => {
+                    logging.error(error);
+                    return res.status(500).json({ error });
+                });
         })
         .catch((error) => {
             logging.error(error);
@@ -79,7 +107,7 @@ const update = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const login = (req: Request, res: Response, next: NextFunction) => {
-    logging.info('Loggin in user...');
+    logging.info('Logging in user...');
 
     let { uid } = req.body;
     let fire_token = res.locals.fire_token;

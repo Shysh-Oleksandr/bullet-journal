@@ -1,6 +1,7 @@
-import e, { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import logging from '../config/logging';
+import { CreateDefaultNotePayload } from '../interfaces/note';
 import Note from '../models/note';
 
 const create = (req: Request, res: Response, next: NextFunction) => {
@@ -31,6 +32,27 @@ const create = (req: Request, res: Response, next: NextFunction) => {
         .catch((error) => {
             logging.error(error);
             return res.status(500).json({ error });
+        });
+};
+
+// Note: it's enough to pass just the id of a User or CustomLabel object in order to create a note
+const createDefaultNote = async (noteData: CreateDefaultNotePayload, author: string, type: string | null, category: string[]) => {
+    logging.info('Attempting to create a default note...');
+
+    const note = new Note({
+        _id: new mongoose.Types.ObjectId(),
+        ...noteData,
+        author,
+        type,
+        category
+    });
+
+    note.save()
+        .then(() => {
+            logging.info(`New default note created...`);
+        })
+        .catch((error) => {
+            logging.error(error);
         });
 };
 
@@ -146,6 +168,7 @@ const deleteNote = (req: Request, res: Response, next: NextFunction) => {
 
 export default {
     create,
+    createDefaultNote,
     read,
     readAll,
     query,
