@@ -10,8 +10,8 @@ interface NoteFormPreviewProps {
 
 const NoteFormPreview = ({ isShort, startDate, note }: NoteFormPreviewProps) => {
     return (
-        <div className="text-left mt-4">
-            <h4 className="sm:text-2xl text-xl mb-1">Preview</h4>
+        <div className="text-left mt-6">
+            <h4 className="sm:text-2xl text-xl mb-2">Preview</h4>
             {isShort && (
                 <div className="text-[#267491] text-xl">
                     <h4>{new Date(startDate).toDateString()}</h4>

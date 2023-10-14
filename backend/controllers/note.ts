@@ -35,7 +35,7 @@ const create = (req: Request, res: Response, next: NextFunction) => {
         });
 };
 
-// Note: it's enough to pass just the id of a User or CustomLabel object in order to create a note
+// Note: it's enough to pass just the id of a User or CustomLabel objects in order to create a note
 const createDefaultNote = async (noteData: CreateDefaultNotePayload, author: string, type: string | null, category: string[]) => {
     logging.info('Attempting to create a default note...');
 

@@ -35,7 +35,7 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
           <>
             <div
               dangerouslySetInnerHTML={{ __html: sanitizedData(note.content.length > 150 ? note.content.slice(0, 150).concat('...') : note.content) }}
-              className={`sm:px-2 px-1 break-words sm:text-[1.25rem] text-lg min-h-[1.5rem] overflow-y-auto sm:!leading-6 !leading-5 max-h-32 h-auto ${contentClassName}`}
+              className={`sm:px-2 px-1 break-words sm:text-[1.25rem] text-lg min-h-[1.5rem] sm:!leading-6 !leading-5 h-auto ${contentClassName}`}
             ></div>
           </>
         )}

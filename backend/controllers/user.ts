@@ -44,6 +44,48 @@ const refreshToken = (req: Request, res: Response, next: NextFunction) => {
         });
 };
 
+const createDefaultData = (userId: string) => {
+    logging.info(`Attempting to create default custom labels...`);
+    return Promise.all(DEFAULT_LABELS.map((labelData) => customLabelController.createDefaultLabel(labelData, userId)))
+        .then((createdLabels) => {
+            logging.info(`All default custom labels created...`);
+
+            logging.info(`Attempting to create default notes...`);
+            const noteTypeId = createdLabels ? createdLabels[0].toString() : null;
+
+            Promise.all(DEFAULT_NOTES.map((noteData) => noteController.createDefaultNote(noteData, userId, noteTypeId, [])))
+                .then(() => {
+                    logging.info(`All default notes created.`);
+                })
+                .catch((error) => {
+                    logging.error(error);
+                });
+        })
+        .catch((error) => {
+            logging.error(error);
+        });
+};
+
+const createDefaultDataForExistingUsers = async (req: Request, res: Response, next: NextFunction) => {
+    logging.info('Attempting to create default data for existing users...');
+
+    try {
+        const existingUsers = await User.find({});
+
+        for (const user of existingUsers) {
+            const userId = user._id.toString();
+
+            await createDefaultData(userId);
+        }
+
+        logging.info('Success! Default data for existing users is created!');
+        return res.status(201).json({ message: 'Success! Default data for existing users is created!' });
+    } catch (error) {
+        logging.error(error);
+        return res.status(500).json({ error });
+    }
+};
+
 const create = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to register user...');
 
@@ -65,23 +107,9 @@ const create = (req: Request, res: Response, next: NextFunction) => {
 
             const userId = newUserId.toString();
 
-            logging.info(`Attempting to create default custom labels...`);
-            Promise.all(DEFAULT_LABELS.map((labelData) => customLabelController.createDefaultLabel(labelData, userId)))
-                .then((createdLabels) => {
-                    logging.info(`All default custom labels created...`);
-
-                    logging.info(`Attempting to create default notes...`);
-                    const noteTypeId = createdLabels ? createdLabels[0].toString() : null;
-
-                    Promise.all(DEFAULT_NOTES.map((noteData) => noteController.createDefaultNote(noteData, userId, noteTypeId, [])))
-                        .then(() => {
-                            logging.info(`All default notes created. Returning the new user...`);
-                            return res.status(201).json({ user: newUser, fire_token });
-                        })
-                        .catch((error) => {
-                            logging.error(error);
-                            return res.status(500).json({ error });
-                        });
+            createDefaultData(userId)
+                .then(() => {
+                    return res.status(201).json({ user: newUser, fire_token });
                 })
                 .catch((error) => {
                     logging.error(error);
@@ -190,5 +218,6 @@ export default {
     login,
     read,
     update,
-    readAll
+    readAll,
+    createDefaultDataForExistingUsers
 };

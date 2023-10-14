@@ -11,5 +11,6 @@ router.post('/login', extractFirebaseInfo, controller.login);
 router.post('/refresh-token', controller.refreshToken);
 router.patch('/update/:userID', controller.update);
 router.get('/', controller.readAll);
+router.post('/create-default-data', controller.createDefaultDataForExistingUsers);
 
 export = router;

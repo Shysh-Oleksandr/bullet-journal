@@ -44,8 +44,6 @@ export const Validate = async (uid: string, fire_token: string, callback: (error
             headers: { Authorization: `Bearer ${fire_token}` }
         });
 
-        console.log('response.status:', response.status);
-
         if (response.status === 200 || response.status === 304) {
             logging.info('Successfully validated.');
             callback(null, response.data.user);

@@ -30,8 +30,7 @@ const NotePreview = ({ note, previousNoteStartDate }: INotePreviewProps) => {
         titleClassName='hover:underline !cursor-pointer'
         className={`cursor-pointer note__body sm:mt-8 mt-6`}
         note={note}
-        showImage={true}
-        contentClassName={'max-h-[75px]'}
+        showImage
       />
     </div>
   );

@@ -16,6 +16,7 @@ export default interface INote extends Document {
     isEndNote?: boolean;
     isLocked?: boolean;
     isStarred?: boolean;
+    isDefault?: boolean;
 }
 
 export interface INoteType {
@@ -23,7 +24,7 @@ export interface INoteType {
     color?: string;
 }
 
-export type CreateDefaultNotePayload = Pick<INote, 'title' | 'startDate' | 'endDate' | 'content' | 'color' | 'rating' | 'isEndNote' | 'isLocked' | 'isStarred'>
+export type CreateDefaultNotePayload = Pick<INote, 'title' | 'startDate' | 'endDate' | 'content' | 'color' | 'rating' | 'isEndNote' | 'isLocked' | 'isStarred' | 'isDefault'>;
 
 export const DEFAULT_NOTES: CreateDefaultNotePayload[] = [
     {
@@ -42,10 +43,11 @@ export const DEFAULT_NOTES: CreateDefaultNotePayload[] = [
         So, here's to new beginnings and endless possibilities. Welcome to your journal, where every page holds the promise of self-discovery, growth, and a deeper connection with yourself.
         
         Happy journaling! 🌟📝`,
-        color: "#0891b2",
+        color: '#0891b2',
         rating: 5,
         isEndNote: false,
         isLocked: true,
-        isStarred: true
+        isStarred: true,
+        isDefault: true
     }
 ];

@@ -14,6 +14,7 @@ const NoteSchema: Schema = new Schema({
     rating: { type: Number },
     isLocked: { type: Boolean },
     isStarred: { type: Boolean },
+    isDefault: { type: Boolean },
     id: { type: String, unique: true }
 });
 

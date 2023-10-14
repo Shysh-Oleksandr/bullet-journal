@@ -55,7 +55,7 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
           }}
           className="lg:text-3xl text-2xl lg:ml-0 ml-12 w-[24rem] whitespace-nowrap overflow-hidden text-ellipsis font-semibold px-4 block break-all bg-cyan-900 hover:text-cyan-100 transition-colors"
         >
-          {user.name.split(' ')[0]}'s Journal
+          {user.name ? user.name.split(' ')[0] + "'s" : "Your"} Journal
         </Link>
       </div>
       <div className="relative flex-between bg-cyan-800">
