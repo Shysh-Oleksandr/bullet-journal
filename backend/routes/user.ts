@@ -8,6 +8,7 @@ router.get('/validate', extractFirebaseInfo, controller.validate);
 router.get('/read/:userID', controller.read);
 router.post('/create', extractFirebaseInfo, controller.create);
 router.post('/login', extractFirebaseInfo, controller.login);
+router.post('/refresh-token', controller.refreshToken);
 router.patch('/update/:userID', controller.update);
 router.get('/', controller.readAll);
 

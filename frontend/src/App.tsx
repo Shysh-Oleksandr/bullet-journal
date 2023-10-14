@@ -10,9 +10,12 @@ import { login, logout } from './features/user/userSlice';
 import { Validate } from './modules/auth';
 
 function App() {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const dispatch = useAppDispatch();
+
   const { error, success } = useAppSelector((store) => store.journal);
+  const isAuthenticated = useAppSelector((store) => store.user.user._id) !== '';
+
+  const [isLoading, setIsLoading] = useState(true);
 
   /**
    * Check to see if we have a token.
@@ -22,37 +25,43 @@ function App() {
   const checkLocalStorageForCredentials = useCallback(
     () => {
       const fire_token = localStorage.getItem('fire_token');
+      const uid = localStorage.getItem('uid');
 
-      if (fire_token === null) {
+      if (!fire_token || !uid) {
         dispatch(logout());
         setTimeout(() => {
           setIsLoading(false);
         }, 100);
-      } else {
-        return Validate(fire_token, (error, user) => {
-          if (error) {
-            logging.error(error);
-            dispatch(logout());
-            setTimeout(() => {
-              setIsLoading(false);
-            }, 100);
-          } else if (user) {
-            dispatch(login({ user, fire_token }));
-            setTimeout(() => {
-              setIsLoading(false);
-            }, 100);
-          }
-        });
+
+        return;
       }
+
+      return Validate(uid, fire_token, (error, user) => {
+        if (error) {
+          logging.error(error);
+          dispatch(logout());
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 100);
+        } else if (user) {
+          dispatch(login({ user, fire_token }));
+
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 100);
+        }
+      });
     },
     [dispatch],
   )
 
   useEffect(() => {
+    if (isAuthenticated) return;
+
     setTimeout(() => {
       checkLocalStorageForCredentials();
     }, 100);
-  }, [checkLocalStorageForCredentials]);
+  }, [checkLocalStorageForCredentials, isAuthenticated]);
 
   if (isLoading) {
     return (

@@ -6,6 +6,7 @@ import noteController from '../controllers/note';
 import customLabelController from '../controllers/customLabel';
 import { DEFAULT_NOTES } from '../interfaces/note';
 import { DEFAULT_LABELS } from '../interfaces/customLabel';
+import firebaseAdmin from 'firebase-admin';
 
 const validate = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Token validated, returning user...');
@@ -19,6 +20,23 @@ const validate = (req: Request, res: Response, next: NextFunction) => {
             } else {
                 return res.status(401).json({ message: 'user not found' });
             }
+        })
+        .catch((error) => {
+            logging.error(error);
+            return res.status(500).json({ error });
+        });
+};
+
+const refreshToken = (req: Request, res: Response, next: NextFunction) => {
+    logging.info('Trying to refresh the token by uid');
+
+    let { uid } = req.body;
+    firebaseAdmin
+        .auth()
+        .createCustomToken(uid)
+        .then((refreshToken) => {
+            logging.info(`Refresh token for user ${uid} is created, returning...`);
+            return res.status(200).json({ refreshToken });
         })
         .catch((error) => {
             logging.error(error);
@@ -167,6 +185,7 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
 
 export default {
     validate,
+    refreshToken,
     create,
     login,
     read,

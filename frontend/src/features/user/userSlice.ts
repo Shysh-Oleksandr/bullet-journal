@@ -16,16 +16,18 @@ export const userSlice = createSlice({
     initialState,
     // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-        login: (state, { payload }: PayloadAction<IUserState>) => {
+        login: (_, { payload }: PayloadAction<IUserState>) => {
             let user = payload.user;
             let fire_token = payload.fire_token;
 
             localStorage.setItem('fire_token', fire_token);
+            localStorage.setItem('uid', user.uid);
 
             return { user, fire_token };
         },
         logout: () => {
             localStorage.removeItem('fire_token');
+            localStorage.removeItem('uid');
 
             return initialState;
         },
