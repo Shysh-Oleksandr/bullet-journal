@@ -12,14 +12,13 @@ export const SignInWithSocialMedia = (provider: firebase.auth.AuthProvider) =>
             .catch((error) => reject(error));
     });
 
-export const Authenticate = async (uid: string, name: string, fire_token: string, callback: (error: string | null, user: IUser | null) => void) => {
+export const Authenticate = async (uid: string, fire_token: string, callback: (error: string | null, user: IUser | null) => void) => {
     try {
         const response = await axios({
             method: 'POST',
             url: `${config.server.url}/users/login`,
             data: {
-                uid,
-                name
+                uid
             },
             headers: { Authorization: `Bearer ${fire_token}` }
         });
@@ -37,7 +36,7 @@ export const Authenticate = async (uid: string, name: string, fire_token: string
     }
 };
 
-export const Validate = async (fire_token: string, callback: (error: string | null, user: IUser | null) => void) => {
+export const Validate = async (uid: string, fire_token: string, callback: (error: string | null, user: IUser | null, token?: string) => void, shouldRefreshIfNeeded = true) => {
     try {
         const response = await axios({
             method: 'GET',
@@ -46,14 +45,46 @@ export const Validate = async (fire_token: string, callback: (error: string | nu
         });
 
         if (response.status === 200 || response.status === 304) {
-            logging.info('Succesfully validated.');
-            callback(null, response.data.user);
-        } else {
-            logging.warn('Unable to validate.');
-            callback('Unable to validate.', null);
+            logging.info('Successfully validated.');
+            callback(null, response.data.user, fire_token);
         }
     } catch (error) {
-        logging.error(error);
-        callback('Unable to validate.', null);
+        if (!shouldRefreshIfNeeded) {
+            logging.error(error);
+            callback('Unable to validate.', null);
+            return;
+        }
+
+        logging.info('Unable to validate. Trying to refresh a token...');
+
+        const refreshTokenResponse = await axios({
+            method: 'POST',
+            url: `${config.server.url}/users/refresh-token`,
+            data: {
+                uid
+            }
+        });
+
+        if (refreshTokenResponse.status === 200 || refreshTokenResponse.status === 304) {
+            logging.info('Refreshed successfully. Trying to sign in with it...');
+
+            const { refreshToken } = refreshTokenResponse.data;
+
+            auth.signInWithCustomToken(refreshToken).then((userCredential) => {
+                const { user } = userCredential;
+
+                if (user) {
+                    logging.info('Signed in successfully. Trying to validate again...');
+
+                    user.getIdToken(true).then((newToken) => {
+                        Validate(uid, newToken, callback, false);
+                    });
+                } else {
+                    callback('Unable to validate.', null);
+                }
+            });
+        } else {
+            callback('Unable to validate.', null);
+        }
     }
 };

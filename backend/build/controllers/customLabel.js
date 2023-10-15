@@ -27,6 +27,19 @@ const create = (req, res, next) => {
         return res.status(500).json({ error });
     });
 };
+const createDefaultLabel = (defaultLabel, user) => {
+    logging_1.default.info('Attempting to create a default customLabel...');
+    const customLabel = new customLabel_1.default(Object.assign(Object.assign({ _id: new mongoose_1.default.Types.ObjectId() }, defaultLabel), { user }));
+    customLabel
+        .save()
+        .then(() => {
+        logging_1.default.info(`New default custom label created...`);
+    })
+        .catch((error) => {
+        logging_1.default.error(error);
+    });
+    return customLabel._id;
+};
 const readAll = (req, res, next) => {
     const author_id = req.params.authorID;
     logging_1.default.info(`Incoming read all...`);
@@ -84,6 +97,7 @@ const deleteCustomLabel = (req, res, next) => {
 };
 exports.default = {
     create,
+    createDefaultLabel,
     readAll,
     update,
     deleteCustomLabel

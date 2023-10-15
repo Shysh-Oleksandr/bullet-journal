@@ -9,7 +9,7 @@ export default interface INote {
     content?: string;
     color: string;
     image?: string;
-    type: ICustomLabel;
+    type: ICustomLabel | null;
     category?: ICustomLabel[];
     rating: number;
     isEndNote?: boolean;

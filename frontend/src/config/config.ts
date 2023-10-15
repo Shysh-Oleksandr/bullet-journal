@@ -1,3 +1,5 @@
+console.log('process.env.API_URL:', process.env.REACT_APP_API_URL);
+
 const config = {
     firebase: {
         apiKey: 'AIzaSyCN0HVzj1sjMzfFMG1DyYobvv5yjz7XsyM',
@@ -9,7 +11,7 @@ const config = {
         measurementId: 'G-SGNH6PWV8L'
     },
     server: {
-        url: 'https://bullet-journal-3q4s.onrender.com' //http://localhost:8001
+        url: process.env.REACT_APP_API_URL ?? 'http://localhost:8001'
     }
 };
 

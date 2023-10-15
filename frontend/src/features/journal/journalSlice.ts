@@ -3,7 +3,7 @@ import axios from 'axios';
 import INote from '../../interfaces/note';
 import config from './../../config/config';
 import IUser from './../../interfaces/user';
-import { dateDiffInDays, getInitialNote } from './../../utils/functions';
+import { dateDiffInDays } from './../../utils/functions';
 
 export interface IJournalState {
     notes: INote[];
@@ -40,7 +40,6 @@ export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', asy
     if (response.status === 200 || response.status === 304) {
         let notes = response.data.notes as INote[];
         const oldestNoteDate = notes.sort((x, y) => y.startDate - x.startDate).at(-1)?.startDate;
-        notes.push(getInitialNote(user));
         notes = filter ? filter(notes) : notes;
         const endNotes: INote[] = notes
             .filter((note) => dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 >= 2)

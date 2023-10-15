@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
+import React, { MutableRefObject, memo, useEffect, useRef, useState } from 'react';
 import { BsPlusLg } from 'react-icons/bs';
 import { useAppSelector } from '../../app/hooks';
 import { useWindowSize } from '../../hooks';
@@ -42,17 +42,17 @@ const Notes = ({ notes }: NotesProps) => {
                 >
                     <BsPlusLg />
                 </button>
-                <NoteForm showFullAddForm={showFullAddForm} setShowFullAddForm={setShowFullAddForm} isShort={true} />
+                <NoteForm showFullAddForm={showFullAddForm} setShowFullAddForm={setShowFullAddForm} isShort />
             </div>
             {loading ? (
-                <Loading scaleSize={2} className="mt-20" />
+                <Loading scaleSize={2} className="my-20" />
             ) : (
                 notes.map((note, index) => {
-                    return <NotePreview note={note} key={`${note._id}${note.isEndNote && 'endNote'}`} previousNote={index === 0 ? null : notes[index - 1]} />;
+                    return <NotePreview note={note} key={`${note._id}${note.isEndNote && 'endNote'}`} previousNoteStartDate={index === 0 ? null : notes[index - 1].startDate} />;
                 })
             )}
         </div>
     );
 };
 
-export default Notes;
+export default memo(Notes);

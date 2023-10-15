@@ -2,6 +2,11 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import logging from '../config/logging';
 import User from '../models/user';
+import noteController from '../controllers/note';
+import customLabelController from '../controllers/customLabel';
+import { DEFAULT_NOTES } from '../interfaces/note';
+import { DEFAULT_LABELS } from '../interfaces/customLabel';
+import firebaseAdmin from 'firebase-admin';
 
 const validate = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Token validated, returning user...');
@@ -22,6 +27,65 @@ const validate = (req: Request, res: Response, next: NextFunction) => {
         });
 };
 
+const refreshToken = (req: Request, res: Response, next: NextFunction) => {
+    logging.info('Trying to refresh the token by uid');
+
+    let { uid } = req.body;
+    firebaseAdmin
+        .auth()
+        .createCustomToken(uid)
+        .then((refreshToken) => {
+            logging.info(`Refresh token for user ${uid} is created, returning...`);
+            return res.status(200).json({ refreshToken });
+        })
+        .catch((error) => {
+            logging.error(error);
+            return res.status(500).json({ error });
+        });
+};
+
+const createDefaultData = (userId: string) => {
+    logging.info(`Attempting to create default custom labels...`);
+    return Promise.all(DEFAULT_LABELS.map((labelData) => customLabelController.createDefaultLabel(labelData, userId)))
+        .then((createdLabels) => {
+            logging.info(`All default custom labels created...`);
+
+            logging.info(`Attempting to create default notes...`);
+            const noteTypeId = createdLabels ? createdLabels[0].toString() : null;
+
+            Promise.all(DEFAULT_NOTES.map((noteData) => noteController.createDefaultNote(noteData, userId, noteTypeId, [])))
+                .then(() => {
+                    logging.info(`All default notes created.`);
+                })
+                .catch((error) => {
+                    logging.error(error);
+                });
+        })
+        .catch((error) => {
+            logging.error(error);
+        });
+};
+
+const createDefaultDataForExistingUsers = async (req: Request, res: Response, next: NextFunction) => {
+    logging.info('Attempting to create default data for existing users...');
+
+    try {
+        const existingUsers = await User.find({});
+
+        for (const user of existingUsers) {
+            const userId = user._id.toString();
+
+            await createDefaultData(userId);
+        }
+
+        logging.info('Success! Default data for existing users is created!');
+        return res.status(201).json({ message: 'Success! Default data for existing users is created!' });
+    } catch (error) {
+        logging.error(error);
+        return res.status(500).json({ error });
+    }
+};
+
 const create = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to register user...');
 
@@ -40,7 +104,17 @@ const create = (req: Request, res: Response, next: NextFunction) => {
         .save()
         .then((newUser) => {
             logging.info(`New user ${uid} created...`);
-            return res.status(201).json({ user: newUser, fire_token });
+
+            const userId = newUserId.toString();
+
+            createDefaultData(userId)
+                .then(() => {
+                    return res.status(201).json({ user: newUser, fire_token });
+                })
+                .catch((error) => {
+                    logging.error(error);
+                    return res.status(500).json({ error });
+                });
         })
         .catch((error) => {
             logging.error(error);
@@ -79,7 +153,7 @@ const update = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const login = (req: Request, res: Response, next: NextFunction) => {
-    logging.info('Loggin in user...');
+    logging.info('Logging in user...');
 
     let { uid } = req.body;
     let fire_token = res.locals.fire_token;
@@ -139,9 +213,11 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
 
 export default {
     validate,
+    refreshToken,
     create,
     login,
     read,
     update,
-    readAll
+    readAll,
+    createDefaultDataForExistingUsers
 };

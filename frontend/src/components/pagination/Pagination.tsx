@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { MdArrowForwardIos } from 'react-icons/md';
 import ReactPaginate from 'react-paginate';
 import { useAppSelector } from '../../app/hooks';
@@ -40,7 +40,7 @@ const Pagination = ({ items }: PaginationProps) => {
                     onPageChange={handlePageClick}
                     pageRangeDisplayed={3}
                     pageCount={pageCount}
-                    containerClassName="sm:mb-10 mb-7 sm:pt-3 pt-1 flex gap-1 items-center justify-center text-xl list-none"
+                    containerClassName="sm:pt-3 pt-1 flex gap-1 items-center justify-center text-xl list-none"
                     pageLinkClassName="py-2 px-4 cursor-pointer rounded transition-all text-cyan-700 hover:bg-cyan-500 hover:text-white"
                     activeLinkClassName="bg-cyan-600 !text-white"
                     renderOnZeroPageCount={() => null}
@@ -50,4 +50,4 @@ const Pagination = ({ items }: PaginationProps) => {
     );
 };
 
-export default Pagination;
+export default memo(Pagination);

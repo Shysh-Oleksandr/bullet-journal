@@ -1,6 +1,7 @@
-import e, { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import logging from '../config/logging';
+import { CreateDefaultLabelPayload } from '../interfaces/customLabel';
 import CustomLabel from '../models/customLabel';
 
 const create = (req: Request, res: Response, next: NextFunction) => {
@@ -26,6 +27,27 @@ const create = (req: Request, res: Response, next: NextFunction) => {
             logging.error(error);
             return res.status(500).json({ error });
         });
+};
+
+const createDefaultLabel = (defaultLabel: CreateDefaultLabelPayload, user: string) => {
+    logging.info('Attempting to create a default customLabel...');
+
+    const customLabel = new CustomLabel({
+        _id: new mongoose.Types.ObjectId(),
+        ...defaultLabel,
+        user
+    });
+
+    customLabel
+        .save()
+        .then(() => {
+            logging.info(`New default custom label created...`);
+        })
+        .catch((error) => {
+            logging.error(error);
+        });
+
+    return customLabel._id;
 };
 
 const readAll = (req: Request, res: Response, next: NextFunction) => {
@@ -94,6 +116,7 @@ const deleteCustomLabel = (req: Request, res: Response, next: NextFunction) => {
 
 export default {
     create,
+    createDefaultLabel,
     readAll,
     update,
     deleteCustomLabel
