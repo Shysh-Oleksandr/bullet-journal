@@ -37,6 +37,7 @@ const NoteSchema = new mongoose_1.Schema({
     rating: { type: Number },
     isLocked: { type: Boolean },
     isStarred: { type: Boolean },
+    isDefault: { type: Boolean },
     id: { type: String, unique: true }
 });
 exports.default = mongoose_1.default.model('Note', NoteSchema);

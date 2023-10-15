@@ -32,7 +32,7 @@ const createDefaultLabel = (defaultLabel, user) => {
     const customLabel = new customLabel_1.default(Object.assign(Object.assign({ _id: new mongoose_1.default.Types.ObjectId() }, defaultLabel), { user }));
     customLabel
         .save()
-        .then((newCustomLabel) => {
+        .then(() => {
         logging_1.default.info(`New default custom label created...`);
     })
         .catch((error) => {

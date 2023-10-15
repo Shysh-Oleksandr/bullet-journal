@@ -36,7 +36,7 @@ function App() {
         return;
       }
 
-      return Validate(uid, fire_token, (error, user) => {
+      return Validate(uid, fire_token, (error, user, token) => {
         if (error) {
           logging.error(error);
           dispatch(logout());
@@ -44,7 +44,7 @@ function App() {
             setIsLoading(false);
           }, 100);
         } else if (user) {
-          dispatch(login({ user, fire_token }));
+          dispatch(login({ user, fire_token: token ?? fire_token }));
 
           setTimeout(() => {
             setIsLoading(false);

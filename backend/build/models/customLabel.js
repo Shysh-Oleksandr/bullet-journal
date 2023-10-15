@@ -28,6 +28,7 @@ const CustomLabelSchema = new mongoose_1.Schema({
     labelName: { type: String },
     color: { type: String },
     isCategoryLabel: { type: Boolean },
+    isDefault: { type: Boolean },
     user: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User' }
 });
 exports.default = mongoose_1.default.model('CustomLabel', CustomLabelSchema);

@@ -18,36 +18,40 @@ interface FilterBarProps {
 }
 
 const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
+  const dispatch = useAppDispatch();
+
   const { user } = useAppSelector((store) => store.user);
-  const [customLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${user._id}`, 'customLabels');
-  const allTypes = customLabels.filter((label) => !label.isCategoryLabel);
-  const allCategories = customLabels.filter((label) => label.isCategoryLabel);
   const { oldestNoteDate } = useAppSelector((store) => store.journal);
   const { isFilterBarShown } = useAppSelector((store) => store.journal);
-  const dispatch = useAppDispatch();
-  const [wasReset, setWasReset] = useState(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortType, setSortType] = useState<SortOptions>(SortOptions.NEWEST);
-  const [startDate, setStartDate] = useState<number>(oldestNoteDate);
 
-  const [endDate, setEndDate] = useState<number>(new Date().getTime());
-  const [type, setType] = useState<string[]>(allTypes.map((label) => label.labelName));
-  const [category, setCategory] = useState<string[]>(allCategories.map((label) => label.labelName));
-  const [showAnyCategory, setShowAnyCategory] = useState<boolean>(true);
-  const [showAnyType, setShowAnyType] = useState<boolean>(true);
-  const [importanceMin, setImportanceMin] = useState<number>(1);
-  const [importanceMax, setImportanceMax] = useState<number>(10);
+  const [customLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${user._id}`, 'customLabels');
+
+  const [allTypes, setAllTypes] = useState(customLabels.filter((label) => !label.isCategoryLabel));
+  const [allCategories, setAllCategories] = useState(customLabels.filter((label) => label.isCategoryLabel));
+
+  const [wasReset, setWasReset] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortType, setSortType] = useState(SortOptions.NEWEST);
+  const [startDate, setStartDate] = useState(oldestNoteDate);
+
+  const [endDate, setEndDate] = useState(new Date().getTime());
+  const [type, setType] = useState(allTypes.map((label) => label.labelName));
+  const [category, setCategory] = useState(allCategories.map((label) => label.labelName));
+  const [showAnyCategory, setShowAnyCategory] = useState(true);
+  const [showAnyType, setShowAnyType] = useState(true);
+  const [importanceMin, setImportanceMin] = useState(1);
+  const [importanceMax, setImportanceMax] = useState(10);
 
   const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showAnyCategory, wasReset, oldestNoteDate, showAnyType, allTypes, allCategories };
   const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportanceMin, setImportanceMax, setShowAnyCategory, setShowAnyType };
-  const debouncedSearchTerm: string = useDebounce(searchQuery, 500);
+  const debouncedSearchTerm = useDebounce(searchQuery, 500);
   const debouncedSortType = useDebounce(sortType, 500);
   const debouncedStartDate = useDebounce(startDate, 500);
   const debouncedEndDate = useDebounce(endDate, 500);
   const debouncedShowAnyCategory = useDebounce(showAnyCategory, 500);
   const debouncedShowAnyType = useDebounce(showAnyType, 500);
-  const debouncedType: string[] = useDebounce(type, 500);
-  const debouncedCategory: string[] = useDebounce(category, 500);
+  const debouncedType = useDebounce(type, 500);
+  const debouncedCategory = useDebounce(category, 500);
   const debouncedImportanceMin = useDebounce(importanceMin, 500);
   const debouncedImportanceMax = useDebounce(importanceMax, 500);
 
@@ -140,19 +144,28 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     setStartDate(oldestNoteDate);
   }, [oldestNoteDate]);
 
-  // Choosing new added type.
   useEffect(() => {
-    if (!type.includes(allTypes.map((label) => label.labelName).at(-1) || '')) {
-      setType((prev) => [...prev, allTypes.map((label) => label.labelName).at(-1) || '']);
-    }
-  }, [user.customNoteTypes]);
+    console.log('customLabels.length:', customLabels.length);
+    if (customLabels.length === 0) return;
 
-  // Choosing new added category.
-  useEffect(() => {
-    if (!category.includes(allCategories.map((label) => label.labelName).at(-1) || '')) {
-      setCategory((prev) => [...prev, allCategories.map((label) => label.labelName).at(-1) || '']);
-    }
-  }, [user.customNoteCategories]);
+    setAllTypes(customLabels.filter((label) => !label.isCategoryLabel))
+    setAllCategories(customLabels.filter((label) => label.isCategoryLabel))
+  }, [customLabels]);
+
+
+  // // Choosing new added type.
+  // useEffect(() => {
+  //   if (!type.includes(allTypes.map((label) => label.labelName).at(-1) || '')) {
+  //     setType((prev) => [...prev, allTypes.map((label) => label.labelName).at(-1) || '']);
+  //   }
+  // }, [user.customNoteTypes]);
+
+  // // Choosing new added category.
+  // useEffect(() => {
+  //   if (!category.includes(allCategories.map((label) => label.labelName).at(-1) || '')) {
+  //     setCategory((prev) => [...prev, allCategories.map((label) => label.labelName).at(-1) || '']);
+  //   }
+  // }, [user.customNoteCategories]);
 
   return (
     <div

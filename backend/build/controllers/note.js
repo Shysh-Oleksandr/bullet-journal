@@ -15,19 +15,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const logging_1 = __importDefault(require("../config/logging"));
 const note_1 = __importDefault(require("../models/note"));
+const security_1 = require("../utils/security");
 const create = (req, res, next) => {
     logging_1.default.info('Attempting to register note...');
     let { title, author, startDate, endDate, content, color, image, type, category, rating } = req.body;
+    const obfTitle = (0, security_1.obfuscateText)(title);
+    const obfContent = (0, security_1.obfuscateText)(content);
     const note = new note_1.default({
         _id: new mongoose_1.default.Types.ObjectId(),
-        title,
+        title: obfTitle,
         author,
         startDate,
         endDate,
-        content,
+        content: obfContent,
         color,
         image,
-        type,
+        type: type !== null && type !== void 0 ? type : null,
         category,
         rating
     });
@@ -42,12 +45,17 @@ const create = (req, res, next) => {
         return res.status(500).json({ error });
     });
 };
-// Note: it's not to pass just the id of a User or CustomLabel object in order to create a note
+// Note: it's enough to pass just the id of a User or CustomLabel objects in order to create a note
 const createDefaultNote = (noteData, author, type, category) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     logging_1.default.info('Attempting to create a default note...');
     const note = new note_1.default(Object.assign(Object.assign({ _id: new mongoose_1.default.Types.ObjectId() }, noteData), { author,
         type,
         category }));
+    const obfTitle = (0, security_1.obfuscateText)(note.title);
+    const obfContent = (0, security_1.obfuscateText)((_a = note.content) !== null && _a !== void 0 ? _a : '');
+    obfTitle && note.set({ title: obfTitle });
+    obfContent && note.set({ content: obfContent });
     note.save()
         .then(() => {
         logging_1.default.info(`New default note created...`);
@@ -63,7 +71,12 @@ const read = (req, res, next) => {
         .populate('type')
         .populate('category')
         .then((note) => {
+        var _a;
         if (note) {
+            const deobfTitle = (0, security_1.deobfuscateText)(note.title);
+            const deobfContent = (0, security_1.deobfuscateText)((_a = note.content) !== null && _a !== void 0 ? _a : '');
+            deobfTitle && note.set({ title: deobfTitle });
+            deobfContent && note.set({ content: deobfContent });
             return res.status(200).json({ note });
         }
         else {
@@ -83,6 +96,13 @@ const readAll = (req, res, next) => {
         .populate('category')
         .exec()
         .then((notes) => {
+        notes.forEach((note) => {
+            var _a;
+            const deobfTitle = (0, security_1.deobfuscateText)(note.title);
+            const deobfContent = (0, security_1.deobfuscateText)((_a = note.content) !== null && _a !== void 0 ? _a : '');
+            deobfTitle && note.set({ title: deobfTitle });
+            deobfContent && note.set({ content: deobfContent });
+        });
         return res.status(200).json({
             count: notes.length,
             notes
@@ -103,6 +123,13 @@ const query = (req, res, next) => {
         .populate('category')
         .exec()
         .then((notes) => {
+        notes.forEach((note) => {
+            var _a;
+            const deobfTitle = (0, security_1.deobfuscateText)(note.title);
+            const deobfContent = (0, security_1.deobfuscateText)((_a = note.content) !== null && _a !== void 0 ? _a : '');
+            deobfTitle && note.set({ title: deobfTitle });
+            deobfContent && note.set({ content: deobfContent });
+        });
         return res.status(200).json({
             count: notes.length,
             notes
@@ -119,8 +146,15 @@ const update = (req, res, next) => {
     return note_1.default.findById(_id)
         .exec()
         .then((note) => {
+        var _a, _b;
         if (note) {
+            const title = (_a = req.body) === null || _a === void 0 ? void 0 : _a.title;
+            const content = (_b = req.body) === null || _b === void 0 ? void 0 : _b.content;
+            const obfTitle = (0, security_1.obfuscateText)(title);
+            const obfContent = (0, security_1.obfuscateText)(content);
             note.set(req.body);
+            obfTitle && note.set({ title: obfTitle });
+            obfContent && note.set({ content: obfContent });
             note.save()
                 .then((newNote) => {
                 logging_1.default.info(`Note updated...`);
@@ -159,5 +193,5 @@ exports.default = {
     readAll,
     query,
     update,
-    deleteNote
+    deleteNote,
 };

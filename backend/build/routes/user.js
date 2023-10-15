@@ -10,6 +10,8 @@ router.get('/validate', extractFirebaseInfo_1.default, user_1.default.validate);
 router.get('/read/:userID', user_1.default.read);
 router.post('/create', extractFirebaseInfo_1.default, user_1.default.create);
 router.post('/login', extractFirebaseInfo_1.default, user_1.default.login);
+router.post('/refresh-token', user_1.default.refreshToken);
 router.patch('/update/:userID', user_1.default.update);
 router.get('/', user_1.default.readAll);
+router.post('/create-default-data', user_1.default.createDefaultDataForExistingUsers);
 module.exports = router;

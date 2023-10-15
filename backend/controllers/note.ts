@@ -3,19 +3,23 @@ import mongoose from 'mongoose';
 import logging from '../config/logging';
 import { CreateDefaultNotePayload } from '../interfaces/note';
 import Note from '../models/note';
+import { obfuscateText, deobfuscateText } from '../utils/security';
 
 const create = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to register note...');
 
     let { title, author, startDate, endDate, content, color, image, type, category, rating } = req.body;
 
+    const obfTitle = obfuscateText(title);
+    const obfContent = obfuscateText(content);
+
     const note = new Note({
         _id: new mongoose.Types.ObjectId(),
-        title,
+        title: obfTitle,
         author,
         startDate,
         endDate,
-        content,
+        content: obfContent,
         color,
         image,
         type: type ?? null,
@@ -47,6 +51,12 @@ const createDefaultNote = async (noteData: CreateDefaultNotePayload, author: str
         category
     });
 
+    const obfTitle = obfuscateText(note.title);
+    const obfContent = obfuscateText(note.content ?? '');
+
+    obfTitle && note.set({ title: obfTitle });
+    obfContent && note.set({ content: obfContent });
+
     note.save()
         .then(() => {
             logging.info(`New default note created...`);
@@ -66,6 +76,11 @@ const read = (req: Request, res: Response, next: NextFunction) => {
         .populate('category')
         .then((note) => {
             if (note) {
+                const deobfTitle = deobfuscateText(note.title);
+                const deobfContent = deobfuscateText(note.content ?? '');
+
+                deobfTitle && note.set({ title: deobfTitle });
+                deobfContent && note.set({ content: deobfContent });
                 return res.status(200).json({ note });
             } else {
                 return res.status(404).json({ message: 'note not found' });
@@ -87,6 +102,14 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
         .populate('category')
         .exec()
         .then((notes) => {
+            notes.forEach((note) => {
+                const deobfTitle = deobfuscateText(note.title);
+                const deobfContent = deobfuscateText(note.content ?? '');
+
+                deobfTitle && note.set({ title: deobfTitle });
+                deobfContent && note.set({ content: deobfContent });
+            });
+
             return res.status(200).json({
                 count: notes.length,
                 notes
@@ -110,6 +133,14 @@ const query = (req: Request, res: Response, next: NextFunction) => {
         .populate('category')
         .exec()
         .then((notes) => {
+            notes.forEach((note) => {
+                const deobfTitle = deobfuscateText(note.title);
+                const deobfContent = deobfuscateText(note.content ?? '');
+
+                deobfTitle && note.set({ title: deobfTitle });
+                deobfContent && note.set({ content: deobfContent });
+            });
+
             return res.status(200).json({
                 count: notes.length,
                 notes
@@ -130,7 +161,16 @@ const update = (req: Request, res: Response, next: NextFunction) => {
         .exec()
         .then((note) => {
             if (note) {
+                const title = req.body?.title;
+                const content = req.body?.content;
+
+                const obfTitle = obfuscateText(title);
+                const obfContent = obfuscateText(content);
+
                 note.set(req.body);
+
+                obfTitle && note.set({ title: obfTitle });
+                obfContent && note.set({ content: obfContent });
 
                 note.save()
                     .then((newNote) => {
@@ -173,5 +213,5 @@ export default {
     readAll,
     query,
     update,
-    deleteNote
+    deleteNote,
 };

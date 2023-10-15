@@ -18,10 +18,11 @@ exports.DEFAULT_NOTES = [
         So, here's to new beginnings and endless possibilities. Welcome to your journal, where every page holds the promise of self-discovery, growth, and a deeper connection with yourself.
         
         Happy journaling! 🌟📝`,
-        color: "#0891b2",
+        color: '#0891b2',
         rating: 5,
         isEndNote: false,
         isLocked: true,
-        isStarred: true
+        isStarred: true,
+        isDefault: true
     }
 ];

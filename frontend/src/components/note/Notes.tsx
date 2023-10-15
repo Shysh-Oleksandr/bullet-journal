@@ -45,7 +45,7 @@ const Notes = ({ notes }: NotesProps) => {
                 <NoteForm showFullAddForm={showFullAddForm} setShowFullAddForm={setShowFullAddForm} isShort />
             </div>
             {loading ? (
-                <Loading scaleSize={2} className="mt-20" />
+                <Loading scaleSize={2} className="my-20" />
             ) : (
                 notes.map((note, index) => {
                     return <NotePreview note={note} key={`${note._id}${note.isEndNote && 'endNote'}`} previousNoteStartDate={index === 0 ? null : notes[index - 1].startDate} />;

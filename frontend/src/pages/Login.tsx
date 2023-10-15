@@ -82,7 +82,7 @@ const LoginPage = () => {
               providerName="Github"
             />
             <InfoMessage message={error} isError={true} />
-            {authenticating && <Loading />}
+            {authenticating && <Loading scaleSize={1.2} innerClassName='!pt-12 !pb-10'/>}
           </div>
         </div>
       </div>

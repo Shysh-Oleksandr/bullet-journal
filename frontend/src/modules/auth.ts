@@ -36,7 +36,7 @@ export const Authenticate = async (uid: string, fire_token: string, callback: (e
     }
 };
 
-export const Validate = async (uid: string, fire_token: string, callback: (error: string | null, user: IUser | null) => void, shouldRefreshIfNeeded = true) => {
+export const Validate = async (uid: string, fire_token: string, callback: (error: string | null, user: IUser | null, token?: string) => void, shouldRefreshIfNeeded = true) => {
     try {
         const response = await axios({
             method: 'GET',
@@ -46,7 +46,7 @@ export const Validate = async (uid: string, fire_token: string, callback: (error
 
         if (response.status === 200 || response.status === 304) {
             logging.info('Successfully validated.');
-            callback(null, response.data.user);
+            callback(null, response.data.user, fire_token);
         }
     } catch (error) {
         if (!shouldRefreshIfNeeded) {
