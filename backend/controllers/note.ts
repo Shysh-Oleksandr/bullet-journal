@@ -8,7 +8,7 @@ import { obfuscateText, deobfuscateText } from '../utils/security';
 const create = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to register note...');
 
-    let { title, author, startDate, endDate, content, color, image, type, category, rating } = req.body;
+    let { title, author, startDate, endDate, content, color, image, type, category, rating, isStarred } = req.body;
 
     const obfTitle = obfuscateText(title);
     const obfContent = obfuscateText(content);
@@ -24,7 +24,8 @@ const create = (req: Request, res: Response, next: NextFunction) => {
         image,
         type: type ?? null,
         category,
-        rating
+        rating,
+        isStarred
     });
 
     return note

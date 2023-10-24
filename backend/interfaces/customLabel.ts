@@ -6,6 +6,8 @@ export default interface ICustomLabel extends Document {
     isCategoryLabel: boolean;
     isDefault?: boolean;
     user: IUser;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export type CreateDefaultLabelPayload = Pick<ICustomLabel, 'labelName' | 'color' | 'isCategoryLabel' | 'isDefault'>;

@@ -189,7 +189,7 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
             <li
               className={`relative block whitespace-nowrap overflow-hidden text-ellipsis px-8 py-2 text-lg tracking-wide transition-all cursor-pointer ${label?._id === customLabel._id ? '!bg-cyan-500 font-semibold' : ''
                 } hover:bg-cyan-700`}
-              key={customLabel.labelName}
+              key={customLabel._id}
               onClick={() => chooseLabel(customLabel)}
             >
               {customLabel.labelName}

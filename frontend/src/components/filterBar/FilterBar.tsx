@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import { useAppSelector } from '../../app/hooks';
 import config from '../../config/config';
@@ -26,8 +26,10 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
 
   const [customLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${user._id}`, 'customLabels');
 
-  const [allTypes, setAllTypes] = useState(customLabels.filter((label) => !label.isCategoryLabel));
-  const [allCategories, setAllCategories] = useState(customLabels.filter((label) => label.isCategoryLabel));
+  const { allTypes, allCategories } = useMemo(() => ({
+    allTypes: customLabels.filter((label) => !label.isCategoryLabel),
+    allCategories: customLabels.filter((label) => label.isCategoryLabel),
+  }), [customLabels])
 
   const [wasReset, setWasReset] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -144,28 +146,19 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     setStartDate(oldestNoteDate);
   }, [oldestNoteDate]);
 
+  // Choosing new added type.
   useEffect(() => {
-    console.log('customLabels.length:', customLabels.length);
-    if (customLabels.length === 0) return;
+    if (!type.includes(allTypes.map((label) => label.labelName).at(-1) || '')) {
+      setType((prev) => [...prev, allTypes.map((label) => label.labelName).at(-1) || '']);
+    }
+  }, [user.customNoteTypes]);
 
-    setAllTypes(customLabels.filter((label) => !label.isCategoryLabel))
-    setAllCategories(customLabels.filter((label) => label.isCategoryLabel))
-  }, [customLabels]);
-
-
-  // // Choosing new added type.
-  // useEffect(() => {
-  //   if (!type.includes(allTypes.map((label) => label.labelName).at(-1) || '')) {
-  //     setType((prev) => [...prev, allTypes.map((label) => label.labelName).at(-1) || '']);
-  //   }
-  // }, [user.customNoteTypes]);
-
-  // // Choosing new added category.
-  // useEffect(() => {
-  //   if (!category.includes(allCategories.map((label) => label.labelName).at(-1) || '')) {
-  //     setCategory((prev) => [...prev, allCategories.map((label) => label.labelName).at(-1) || '']);
-  //   }
-  // }, [user.customNoteCategories]);
+  // Choosing new added category.
+  useEffect(() => {
+    if (!category.includes(allCategories.map((label) => label.labelName).at(-1) || '')) {
+      setCategory((prev) => [...prev, allCategories.map((label) => label.labelName).at(-1) || '']);
+    }
+  }, [user.customNoteCategories]);
 
   return (
     <div
