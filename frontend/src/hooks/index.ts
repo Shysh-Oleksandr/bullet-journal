@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useEffect, useLayoutEffect, useState } from 'react';
+import logging from '../config/logging';
 
 export function useDebounce(value: any, delay: number) {
     const [debouncedValue, setDebouncedValue] = useState(value);
@@ -74,10 +75,10 @@ export function useFetchData<T>(method: string = 'GET', url: string, name: strin
 
                 setItems(data);
             } else {
-                console.log("Can't get items");
+                logging.info("Can't get items");
             }
         } catch (error) {
-            console.log('Catch: ' + error);
+            logging.info('Catch: ' + error);
         } finally {
             setLoading(false);
         }

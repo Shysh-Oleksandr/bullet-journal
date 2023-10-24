@@ -57,9 +57,15 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
 
     return CustomLabel.find({ user: author_id })
         .then((customLabels) => {
+          const sortedCustomLabels = customLabels.slice().sort((a, b) => {
+            if(!a.createdAt || !b.createdAt) return 1;
+
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          })
+
             return res.status(200).json({
                 count: customLabels.length,
-                customLabels
+                customLabels: sortedCustomLabels
             });
         })
         .catch((error) => {

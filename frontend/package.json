@@ -15,6 +15,7 @@
     "@types/react-paginate": "^7.1.1",
     "@types/react-textarea-autosize": "^8.0.0",
     "axios": "^0.27.2",
+    "date-fns": "^2.30.0",
     "dompurify": "^2.3.8",
     "draft-js": "^0.11.7",
     "draftjs-to-html": "^0.9.1",

@@ -17,7 +17,7 @@ const HomePage = () => {
             <div style={{ marginLeft: isSidebarShown && width > 1024 ? (sidebarRef.current ? sidebarRef.current.offsetWidth : 336) : 0 }} className="transition-all duration-500 ease-in-out md:pb-12 pb-8">
                 <div ref={topRef} className="top"></div>
                 <Navbar topRef={topRef} />
-                <Pagination items={notes} />
+                <Pagination items={notes} topRef={topRef} />
             </div>
         </div>
     );
