@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from './app/hooks';
 import AuthRoute from './components/auth/AuthRoute';
 import Alert from './components/UI/Alert';
 import Loading from './components/UI/Loading';
@@ -8,6 +7,7 @@ import logging from './config/logging';
 import routes from './config/routes';
 import { login, logout } from './features/user/userSlice';
 import { Validate } from './modules/auth';
+import { useAppDispatch, useAppSelector } from './store/helpers/storeHooks';
 
 function App() {
   const dispatch = useAppDispatch();

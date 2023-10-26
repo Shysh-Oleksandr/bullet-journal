@@ -1,9 +1,9 @@
 import { memo, useEffect, useState } from 'react';
 import { MdArrowForwardIos } from 'react-icons/md';
 import ReactPaginate from 'react-paginate';
-import { useAppSelector } from '../../app/hooks';
 import INote from '../../interfaces/note';
 import Notes from '../note/Notes';
+import { useAppSelector } from '../../store/helpers/storeHooks';
 
 interface PaginationProps {
   items: INote[];

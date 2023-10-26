@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BiError } from 'react-icons/bi';
 import { IoIosCheckmarkCircle } from 'react-icons/io';
 import { setError, setSuccess } from '../../features/journal/journalSlice';
-import { useAppDispatch } from './../../app/hooks';
+import { useAppDispatch } from '../../store/helpers/storeHooks';
 
 interface AlertProps {
     message: string;

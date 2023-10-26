@@ -4,8 +4,12 @@ import INote from '../../interfaces/note';
 import config from './../../config/config';
 import IUser from './../../interfaces/user';
 import { dateDiffInDays } from './../../utils/functions';
+import { logout } from '../user/userSlice';
+import { RootState } from '../../store/store';
 
-export interface IJournalState {
+export const STATE_KEY = 'journal';
+
+interface JournalState {
     notes: INote[];
     loading: boolean;
     isSidebarShown?: boolean;
@@ -15,7 +19,7 @@ export interface IJournalState {
     oldestNoteDate: number;
 }
 
-const initialState: IJournalState = {
+const initialState: JournalState = {
     notes: [],
     loading: true,
     isSidebarShown: (document.documentElement.clientWidth > 1023 && localStorage.getItem('isSidebarShown') === 'true') || false,
@@ -62,7 +66,7 @@ export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', asy
 });
 
 export const journalSlice = createSlice({
-    name: 'journal',
+    name: STATE_KEY,
     initialState,
     // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
@@ -98,9 +102,15 @@ export const journalSlice = createSlice({
             state.loading = false;
             state.error = 'Unable to retreive notes.';
         });
+        builder.addMatcher(logout.match, () => ({
+            ...initialState
+        }));
     }
 });
 
 export const { setNotes, setError, setSuccess, setShowFilterBar, setShowSidebar } = journalSlice.actions;
 
 export default journalSlice.reducer;
+
+// Selectors
+export const getNotes = (state: RootState): INote[] => state[STATE_KEY].notes;

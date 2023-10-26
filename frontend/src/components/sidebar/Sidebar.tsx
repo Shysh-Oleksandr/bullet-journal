@@ -2,13 +2,12 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { BsPlusLg, BsStarFill } from 'react-icons/bs';
 import { IoMdMenu } from 'react-icons/io';
 import { Link } from 'react-router-dom';
-import { useAppSelector } from '../../app/hooks';
 import { fetchAllNotes, setShowSidebar } from '../../features/journal/journalSlice';
 import { useDebounce, useOnClickOutside, useWindowSize } from '../../hooks';
 import FilterSearchInput from '../filterBar/FilterSearchInput';
-import { useAppDispatch } from './../../app/hooks';
 import NoteSidebarPreview from './NoteSidebarPreview';
 import INote from './../../interfaces/note';
+import { useAppDispatch, useAppSelector } from '../../store/helpers/storeHooks';
 
 interface SidebarProps {
   sidebarRef: React.MutableRefObject<HTMLDivElement>;

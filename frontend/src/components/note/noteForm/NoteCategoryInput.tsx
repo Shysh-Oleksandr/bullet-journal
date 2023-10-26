@@ -3,12 +3,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
 import { IoIosColorPalette } from 'react-icons/io';
-import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import config from '../../../config/config';
 import { setError, setSuccess } from '../../../features/journal/journalSlice';
 import { useFetchData } from '../../../hooks';
 import ICustomLabel from '../../../interfaces/customLabel';
 import { getCategoriesLabelName, getRandomColor } from '../../../utils/functions';
+import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
 
 interface NoteLabelInputProps {
   setLabel: React.Dispatch<React.SetStateAction<ICustomLabel[]>>;
@@ -33,6 +33,7 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
   const [color, setColor] = useState<string>(getRandomColor());
   const labelName = 'category';
   const dispatch = useAppDispatch();
+  
   let addedLabel = '';
 
   useEffect(() => {
@@ -67,7 +68,7 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
     setPreviousLabel(getCategoriesLabelName(label));
     setInputLabel('');
   };
-  
+
   const onBlur = () => {
     setFocused(false);
     const labelInputText = labelInputRef.current?.value;

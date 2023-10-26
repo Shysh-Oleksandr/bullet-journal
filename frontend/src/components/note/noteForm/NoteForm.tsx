@@ -10,7 +10,6 @@ import { MdDelete } from 'react-icons/md';
 import { RiSave3Fill } from 'react-icons/ri';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import TextareaAutosize from 'react-textarea-autosize';
-import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import config from '../../../config/config';
 import logging from '../../../config/logging';
 import { fetchAllNotes, setError, setSuccess } from '../../../features/journal/journalSlice';
@@ -30,6 +29,7 @@ import NoteSavingIndicator from './NoteSavingIndicator';
 import NoteTypeInput from './NoteTypeInput';
 import OtherNotes from './OtherNotes';
 import SaveButton from './SaveButton';
+import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
 
 interface NoteFormProps {
   isShort?: boolean;
@@ -38,26 +38,26 @@ interface NoteFormProps {
 }
 
 const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProps) => {
-  const [_id, setId] = useState<string>('');
-  const [title, setTitle] = useState<string>('');
-  const [startDate, setStartDate] = useState<number>(new Date().getTime());
-  const [endDate, setEndDate] = useState<number>(new Date().getTime());
-  const [content, setContent] = useState<string>('');
-  const [image, setImage] = useState<string>('');
-  const [color, setColor] = useState<string>('#04a9c6');
-  const [rating, setRating] = useState<number>(1);
+  const [_id, setId] = useState('');
+  const [title, setTitle] = useState('');
+  const [startDate, setStartDate] = useState(new Date().getTime());
+  const [endDate, setEndDate] = useState(new Date().getTime());
+  const [content, setContent] = useState('');
+  const [image, setImage] = useState('');
+  const [color, setColor] = useState('#04a9c6');
+  const [rating, setRating] = useState(1);
   const [type, setType] = useState<ICustomLabel | null>(null);
   const [category, setCategory] = useState<ICustomLabel[]>([]);
-  const [isLocked, setIsLocked] = useState<boolean>(false);
-  const [isStarred, setIsStarred] = useState<boolean>(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [isStarred, setIsStarred] = useState(false);
   const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
   const [prevNote, setPrevNote] = useState<INote | null>(null);
   const [nextNote, setNextNote] = useState<INote | null>(null);
 
-  const [modal, setModal] = useState<boolean>(false);
-  const [saving, setSaving] = useState<boolean>(false);
-  const [deleting, setDeleting] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [modal, setModal] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [words, setWords] = useState(0);
 
   const { user } = useAppSelector((store) => store.user);

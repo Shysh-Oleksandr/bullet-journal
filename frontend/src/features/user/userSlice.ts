@@ -1,22 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import IUser, { DEFAULT_FIRE_TOKEN, DEFAULT_USER } from '../../interfaces/user';
 
-export interface IUserState {
+export const STATE_KEY = 'user';
+
+interface UserState {
     user: IUser;
     fire_token: string;
 }
 
-export const initialState: IUserState = {
+const initialState: UserState = {
     user: DEFAULT_USER,
     fire_token: DEFAULT_FIRE_TOKEN
 };
 
-export const userSlice = createSlice({
-    name: 'user',
+const userSlice = createSlice({
+    name: STATE_KEY,
     initialState,
-    // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-        login: (_, { payload }: PayloadAction<IUserState>) => {
+        login: (_, { payload }: PayloadAction<UserState>) => {
             let user = payload.user;
             let fire_token = payload.fire_token;
 

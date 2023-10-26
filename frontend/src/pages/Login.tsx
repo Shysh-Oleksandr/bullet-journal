@@ -2,7 +2,6 @@ import firebase from 'firebase/compat/app';
 import React, { useState } from 'react';
 import { BsGithub, BsGoogle } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../app/hooks';
 import CenterPiece from '../components/auth/CenterPiece';
 import LoginBtn from '../components/auth/LoginBtn';
 import InfoMessage from '../components/UI/InfoMessage';
@@ -11,10 +10,11 @@ import { Providers } from '../config/firebase';
 import logging from '../config/logging';
 import { login } from '../features/user/userSlice';
 import { Authenticate, SignInWithSocialMedia as SocialMediaPopup } from '../modules/auth';
+import { useAppDispatch } from '../store/helpers/storeHooks';
 
 const LoginPage = () => {
-  const [authenticating, setAuthenticating] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [authenticating, setAuthenticating] = useState(false);
+  const [error, setError] = useState('');
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -82,7 +82,7 @@ const LoginPage = () => {
               providerName="Github"
             />
             <InfoMessage message={error} isError={true} />
-            {authenticating && <Loading scaleSize={1.2} innerClassName='!pt-12 !pb-10'/>}
+            {authenticating && <Loading scaleSize={1.2} innerClassName='!pt-12 !pb-10' />}
           </div>
         </div>
       </div>

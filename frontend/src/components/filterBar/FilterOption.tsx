@@ -1,8 +1,7 @@
 import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { BsDashLg } from 'react-icons/bs';
 import { IoIosArrowDown } from 'react-icons/io';
-import { useAppSelector } from '../../app/hooks';
-import { useFetchData, useOnClickOutside } from '../../hooks';
+import { useOnClickOutside } from '../../hooks';
 import { FilterOptions, getDateOptions, IFilterOption, importanceFilterOptions, SortOptions, sortOptions } from './../../utils/data';
 import FilterModal from './FilterModal';
 import FilterModalOption from './FilterModalOption';
@@ -52,7 +51,6 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
     const importanceDashRef = useRef() as MutableRefObject<HTMLDivElement>;
     const sortingRef = useRef() as MutableRefObject<HTMLDivElement>;
     useOnClickOutside(modalRef, () => setIsModalOpened(false));
-    const { user } = useAppSelector((store) => store.user);
 
     useEffect(() => {
         setOptionsChosen(undefined);

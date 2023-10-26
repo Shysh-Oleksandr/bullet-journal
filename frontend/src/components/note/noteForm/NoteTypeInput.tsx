@@ -3,12 +3,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
 import { IoIosColorPalette } from 'react-icons/io';
-import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import config from '../../../config/config';
 import { setError, setSuccess } from '../../../features/journal/journalSlice';
 import { useFetchData } from '../../../hooks';
 import ICustomLabel from '../../../interfaces/customLabel';
 import { getRandomColor } from './../../../utils/functions';
+import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
 
 interface NoteLabelInputProps {
   setLabel: React.Dispatch<React.SetStateAction<ICustomLabel | null>>;

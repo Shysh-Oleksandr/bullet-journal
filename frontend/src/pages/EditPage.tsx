@@ -1,9 +1,9 @@
 import React, { MutableRefObject, useRef } from 'react';
-import { useAppSelector } from '../app/hooks';
 import Navbar from '../components/Navbar';
 import NoteForm from '../components/note/noteForm/NoteForm';
 import Sidebar from '../components/sidebar/Sidebar';
 import { useWindowSize } from '../hooks';
+import { useAppSelector } from '../store/helpers/storeHooks';
 
 const EditPage = () => {
     const sidebarRef = useRef() as MutableRefObject<HTMLDivElement>;
