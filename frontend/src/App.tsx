@@ -5,54 +5,56 @@ import Alert from './components/UI/Alert';
 import Loading from './components/UI/Loading';
 import logging from './config/logging';
 import routes from './config/routes';
-import { login, logout } from './features/user/userSlice';
-import { Validate } from './modules/auth';
+import { getIsAuthenticated, logout } from './features/user/userSlice';
 import { useAppDispatch, useAppSelector } from './store/helpers/storeHooks';
+import { authApi } from './features/user/userApi';
 
 function App() {
+  const [validateToken] = authApi.useLazyValidateTokenQuery();
+
   const dispatch = useAppDispatch();
 
   const { error, success } = useAppSelector((store) => store.journal);
-  const isAuthenticated = useAppSelector((store) => store.user.user._id) !== '';
+  const isAuthenticated = useAppSelector(getIsAuthenticated);
 
   const [isLoading, setIsLoading] = useState(true);
 
   /**
    * Check to see if we have a token.
+   * If not, we are logged out initially,
    * If we do, verify it with the backend.
-   * If not, we are logged out initially.
    */
   const checkLocalStorageForCredentials = useCallback(
-    () => {
+    async () => {
       const fire_token = localStorage.getItem('fire_token');
       const uid = localStorage.getItem('uid');
 
-      if (!fire_token || !uid) {
+      const triggerLogout = () => {
         dispatch(logout());
         setTimeout(() => {
           setIsLoading(false);
         }, 100);
+      }
+
+      if (!fire_token || !uid) {
+        triggerLogout()
 
         return;
       }
 
-      return Validate(uid, fire_token, (error, user, token) => {
-        if (error) {
-          logging.error(error);
-          dispatch(logout());
-          setTimeout(() => {
-            setIsLoading(false);
-          }, 100);
-        } else if (user) {
-          dispatch(login({ user, fire_token: token ?? fire_token }));
+      try {
+        const validateResponse = await validateToken({ fire_token, uid })
 
-          setTimeout(() => {
-            setIsLoading(false);
-          }, 100);
+        if (!validateResponse.data?.user) {
+          triggerLogout();
         }
-      });
+
+      } catch (error) {
+        logging.error(error);
+        triggerLogout();
+      }
     },
-    [dispatch],
+    [dispatch, validateToken],
   )
 
   useEffect(() => {

@@ -1,9 +1,9 @@
-import IUser from './user';
+import { User } from '../features/user/types';
 
 export default interface ICustomLabel {
     labelName: string;
     color: string;
     isCategoryLabel: boolean;
-    user: IUser;
+    user: User;
     _id: string;
 }

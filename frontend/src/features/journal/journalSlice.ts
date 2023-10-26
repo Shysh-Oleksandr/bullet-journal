@@ -2,10 +2,10 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import INote from '../../interfaces/note';
 import config from './../../config/config';
-import IUser from './../../interfaces/user';
 import { dateDiffInDays } from './../../utils/functions';
 import { logout } from '../user/userSlice';
 import { RootState } from '../../store/store';
+import { User } from '../user/types';
 
 export const STATE_KEY = 'journal';
 
@@ -30,7 +30,7 @@ const initialState: JournalState = {
 };
 
 export interface IFilterNotes {
-    user: IUser;
+    user: User;
     filter?: (notes: INote[]) => INote[];
     sort?: (notes: INote[]) => INote[];
 }

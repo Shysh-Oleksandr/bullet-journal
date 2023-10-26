@@ -9,7 +9,7 @@ const config = {
         measurementId: 'G-SGNH6PWV8L'
     },
     server: {
-        url: process.env.REACT_APP_API_URL ?? 'http://localhost:8001'
+        url: 'http://localhost:8001' ?? process.env.REACT_APP_API_URL ?? 'http://localhost:8001'
     }
 };
 

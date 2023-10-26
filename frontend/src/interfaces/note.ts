@@ -1,9 +1,9 @@
+import { User } from '../features/user/types';
 import ICustomLabel from './customLabel';
-import IUser from './user';
 
 export default interface INote {
     title: string;
-    author: string | IUser;
+    author: string | User;
     startDate: number;
     endDate: number;
     content?: string;
@@ -16,5 +16,4 @@ export default interface INote {
     isLocked?: boolean;
     isStarred?: boolean;
     _id: string;
-    // milestones: IMilestone[];
 }

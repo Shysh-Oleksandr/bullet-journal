@@ -5,9 +5,7 @@ import { INoteType } from './../interfaces/note';
 const UserSchema: Schema = new Schema(
     {
         uid: { type: String, unique: true },
-        name: { type: String },
-        customNoteTypes: { type: String },
-        customNoteCategories: { type: String }
+        name: { type: String }
     },
     {
         timestamps: true

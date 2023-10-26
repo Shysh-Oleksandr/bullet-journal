@@ -150,14 +150,14 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     if (!type.includes(allTypes.map((label) => label.labelName).at(-1) || '')) {
       setType((prev) => [...prev, allTypes.map((label) => label.labelName).at(-1) || '']);
     }
-  }, [user.customNoteTypes]);
+  }, []); // TODO: handle dependency correctly
 
   // Choosing new added category.
   useEffect(() => {
     if (!category.includes(allCategories.map((label) => label.labelName).at(-1) || '')) {
       setCategory((prev) => [...prev, allCategories.map((label) => label.labelName).at(-1) || '']);
     }
-  }, [user.customNoteCategories]);
+  }, []); // TODO: handle dependency correctly
 
   return (
     <div
