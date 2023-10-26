@@ -53,6 +53,9 @@ function App() {
         logging.error(error);
         triggerLogout();
       }
+      finally {
+        setIsLoading(false);
+      }
     },
     [dispatch, validateToken],
   )

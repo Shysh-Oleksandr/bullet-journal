@@ -10,6 +10,7 @@ import { getContentWords } from './../../utils/functions';
 import FilterOption from './FilterOption';
 import FilterSearchInput from './FilterSearchInput';
 import { useAppDispatch, useAppSelector } from '../../store/helpers/storeHooks';
+import { getUserData, getUserId } from '../../features/user/userSlice';
 
 interface FilterBarProps {
   filterBarRef: React.MutableRefObject<HTMLDivElement>;
@@ -19,11 +20,12 @@ interface FilterBarProps {
 const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
   const dispatch = useAppDispatch();
 
-  const { user } = useAppSelector((store) => store.user);
+  const user = useAppSelector(getUserData); // remove later
+  const userId = useAppSelector(getUserId);
   const { oldestNoteDate } = useAppSelector((store) => store.journal);
   const { isFilterBarShown } = useAppSelector((store) => store.journal);
 
-  const [customLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${user._id}`, 'customLabels');
+  const [customLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${userId ?? ''}`, 'customLabels');
 
   const { allTypes, allCategories } = useMemo(() => ({
     allTypes: customLabels.filter((label) => !label.isCategoryLabel),
@@ -127,6 +129,8 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
   };
 
   useEffect(() => {
+    if (!user) return;
+
     dispatch(fetchAllNotes({ user, filter, sort }));
   }, [
     debouncedSortType,

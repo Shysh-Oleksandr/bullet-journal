@@ -21,7 +21,7 @@ export const authApi = emptyAxiosApi.injectEndpoints({
                 query({ fire_token, uid }) {
                     return {
                         url: `/users/validate`,
-                        method: Method.GET,
+                        method: Method.POST,
                         body: {
                             uid
                         },

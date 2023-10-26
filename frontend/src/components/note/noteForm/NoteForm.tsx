@@ -30,6 +30,7 @@ import NoteTypeInput from './NoteTypeInput';
 import OtherNotes from './OtherNotes';
 import SaveButton from './SaveButton';
 import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
+import { getUserData, getUserId } from '../../../features/user/userSlice';
 
 interface NoteFormProps {
   isShort?: boolean;
@@ -60,7 +61,8 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
   const [isLoading, setIsLoading] = useState(true);
   const [words, setWords] = useState(0);
 
-  const { user } = useAppSelector((store) => store.user);
+  const user = useAppSelector(getUserData);
+  const userId = useAppSelector(getUserId) ?? '';
   const { notes, isSidebarShown } = useAppSelector((store) => store.journal);
 
   const params = useParams();
@@ -125,7 +127,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         });
 
         if (response.status === 200 || response.status === 304) {
-          if (user._id !== response.data.note.author) {
+          if (userId !== response.data.note.author) {
             logging.warn('This note is owned by someone else');
             setId('');
           } else {
@@ -159,7 +161,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         setIsLoading(false);
       }
     },
-    [dispatch, user._id],
+    [dispatch, userId],
   );
 
   const saveNote = async (method: string, url: string, isCreating: boolean, showMessage: boolean = true) => {
@@ -197,11 +199,11 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
           category: category.map(item => item._id),
           isLocked,
           isStarred,
-          author: user._id
+          author: userId
         }
       });
 
-      if (response.status === 201) {
+      if (response.status === 201 && user) {
         if (isShort) {
           dispatch(fetchAllNotes({ user }));
           resetState();

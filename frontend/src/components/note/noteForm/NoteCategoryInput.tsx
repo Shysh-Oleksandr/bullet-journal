@@ -9,6 +9,7 @@ import { useFetchData } from '../../../hooks';
 import ICustomLabel from '../../../interfaces/customLabel';
 import { getCategoriesLabelName, getRandomColor } from '../../../utils/functions';
 import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
+import { getUserId } from '../../../features/user/userSlice';
 
 interface NoteLabelInputProps {
   setLabel: React.Dispatch<React.SetStateAction<ICustomLabel[]>>;
@@ -18,9 +19,9 @@ interface NoteLabelInputProps {
 }
 
 const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInputProps) => {
-  const { user } = useAppSelector((store) => store.user);
+  const userId = useAppSelector(getUserId) ?? '';
   const [fetchLabels, setFetchLabels] = useState(false);
-  const [customLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${user._id}`, 'customLabels', fetchLabels);
+  const [customLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${userId}`, 'customLabels', fetchLabels);
 
   const [currentCustomLabels, setCurrentCustomLabels] = useState<ICustomLabel[]>([]);
   const [focused, setFocused] = useState(false);
@@ -33,7 +34,7 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
   const [color, setColor] = useState<string>(getRandomColor());
   const labelName = 'category';
   const dispatch = useAppDispatch();
-  
+
   let addedLabel = '';
 
   useEffect(() => {
@@ -97,7 +98,7 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
             labelName: newLabel,
             color: color,
             isCategoryLabel: true,
-            user: user._id
+            user: userId
           }
         });
 
