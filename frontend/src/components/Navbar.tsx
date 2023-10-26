@@ -4,8 +4,8 @@ import { IoMdMenu } from 'react-icons/io';
 import { Link } from 'react-router-dom';
 import { setShowSidebar } from '../features/journal/journalSlice';
 import { logout } from '../features/user/userSlice';
-import { useWindowSize } from '../hooks';
 import { useAppDispatch, useAppSelector } from '../store/helpers/storeHooks';
+import { useWindowSize } from '../hooks/useWindowSize';
 
 interface NavbarProps {
   topRef?: React.MutableRefObject<HTMLDivElement>;

@@ -2,7 +2,7 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import config from '../../config/config';
 import { fetchAllNotes, setShowFilterBar } from '../../features/journal/journalSlice';
-import { useDebounce, useFetchData } from '../../hooks';
+import { useFetchData } from '../../hooks';
 import ICustomLabel from '../../interfaces/customLabel';
 import INote from './../../interfaces/note';
 import { SortOptions, filterOptions, getLastPeriodDate } from './../../utils/data';
@@ -11,6 +11,7 @@ import FilterOption from './FilterOption';
 import FilterSearchInput from './FilterSearchInput';
 import { useAppDispatch, useAppSelector } from '../../store/helpers/storeHooks';
 import { getUserData, getUserId } from '../../features/user/userSlice';
+import { useDebounce } from '../../hooks/useDebounce';
 
 interface FilterBarProps {
   filterBarRef: React.MutableRefObject<HTMLDivElement>;

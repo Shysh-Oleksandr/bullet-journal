@@ -13,7 +13,6 @@ import TextareaAutosize from 'react-textarea-autosize';
 import config from '../../../config/config';
 import logging from '../../../config/logging';
 import { fetchAllNotes, setError, setSuccess } from '../../../features/journal/journalSlice';
-import { useWindowSize } from '../../../hooks';
 import ICustomLabel from '../../../interfaces/customLabel';
 import INote from '../../../interfaces/note';
 import { getContentWords } from '../../../utils/functions';
@@ -31,6 +30,7 @@ import OtherNotes from './OtherNotes';
 import SaveButton from './SaveButton';
 import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
 import { getUserData, getUserId } from '../../../features/user/userSlice';
+import { useWindowSize } from '../../../hooks/useWindowSize';
 
 interface NoteFormProps {
   isShort?: boolean;

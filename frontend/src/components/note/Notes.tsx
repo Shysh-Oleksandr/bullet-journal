@@ -1,6 +1,5 @@
 import React, { MutableRefObject, memo, useEffect, useRef, useState } from 'react';
 import { BsPlusLg } from 'react-icons/bs';
-import { useWindowSize } from '../../hooks';
 import '../../styles/note.scss';
 import Loading from '../UI/Loading';
 import FilterBar from './../filterBar/FilterBar';
@@ -8,6 +7,7 @@ import NoteForm from './noteForm/NoteForm';
 import NotePreview from './NotePreview';
 import INote from './../../interfaces/note';
 import { useAppSelector } from '../../store/helpers/storeHooks';
+import { useWindowSize } from '../../hooks/useWindowSize';
 
 interface NotesProps {
   notes: INote[];

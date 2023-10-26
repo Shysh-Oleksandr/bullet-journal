@@ -3,12 +3,14 @@ import { BsPlusLg, BsStarFill } from 'react-icons/bs';
 import { IoMdMenu } from 'react-icons/io';
 import { Link } from 'react-router-dom';
 import { fetchAllNotes, setShowSidebar } from '../../features/journal/journalSlice';
-import { useDebounce, useOnClickOutside, useWindowSize } from '../../hooks';
 import FilterSearchInput from '../filterBar/FilterSearchInput';
 import NoteSidebarPreview from './NoteSidebarPreview';
 import INote from './../../interfaces/note';
 import { useAppDispatch, useAppSelector } from '../../store/helpers/storeHooks';
 import { getUserData } from '../../features/user/userSlice';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useWindowSize } from '../../hooks/useWindowSize';
+import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 
 interface SidebarProps {
   sidebarRef: React.MutableRefObject<HTMLDivElement>;

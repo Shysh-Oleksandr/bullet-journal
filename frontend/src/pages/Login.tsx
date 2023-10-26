@@ -3,14 +3,14 @@ import { BsGithub, BsGoogle } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 import InfoMessage from '../components/UI/InfoMessage';
 import Loading from '../components/UI/Loading';
-import CenterPiece from '../components/auth/CenterPiece';
-import LoginBtn from '../components/auth/LoginBtn';
 import { Providers } from '../config/firebase';
 import logging from '../config/logging';
 import { authApi } from '../features/user/userApi';
 import { getAuthErrorMsg, getIsAuthenticating } from '../features/user/userSlice';
 import { useAppSelector } from '../store/helpers/storeHooks';
 import { auth } from '../config/firebase';
+import CenterPiece from '../features/user/components/CenterPiece';
+import LoginBtn from '../features/user/components/LoginBtn';
 
 const SocialMediaPopup = (provider: firebase.auth.AuthProvider) =>
   new Promise<firebase.auth.UserCredential>((resolve, reject) => {
@@ -63,7 +63,6 @@ const LoginPage = () => {
             <LoginBtn
               className="disabled:bg-orange-900 bg-orange-600  hover:bg-orange-700"
               authenticating={isAuthenticating}
-              isLogin={isLogin}
               icon={<BsGoogle />}
               onclick={() => SignInWithSocialMedia(Providers.google)}
               providerName="Google"
@@ -71,7 +70,6 @@ const LoginPage = () => {
             <LoginBtn
               className="disabled:bg-gray-900 bg-gray-600  hover:bg-gray-700"
               authenticating={isAuthenticating}
-              isLogin={isLogin}
               icon={<BsGithub />}
               onclick={() => SignInWithSocialMedia(Providers.github)}
               providerName="Github"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWindowSize } from '../../hooks';
+import { useWindowSize } from '../../hooks/useWindowSize';
 
 interface FilterModalProps {
     modalRef: React.MutableRefObject<HTMLDivElement>;

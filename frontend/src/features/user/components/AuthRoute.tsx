@@ -1,8 +1,8 @@
 import React from 'react';
-import logging from '../../config/logging';
+import { useAppSelector } from '../../../store/helpers/storeHooks';
+import { getUserId } from '../userSlice';
+import logging from '../../../config/logging';
 import { Navigate } from 'react-router-dom';
-import { useAppSelector } from '../../store/helpers/storeHooks';
-import { getUserId } from '../../features/user/userSlice';
 
 interface IAuthRouteProps {
   children: JSX.Element;

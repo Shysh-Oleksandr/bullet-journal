@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import AuthRoute from './components/auth/AuthRoute';
 import Alert from './components/UI/Alert';
 import Loading from './components/UI/Loading';
 import logging from './config/logging';
@@ -8,6 +7,7 @@ import routes from './config/routes';
 import { getIsAuthenticated, logout } from './features/user/userSlice';
 import { useAppDispatch, useAppSelector } from './store/helpers/storeHooks';
 import { authApi } from './features/user/userApi';
+import AuthRoute from './features/user/components/AuthRoute';
 
 function App() {
   const [validateToken] = authApi.useLazyValidateTokenQuery();

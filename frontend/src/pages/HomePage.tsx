@@ -1,9 +1,9 @@
 import React, { MutableRefObject, useRef } from 'react';
 import Sidebar from '../components/sidebar/Sidebar';
-import { useWindowSize } from '../hooks';
 import Navbar from './../components/Navbar';
 import Pagination from './../components/pagination/Pagination';
 import { useAppSelector } from '../store/helpers/storeHooks';
+import { useWindowSize } from '../hooks/useWindowSize';
 
 const HomePage = () => {
   const sidebarRef = useRef() as MutableRefObject<HTMLDivElement>;
