@@ -1,23 +1,28 @@
-import React, { MutableRefObject, memo, useEffect, useRef, useState } from 'react';
+import { MutableRefObject, memo, useEffect, useRef, useState } from 'react';
 import { BsPlusLg } from 'react-icons/bs';
 import '../../styles/note.scss';
 import Loading from '../UI/Loading';
 import FilterBar from './../filterBar/FilterBar';
 import NoteForm from './noteForm/NoteForm';
 import NotePreview from './NotePreview';
-import INote from './../../interfaces/note';
 import { useAppSelector } from '../../store/helpers/storeHooks';
 import { useWindowSize } from '../../hooks/useWindowSize';
+import { Note } from '../../features/journal/types';
+import { getIsFilterBarShown, getIsSidebarShown } from '../../features/journal/journalSlice';
 
 interface NotesProps {
-  notes: INote[];
+  notes: Note[];
 }
 
 const Notes = ({ notes }: NotesProps) => {
-  const { loading, isSidebarShown, isFilterBarShown } = useAppSelector((store) => store.journal);
-  const [showFullAddForm, setShowFullAddForm] = useState<boolean>(false);
-  const filterBarRef = useRef() as MutableRefObject<HTMLDivElement>;
+  const isSidebarShown = useAppSelector(getIsSidebarShown);
+  const isFilterBarShown = useAppSelector(getIsFilterBarShown);
+
   const [width] = useWindowSize();
+
+  const [showFullAddForm, setShowFullAddForm] = useState(false);
+
+  const filterBarRef = useRef() as MutableRefObject<HTMLDivElement>;
 
   useEffect(() => {
     setTimeout(() => {
@@ -43,7 +48,7 @@ const Notes = ({ notes }: NotesProps) => {
         </button>
         <NoteForm showFullAddForm={showFullAddForm} setShowFullAddForm={setShowFullAddForm} isShort />
       </div>
-      {loading ? (
+      {false ? (
         <Loading scaleSize={2} className="my-20" />
       ) : (
         notes.map((note, index) => {

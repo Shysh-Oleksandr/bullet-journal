@@ -1,11 +1,11 @@
 import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import INote from '../../interfaces/note';
 import { getDifferentColor } from '../../utils/functions';
 import NoteBody from './NoteBody';
+import { Note } from '../../features/journal/types';
 
 interface INotePreviewProps {
-  note: INote;
+  note: Note;
   previousNoteStartDate: number | null;
 }
 

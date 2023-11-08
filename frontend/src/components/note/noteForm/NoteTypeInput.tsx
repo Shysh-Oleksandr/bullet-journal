@@ -4,16 +4,16 @@ import { AiOutlineArrowRight } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
 import { IoIosColorPalette } from 'react-icons/io';
 import config from '../../../config/config';
-import { setError, setSuccess } from '../../../features/journal/journalSlice';
+import { setErrorMsg, setSuccessMsg } from '../../../features/journal/journalSlice';
 import { useFetchData } from '../../../hooks';
-import ICustomLabel from '../../../interfaces/customLabel';
 import { getRandomColor } from './../../../utils/functions';
 import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
 import { getUserId } from '../../../features/user/userSlice';
+import { CustomLabel } from '../../../features/journal/types';
 
 interface NoteLabelInputProps {
-  setLabel: React.Dispatch<React.SetStateAction<ICustomLabel | null>>;
-  label: ICustomLabel | null;
+  setLabel: React.Dispatch<React.SetStateAction<CustomLabel | null>>;
+  label: CustomLabel | null;
   disabled?: boolean;
   setNoteColor: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -21,7 +21,7 @@ interface NoteLabelInputProps {
 const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInputProps) => {
   const userId = useAppSelector(getUserId) ?? '';
   const [fetchLabels, setFetchLabels] = useState(false);
-  const [customLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${userId}`, 'customLabels', fetchLabels);
+  const [customLabels] = useFetchData<CustomLabel>('GET', `${config.server.url}/customlabels/${userId}`, 'customLabels', fetchLabels);
 
   const currentCustomLabels = customLabels.filter((label) => !label.isCategoryLabel);
   const [focused, setFocused] = useState(false);
@@ -78,9 +78,9 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
     const isNew: boolean = !currentCustomLabels.map((label) => label.labelName).includes(newLabel);
 
     if (newLabel.trim() === '') {
-      dispatch(setError(`Note ${labelName} cannot be empty.`));
+      dispatch(setErrorMsg(`Note ${labelName} cannot be empty.`));
     } else if (!isNew) {
-      dispatch(setError(`Note ${labelName} "${newLabel}" already exists.`));
+      dispatch(setErrorMsg(`Note ${labelName} "${newLabel}" already exists.`));
     } else {
       try {
         const response = await axios({
@@ -95,7 +95,7 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
         });
 
         if (response.status === 201) {
-          dispatch(setSuccess(`New ${labelName} "${newLabel}" added.`));
+          dispatch(setSuccessMsg(`New ${labelName} "${newLabel}" added.`));
           setAddedLabel(newLabel);
           setFetchLabels(!fetchLabels);
 
@@ -104,16 +104,16 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
 
           setColor(getRandomColor());
         } else {
-          dispatch(setError(`Unable to create note ${labelName}.`));
+          dispatch(setErrorMsg(`Unable to create note ${labelName}.`));
         }
       } catch (error: any) {
-        dispatch(setError(error.message));
+        dispatch(setErrorMsg(error.message));
       }
       labelInputRef.current?.blur();
     }
   };
 
-  const deleteLabel = async (labelToDelete: ICustomLabel) => {
+  const deleteLabel = async (labelToDelete: CustomLabel) => {
     if (disabled) return;
 
     try {
@@ -123,7 +123,7 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
       });
 
       if (response.status === 200) {
-        dispatch(setSuccess(`Note ${labelName} "${labelToDelete.labelName}" has been deleted.`));
+        dispatch(setSuccessMsg(`Note ${labelName} "${labelToDelete.labelName}" has been deleted.`));
         setFetchLabels(!fetchLabels);
         if (label?._id === labelToDelete._id) {
           const newLabel = currentCustomLabels[0] || currentCustomLabels[1];
@@ -131,14 +131,14 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
           setInputLabel(newLabel.labelName);
         }
       } else {
-        dispatch(setError(`Unable to delete note ${labelName}.`));
+        dispatch(setErrorMsg(`Unable to delete note ${labelName}.`));
       }
     } catch (error: any) {
-      dispatch(setError(error.message));
+      dispatch(setErrorMsg(error.message));
     }
   };
 
-  const chooseLabel = (chosenLabel: ICustomLabel) => {
+  const chooseLabel = (chosenLabel: CustomLabel) => {
     if (disabled) return;
     setLabel(chosenLabel);
     setInputLabel(chosenLabel.labelName);

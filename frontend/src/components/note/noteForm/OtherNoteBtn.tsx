@@ -1,10 +1,10 @@
 import React from 'react';
 import { AiOutlineDoubleRight, AiOutlineDoubleLeft } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
-import INote from '../../../interfaces/note';
+import { Note } from '../../../features/journal/types';
 
 interface OtherNoteBtnProps {
-    otherNote: INote | null;
+    otherNote: Note | null;
     isPrev: boolean;
 }
 

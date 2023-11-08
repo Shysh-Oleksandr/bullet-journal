@@ -7,15 +7,15 @@ import FilterModalOption from './FilterModalOption';
 import NoteDate from './../note/noteForm/NoteDate';
 import NoteImportanceInput from './../note/noteForm/NoteImportanceInput';
 import InputLabel from './../note/noteForm/InputLabel';
-import ICustomLabel from '../../interfaces/customLabel';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
+import { CustomLabel } from '../../features/journal/types';
 
 interface FilterOptionProps {
   option: IFilterOption;
   setShowFullAddForm: React.Dispatch<React.SetStateAction<boolean>>;
   filterData: {
     sortType: SortOptions;
-    startDate: number;
+    startDate: number | null;
     endDate: number;
     type: string[];
     category: string[];
@@ -24,13 +24,13 @@ interface FilterOptionProps {
     showAnyCategory: boolean;
     showAnyType: boolean;
     wasReset: boolean;
-    oldestNoteDate: number;
-    allTypes: ICustomLabel[];
-    allCategories: ICustomLabel[];
+    oldestNoteDate: number | null;
+    allTypes: CustomLabel[];
+    allCategories: CustomLabel[];
   };
   filterDataSetters: {
     setSortType: React.Dispatch<React.SetStateAction<SortOptions>>;
-    setStartDate: React.Dispatch<React.SetStateAction<number>>;
+    setStartDate: React.Dispatch<React.SetStateAction<number | null>>;
     setEndDate: React.Dispatch<React.SetStateAction<number>>;
     setType: React.Dispatch<React.SetStateAction<string[]>>;
     setCategory: React.Dispatch<React.SetStateAction<string[]>>;
@@ -124,14 +124,18 @@ const FilterOption = ({ option, filterData, filterDataSetters, setShowFullAddFor
         );
         break;
       case FilterOptions.DATE:
-        const chooseDatePeriod = (startDate: number, periodName: string | undefined = undefined, endDate: number = new Date().getTime()) => {
+        const chooseDatePeriod = (startDate: number | null, periodName: string | undefined = undefined, endDate: number = new Date().getTime()) => {
+          if (!startDate) return;
+
           const _stardDate = new Date(startDate);
           _stardDate.setHours(0, 0, 0, 0);
           filterDataSetters.setStartDate(_stardDate.getTime());
           filterDataSetters.setEndDate(endDate);
           setOptionsChosen(periodName);
         };
-        const checkDatePeriodChosen = (startDate: number, endDate: number = new Date().getTime()) => {
+        const checkDatePeriodChosen = (startDate: number | null, endDate: number = new Date().getTime()) => {
+          if (!startDate || !filterData.startDate) return false;
+
           const _stardDate = new Date(startDate);
           const _endDate = new Date(endDate);
           const stardD = new Date(filterData.startDate);

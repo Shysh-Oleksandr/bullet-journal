@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import INote from '../../interfaces/note';
 import { getDifferentColor, sanitizedData } from '../../utils/functions';
 import NoteInfo from './NoteInfo';
 import { dateDiffInDays } from './../../utils/functions';
 import { AiFillStar } from 'react-icons/ai';
 import { getTimeByDate } from '../../utils/getFormattedDate';
+import { Note } from '../../features/journal/types';
 
 interface NoteBodyProps {
   onMouseEnter?: () => void;
@@ -14,12 +14,12 @@ interface NoteBodyProps {
   titleClassName?: string;
   contentClassName?: string;
   className?: string;
-  note: INote;
+  note: Note;
   showImage?: boolean;
 }
 
 const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName, className, contentClassName, note, showImage }: NoteBodyProps) => {
-  const noteTime = useMemo(() => dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1, [note.endDate, note.startDate]) ;
+  const noteTime = useMemo(() => note.endDate ? dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 : 0, [note.endDate, note.startDate]);
 
   return (
     <div

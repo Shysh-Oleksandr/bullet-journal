@@ -111,9 +111,11 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
                 deobfContent && note.set({ content: deobfContent });
             });
 
+            const sortedNotes = notes.slice().sort((a, b) => b.startDate - a.startDate);
+
             return res.status(200).json({
-                count: notes.length,
-                notes
+                count: sortedNotes.length,
+                notes: sortedNotes
             });
         })
         .catch((error) => {
@@ -214,5 +216,5 @@ export default {
     readAll,
     query,
     update,
-    deleteNote,
+    deleteNote
 };

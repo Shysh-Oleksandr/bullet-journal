@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { ContentState, EditorState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
 import React, { memo, useCallback, useEffect, useState } from 'react';
@@ -10,11 +9,13 @@ import { MdDelete } from 'react-icons/md';
 import { RiSave3Fill } from 'react-icons/ri';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import TextareaAutosize from 'react-textarea-autosize';
-import config from '../../../config/config';
 import logging from '../../../config/logging';
-import { fetchAllNotes, setError, setSuccess } from '../../../features/journal/journalSlice';
-import ICustomLabel from '../../../interfaces/customLabel';
-import INote from '../../../interfaces/note';
+import { notesApi } from '../../../features/journal/journalApi';
+import { getIsSidebarShown, getNoteById, getNotes, setErrorMsg, setSuccessMsg } from '../../../features/journal/journalSlice';
+import { CustomLabel, Note, UpdateNoteRequest } from '../../../features/journal/types';
+import { getUserId } from '../../../features/user/userSlice';
+import { useWindowSize } from '../../../hooks/useWindowSize';
+import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
 import { getContentWords } from '../../../utils/functions';
 import DeleteModal from '../../UI/DeleteModal.';
 import Loading from '../../UI/Loading';
@@ -28,9 +29,8 @@ import NoteSavingIndicator from './NoteSavingIndicator';
 import NoteTypeInput from './NoteTypeInput';
 import OtherNotes from './OtherNotes';
 import SaveButton from './SaveButton';
-import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
-import { getUserData, getUserId } from '../../../features/user/userSlice';
-import { useWindowSize } from '../../../hooks/useWindowSize';
+
+const DEFAULT_COLOR = '#04a9c6'
 
 interface NoteFormProps {
   isShort?: boolean;
@@ -39,37 +39,48 @@ interface NoteFormProps {
 }
 
 const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProps) => {
-  const [_id, setId] = useState('');
-  const [title, setTitle] = useState('');
-  const [startDate, setStartDate] = useState(new Date().getTime());
-  const [endDate, setEndDate] = useState(new Date().getTime());
-  const [content, setContent] = useState('');
-  const [image, setImage] = useState('');
-  const [color, setColor] = useState('#04a9c6');
-  const [rating, setRating] = useState(1);
-  const [type, setType] = useState<ICustomLabel | null>(null);
-  const [category, setCategory] = useState<ICustomLabel[]>([]);
-  const [isLocked, setIsLocked] = useState(false);
-  const [isStarred, setIsStarred] = useState(false);
-  const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
-  const [prevNote, setPrevNote] = useState<INote | null>(null);
-  const [nextNote, setNextNote] = useState<INote | null>(null);
-
-  const [modal, setModal] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [words, setWords] = useState(0);
-
-  const user = useAppSelector(getUserData);
-  const userId = useAppSelector(getUserId) ?? '';
-  const { notes, isSidebarShown } = useAppSelector((store) => store.journal);
-
   const params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [width] = useWindowSize();
+
+  const noteId = params.noteID;
+
+  const noteData = useAppSelector(state => noteId ? getNoteById(state, noteId) : null);
+
+  const [fetchNoteById, { isLoading: isNoteLoading }] =
+    notesApi.useLazyFetchNoteByIdQuery();
+  const [createNote] = notesApi.useCreateNoteMutation();
+  const [updateNote] = notesApi.useUpdateNoteMutation();
+  const [deleteNote, { isLoading: isDeleting }] = notesApi.useDeleteNoteMutation();
+
+  const userId = useAppSelector(getUserId) ?? '';
+  const isSidebarShown = useAppSelector(getIsSidebarShown);
+  const notes = useAppSelector(getNotes);
+
+  const [currentNote, setCurrentNote] = useState<Note | null>(noteData ?? null)
+
+  const [_id, setId] = useState(currentNote?._id ?? '');
+  const [title, setTitle] = useState(currentNote?.title ?? '');
+  const [startDate, setStartDate] = useState(currentNote?.startDate ?? new Date().getTime());
+  const [endDate, setEndDate] = useState(currentNote?.endDate ?? new Date().getTime());
+  const [content, setContent] = useState(currentNote?.content ?? '');
+  const [image, setImage] = useState(currentNote?.image ?? '');
+  const [color, setColor] = useState(currentNote?.color ?? DEFAULT_COLOR);
+  const [rating, setRating] = useState(currentNote?.rating ?? 1);
+  const [type, setType] = useState<CustomLabel | null>(currentNote?.type ?? null);
+  const [category, setCategory] = useState<CustomLabel[]>(currentNote?.category ?? []);
+  const [isLocked, setIsLocked] = useState(currentNote?.isLocked ?? false);
+  const [isStarred, setIsStarred] = useState(currentNote?.isStarred ?? false);
+
+  const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
+  const [prevNote, setPrevNote] = useState<Note | null>(null);
+  const [nextNote, setNextNote] = useState<Note | null>(null);
+
+  const [modal, setModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [words, setWords] = useState(0);
 
   const resetState = () => {
     setId('');
@@ -78,13 +89,132 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     setEndDate(new Date().getTime());
     setContent('');
     setImage('');
-    setColor('#04a9c6');
+    setColor(DEFAULT_COLOR);
     setRating(1);
     setType(null);
     setCategory([]);
     setEditorState(EditorState.createEmpty());
     setIsLocked(false);
     setIsStarred(false);
+  };
+
+  const getNote = useCallback(
+    async (id: string) => {
+      try {
+        const response = await fetchNoteById(id);
+
+        let note = response.data?.note;
+
+        if (!note) {
+          const errorMsg = 'Unable to retrieve the note ' + id;
+          dispatch(setErrorMsg(errorMsg));
+          logging.error(errorMsg);
+
+          return;
+        }
+
+        setCurrentNote(note);
+
+        setId(note._id)
+        setTitle(note.title);
+        setStartDate(note.startDate);
+        // setEndDate(note.endDate);
+        setContent(note.content || '');
+        setImage(note.image || '');
+        setColor(note.color);
+        setRating(note.rating);
+        setType(note.type ?? null);
+        setCategory(note.category ?? []);
+        setIsLocked(!!note.isLocked);
+        setIsStarred(!!note.isStarred);
+
+        const contentBlock = htmlToDraft(note.content || '');
+        const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+        const _editorState = EditorState.createWithContent(contentState);
+
+        setEditorState(_editorState);
+      } catch (error: any) {
+        dispatch(setErrorMsg(error.message));
+      }
+    },
+    [dispatch, fetchNoteById],
+  );
+
+  const saveNoteHandler = async (shouldLock?: boolean, withAlert = true) => {
+    const isNewNote = !_id;
+
+    if (!userId) {
+      logging.error("The user doesn't have an id");
+
+      return;
+    }
+
+    withAlert && dispatch(setErrorMsg(''));
+    setIsSaving(true);
+
+    const newNoteData: Note = {
+      ...currentNote,
+      _id: currentNote?._id ?? '',
+      author: userId ?? "",
+      title: title.trim(),
+      content: content.trim(),
+      color,
+      startDate,
+      rating,
+      type,
+      category,
+      isStarred,
+      isLocked,
+    };
+
+    const updateNoteData: UpdateNoteRequest = {
+      ...newNoteData,
+      title: newNoteData.title || "Note",
+      type: type?._id ?? null,
+      category: category.map(item => item._id),
+      isLocked: shouldLock ?? newNoteData.isLocked,
+    };
+
+    try {
+      if (isNewNote) {
+        const noteId = (await createNote(updateNoteData).unwrap()).note._id;
+        noteId && navigate(`/edit/${noteId}`);
+      } else {
+        await updateNote(updateNoteData);
+      }
+
+      withAlert && dispatch(setSuccessMsg(`The note is ${isNewNote ? "created" : "updated"}`));
+    } catch (error) {
+      logging.error(error);
+      withAlert && dispatch(setErrorMsg('Unable to save note.'));
+    } finally {
+      setTimeout(() => {
+        setIsSaving(false);
+      }, 1000);
+    }
+  };
+
+  const deleteNoteHandler = async () => {
+    try {
+      await deleteNote(_id);
+
+      dispatch(setSuccessMsg('Note has been deleted.'));
+      navigate('/');
+    } catch (error) {
+      logging.error(error);
+      dispatch(setErrorMsg('Unable to delete the note.'));
+    }
+  };
+
+  const handleStarredClick = () => {
+    if (isLocked) return;
+    setIsStarred(!isStarred);
+    dispatch(setSuccessMsg(`Note was ${isStarred ? 'removed from' : 'added to'} the star list.`));
+  };
+
+  const handleLockedClick = () => {
+    setIsLocked(!isLocked);
+    dispatch(setSuccessMsg(`Note was ${isLocked ? 'unlocked' : 'locked'}.`));
   };
 
   useEffect(() => {
@@ -98,171 +228,29 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     // Otherwise, have the blank form.
     else {
       resetState();
-      setIsLoading(false);
     }
-  }, [location]);
+  }, [getNote, location, params.noteID]);
 
   useEffect(() => {
     if (isShort) return;
+
     const filteredNotes = notes.filter((note) => !note.isEndNote);
     const currNoteIndex = filteredNotes.map((note) => note._id).indexOf(_id);
+
     if (currNoteIndex !== -1) {
-      const _prevNote: INote | null = currNoteIndex - 1 >= 0 ? filteredNotes[currNoteIndex - 1] : null;
-      const _nextNote: INote | null = currNoteIndex + 1 < filteredNotes.length ? filteredNotes[currNoteIndex + 1] : null;
+      const _prevNote: Note | null = currNoteIndex - 1 >= 0 ? filteredNotes[currNoteIndex - 1] : null;
+      const _nextNote: Note | null = currNoteIndex + 1 < filteredNotes.length ? filteredNotes[currNoteIndex + 1] : null;
+
       setPrevNote(_prevNote);
       setNextNote(_nextNote);
     }
-  }, [notes, _id]);
+  }, [notes, _id, isShort]);
 
   useEffect(() => {
     setWords(content.trim() === '<p></p>' || content === '' ? 0 : getContentWords(content));
   }, [content]);
 
-  const getNote = useCallback(
-    async (id: string) => {
-      try {
-        const response = await axios({
-          method: 'GET',
-          url: `${config.server.url}/notes/read/${id}`
-        });
-
-        if (response.status === 200 || response.status === 304) {
-          if (userId !== response.data.note.author) {
-            logging.warn('This note is owned by someone else');
-            setId('');
-          } else {
-            let note = response.data.note as INote;
-
-            setTitle(note.title);
-            setStartDate(note.startDate);
-            setEndDate(note.endDate);
-            setContent(note.content || '');
-            setImage(note.image || '');
-            setColor(note.color);
-            setRating(note.rating);
-            setType(note.type ?? null);
-            setCategory(note.category || []);
-            setIsLocked(note.isLocked || false);
-            setIsStarred(note.isStarred || false);
-
-            const contentBlock = htmlToDraft(note.content || '');
-            const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
-            const _editorState = EditorState.createWithContent(contentState);
-
-            setEditorState(_editorState);
-          }
-        } else {
-          dispatch(setError('Unable to retrieve note ' + id));
-          setId('');
-        }
-      } catch (error: any) {
-        dispatch(setError(error.message));
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [dispatch, userId],
-  );
-
-  const saveNote = async (method: string, url: string, isCreating: boolean, showMessage: boolean = true) => {
-    const _startDate = new Date(startDate);
-
-    const _endDate = new Date(endDate);
-    _startDate.setHours(0, 0, 0, 0);
-    _endDate.setHours(0, 0, 0, 0);
-    if (title === '' || color === '' || !startDate || !endDate) {
-      showMessage && dispatch(setError('Please fill out all required fields.'));
-      showMessage && dispatch(setSuccess(''));
-      return null;
-    } else if (_startDate.getTime() > _endDate.getTime()) {
-      showMessage && dispatch(setError('End date cannot be earlier than start date.'));
-      return null;
-    }
-
-    showMessage && dispatch(setError(''));
-    showMessage && dispatch(setSuccess(''));
-    setSaving(true);
-
-    try {
-      const response = await axios({
-        method: method,
-        url: url,
-        data: {
-          title,
-          startDate,
-          endDate,
-          image,
-          color,
-          rating: rating > 0 && rating <= 10 ? rating : 1,
-          content,
-          type: type?._id,
-          category: category.map(item => item._id),
-          isLocked,
-          isStarred,
-          author: userId
-        }
-      });
-
-      if (response.status === 201 && user) {
-        if (isShort) {
-          dispatch(fetchAllNotes({ user }));
-          resetState();
-        } else {
-          setId(response.data.note._id);
-          _id === '' && navigate(`/edit/${response.data.note._id}`);
-        }
-        showMessage && dispatch(setSuccess(`Note ${isCreating ? 'added' : 'updated'}.`));
-      } else {
-        showMessage && dispatch(setError('Unable to save note.'));
-      }
-    } catch (error: any) {
-      showMessage && dispatch(setError(error.message));
-    } finally {
-      setTimeout(() => {
-        setSaving(false);
-      }, 500);
-    }
-  };
-
-  const createNote = async () => await saveNote('POST', `${config.server.url}/notes/create`, true);
-  const editNote = async (showMessage: boolean = true) => await saveNote('PATCH', `${config.server.url}/notes/update/${_id}`, false, showMessage);
-
-  const deleteNote = async () => {
-    setDeleting(true);
-    try {
-      const response = await axios({
-        method: 'DELETE',
-        url: `${config.server.url}/notes/${_id}`
-      });
-
-      if (response.status === 200) {
-        setTimeout(() => {
-          navigate('/');
-          dispatch(setSuccess('Note has been deleted.'));
-          setDeleting(false);
-        }, 500);
-      } else {
-        dispatch(setError('Unable to delete note.'));
-        setDeleting(false);
-      }
-    } catch (error: any) {
-      dispatch(setError(error.message));
-      setDeleting(false);
-    }
-  };
-
-  const handleStarredClick = () => {
-    if (isLocked) return;
-    setIsStarred(!isStarred);
-    dispatch(setSuccess(`Note was ${isStarred ? 'removed from' : 'added to'} the star list.`));
-  };
-
-  const handleLockedClick = () => {
-    setIsLocked(!isLocked);
-    dispatch(setSuccess(`Note was ${isLocked ? 'unlocked' : 'locked'}.`));
-  };
-
-  if (isLoading) {
+  if (isNoteLoading) {
     return (
       <div className={`transition-all duration-500 ${isShort ? '' : `${isSidebarShown && width > 1024 ? 'small-padding-x' : 'padding-x'} sm:pb-12 pb-8`}`}>
         <Loading scaleSize={2} className="mt-20" />
@@ -294,7 +282,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
           <TextareaAutosize
             spellCheck={false}
             maxRows={5}
-            disabled={saving || isLocked}
+            disabled={isSaving || isLocked}
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -302,19 +290,19 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
               }`}
             required={true}
           />
-          {!isShort && _id !== '' && <NoteSavingIndicator saving={saving} />}
+          {!isShort && _id !== '' && <NoteSavingIndicator isSaving={isSaving} />}
         </div>
         <div className="fl lg:flex-row flex-col border-bottom-lg-show mb-6">
           <div className="fl xs:h-11 border-bottom-lg lg:w-auto w-full lg:justify-start xs:justify-between justify-center xs:flex-row flex-col lg:border-r-2 xlg:pr-4">
-            <NoteDate disabled={saving || isLocked} date={startDate} isStartDate={true} setDate={setStartDate} inputClassname="border-bottom-xs w-full fl justify-center" />
+            <NoteDate disabled={isSaving || isLocked} date={startDate} isStartDate={true} setDate={setStartDate} inputClassname="border-bottom-xs w-full fl justify-center" />
             <BsDashLg className="xlg:mx-6 lg:mx-1 mx-3 xs:block hidden xs:text-4xl text-xl" />
-            <NoteDate disabled={saving || isLocked} date={endDate} isStartDate={false} setDate={setEndDate} inputClassname="xs:mt-0 mt-3" />
+            <NoteDate disabled={isSaving || isLocked} date={endDate} isStartDate={false} setDate={setEndDate} inputClassname="xs:mt-0 mt-3" />
           </div>
           <div className="fl border-bottom-lg lg:mt-0 mt-5 w-full justify-between lg:px-0 xs:px-4">
             <div className="xlg:mx-4 lg:mx-1 sm:ml-2 mr-4 flex-shrink-0 text-lg text-cyan-600 whitespace-nowrap">{words} words</div>
             <div className="fl custom-border lg:border-l-2 xlg:pl-8 lg:pl-1">
               <div className="relative fl xlg:mr-3 mr-1 h-11">
-                <NoteImportanceInput disabled={saving || isLocked} importance={rating} setImportance={setRating} inputId="noteRatingInput" />
+                <NoteImportanceInput disabled={isSaving || isLocked} importance={rating} setImportance={setRating} inputId="noteRatingInput" />
                 <label htmlFor="noteRatingInput" className="cursor-pointer text-3xl px-1 text-[#6aaac2] py-2">
                   /10
                 </label>
@@ -328,7 +316,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
                   type="color"
                   id="noteColorInput"
                   className="hidden"
-                  disabled={saving || isLocked}
+                  disabled={isSaving || isLocked}
                   value={color}
                   onChange={(e) => {
                     setColor(e.target.value);
@@ -341,11 +329,11 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         </div>
         <div className="flex-between border-bottom my-3">
           <div className="relative sm:mr-4 mr-2 sm:basis-auto basis-1/2">
-            <NoteTypeInput disabled={saving || isLocked} setNoteColor={setColor} label={type} setLabel={setType} />
+            <NoteTypeInput disabled={isSaving || isLocked} setNoteColor={setColor} label={type} setLabel={setType} />
             <InputLabel htmlFor="noteTypeInput" text="Type" />
           </div>
           <div className="relative sm:basis-3/4 basis-1/2">
-            <NoteCategoryInput disabled={saving || isLocked} setNoteColor={setColor} label={category} setLabel={setCategory} />
+            <NoteCategoryInput disabled={isSaving || isLocked} setNoteColor={setColor} label={category} setLabel={setCategory} />
             <InputLabel htmlFor="noteCategoryInput" text="Categories" />
           </div>
         </div>
@@ -355,9 +343,9 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
             className={`bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-900 ${isShort ? 'mt-2 py-2' : 'mt-4'}`}
             onclick={(e) => {
               e.preventDefault();
-              _id !== '' ? editNote() : createNote();
+              saveNoteHandler();
             }}
-            disabled={saving || isLocked}
+            disabled={isSaving || isLocked}
             type="submit"
             icon={<RiSave3Fill className="mr-2" />}
             text={_id !== '' ? 'Update' : 'Create'}
@@ -366,7 +354,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
             <SaveButton
               className="bg-red-600 hover:bg-red-700 mt-2 disabled:bg-red-900"
               onclick={() => setModal(true)}
-              disabled={saving || isLocked}
+              disabled={isSaving || isLocked}
               type="button"
               icon={<MdDelete className="mr-2" />}
               text="Delete"
@@ -376,7 +364,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         {!isShort && _id && (prevNote || nextNote) && <OtherNotes prevNote={prevNote} nextNote={nextNote} />}
       </form>
       <NoteFormPreview isShort={isShort} startDate={startDate} note={{ _id, title, startDate, endDate, content, image, color, rating, category, type, isStarred, author: '' }} />
-      {_id !== '' && modal && <DeleteModal deleteNote={deleteNote} deleting={deleting} modal={modal} setModal={setModal} />}
+      {_id !== '' && modal && <DeleteModal deleteNote={deleteNoteHandler} deleting={isDeleting} modal={modal} setModal={setModal} />}
     </div>
   );
 };

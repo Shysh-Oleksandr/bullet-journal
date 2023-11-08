@@ -2,7 +2,7 @@ import React from 'react';
 import { BsPlusLg } from 'react-icons/bs';
 import { IoMdMenu } from 'react-icons/io';
 import { Link } from 'react-router-dom';
-import { setShowSidebar } from '../features/journal/journalSlice';
+import { getIsSidebarShown, setShowSidebar } from '../features/journal/journalSlice';
 import { logout } from '../features/user/userSlice';
 import { useAppDispatch, useAppSelector } from '../store/helpers/storeHooks';
 import { useWindowSize } from '../hooks/useWindowSize';
@@ -13,12 +13,9 @@ interface NavbarProps {
 
 const Navbar = ({ topRef }: NavbarProps) => {
   const dispatch = useAppDispatch();
-  const { isSidebarShown } = useAppSelector((store) => store.journal);
   const [width] = useWindowSize();
 
-  const Logout = () => {
-    dispatch(logout());
-  };
+  const isSidebarShown = useAppSelector(getIsSidebarShown);
 
   return (
     <div
@@ -41,7 +38,7 @@ const Navbar = ({ topRef }: NavbarProps) => {
           <BsPlusLg />
         </Link>
         <span className="sm:mx-4 mx-3 text-4xl">|</span>
-        <button onClick={() => Logout()} className="sm:text-2xl text-xl cursor-pointer transition-all bg-cyan-500 sm:px-4 px-3 py-1 rounded-md hover:bg-cyan-600 hover:shadow-sm">
+        <button onClick={() => dispatch(logout())} className="sm:text-2xl text-xl cursor-pointer transition-all bg-cyan-500 sm:px-4 px-3 py-1 rounded-md hover:bg-cyan-600 hover:shadow-sm">
           Logout
         </button>
       </div>

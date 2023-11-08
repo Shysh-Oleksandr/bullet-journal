@@ -1,7 +1,14 @@
-import IRoute from '../interfaces/route';
 import LoginPage from '../pages/Login';
 import EditPage from '../pages/EditPage';
 import HomePage from '../pages/HomePage';
+
+interface IRoute {
+    path: string;
+    name: string;
+    auth: boolean;
+    component: any;
+    props?: any;
+}
 
 const authRoutes: IRoute[] = [
     {

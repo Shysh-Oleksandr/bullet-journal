@@ -1,17 +1,16 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import config from '../../config/config';
-import { fetchAllNotes, setShowFilterBar } from '../../features/journal/journalSlice';
+import { getIsFilterBarShown, getOldestNoteDate, setShowFilterBar } from '../../features/journal/journalSlice';
+import { CustomLabel, Note } from '../../features/journal/types';
+import { getUserId } from '../../features/user/userSlice';
 import { useFetchData } from '../../hooks';
-import ICustomLabel from '../../interfaces/customLabel';
-import INote from './../../interfaces/note';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useAppDispatch, useAppSelector } from '../../store/helpers/storeHooks';
 import { SortOptions, filterOptions, getLastPeriodDate } from './../../utils/data';
 import { getContentWords } from './../../utils/functions';
 import FilterOption from './FilterOption';
 import FilterSearchInput from './FilterSearchInput';
-import { useAppDispatch, useAppSelector } from '../../store/helpers/storeHooks';
-import { getUserData, getUserId } from '../../features/user/userSlice';
-import { useDebounce } from '../../hooks/useDebounce';
 
 interface FilterBarProps {
   filterBarRef: React.MutableRefObject<HTMLDivElement>;
@@ -21,12 +20,11 @@ interface FilterBarProps {
 const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
   const dispatch = useAppDispatch();
 
-  const user = useAppSelector(getUserData); // remove later
   const userId = useAppSelector(getUserId);
-  const { oldestNoteDate } = useAppSelector((store) => store.journal);
-  const { isFilterBarShown } = useAppSelector((store) => store.journal);
+  const oldestNoteDate = useAppSelector(getOldestNoteDate);
+  const isFilterBarShown = useAppSelector(getIsFilterBarShown);
 
-  const [customLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${userId ?? ''}`, 'customLabels');
+  const [customLabels] = useFetchData<CustomLabel>('GET', `${config.server.url}/customlabels/${userId ?? ''}`, 'customLabels');
 
   const { allTypes, allCategories } = useMemo(() => ({
     allTypes: customLabels.filter((label) => !label.isCategoryLabel),
@@ -60,7 +58,7 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
   const debouncedImportanceMax = useDebounce(importanceMax, 500);
 
   const sort = useCallback(
-    (notes: INote[]) => {
+    (notes: Note[]) => {
       const sortedNotes = notes.sort((x, y) => {
         switch (sortType) {
           case SortOptions.NEWEST:
@@ -101,7 +99,7 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     },
     [sortType]);
 
-  const filter = (notes: INote[]) => {
+  const filter = (notes: Note[]) => {
     const filteredNotes = notes.filter((note) => {
       const titleFilter = note.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
       const typeFilter = showAnyType || (note.type && debouncedType.includes(note.type?.labelName));
@@ -129,22 +127,23 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     setWasReset(!wasReset);
   };
 
-  useEffect(() => {
-    if (!user) return;
+  // useEffect(() => {
+  //   if (!user) return;
 
-    dispatch(fetchAllNotes({ user, filter, sort }));
-  }, [
-    debouncedSortType,
-    debouncedStartDate,
-    debouncedEndDate,
-    debouncedType,
-    debouncedCategory,
-    debouncedImportanceMin,
-    debouncedImportanceMax,
-    debouncedSearchTerm,
-    debouncedShowAnyCategory,
-    debouncedShowAnyType
-  ]);
+  //   // Handle filtering and sorting
+  //   dispatch(fetchAllNotes({ user, filter, sort }));
+  // }, [
+  //   debouncedSortType,
+  //   debouncedStartDate,
+  //   debouncedEndDate,
+  //   debouncedType,
+  //   debouncedCategory,
+  //   debouncedImportanceMin,
+  //   debouncedImportanceMax,
+  //   debouncedSearchTerm,
+  //   debouncedShowAnyCategory,
+  //   debouncedShowAnyType
+  // ]);
 
   useEffect(() => {
     setStartDate(oldestNoteDate);
