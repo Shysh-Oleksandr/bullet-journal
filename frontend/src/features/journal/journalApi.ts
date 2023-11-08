@@ -1,5 +1,5 @@
 import { emptyAxiosApi } from '../../store/api/emptyAxiosApi';
-import { Method, TAG } from '../../store/models';
+import { Method } from '../../store/models';
 import { CreateLabelRequest, CreateLabelResponse, CreateNoteRequest, CreateNoteResponse, FetchLabelsResponse, FetchNoteByIdResponse, FetchNotesResponse, UpdateLabelRequest, UpdateNoteRequest } from './types';
 
 export const notesApi = emptyAxiosApi.injectEndpoints({
@@ -12,7 +12,6 @@ export const notesApi = emptyAxiosApi.injectEndpoints({
                         method: Method.GET
                     };
                 },
-                providesTags: [TAG.NOTES]
             }),
             fetchNoteById: build.query<FetchNoteByIdResponse, string>({
                 query(id) {
@@ -30,7 +29,6 @@ export const notesApi = emptyAxiosApi.injectEndpoints({
                         body: payload
                     };
                 },
-                invalidatesTags: [TAG.NOTES]
             }),
             createNote: build.mutation<CreateNoteResponse, CreateNoteRequest>({
                 query(payload) {
@@ -40,7 +38,6 @@ export const notesApi = emptyAxiosApi.injectEndpoints({
                         body: payload
                     };
                 },
-                invalidatesTags: [TAG.NOTES]
             }),
             deleteNote: build.mutation<void, string>({
                 query(noteId) {
@@ -49,7 +46,6 @@ export const notesApi = emptyAxiosApi.injectEndpoints({
                         method: Method.DELETE
                     };
                 },
-                invalidatesTags: [TAG.NOTES]
             }),
             fetchLabels: build.query<FetchLabelsResponse, string>({
                 query(userId) {
@@ -58,7 +54,6 @@ export const notesApi = emptyAxiosApi.injectEndpoints({
                         method: Method.GET
                     };
                 },
-                providesTags: [TAG.LABEL]
             }),
             updateLabel: build.mutation<void, UpdateLabelRequest>({
                 query(payload) {
@@ -68,7 +63,6 @@ export const notesApi = emptyAxiosApi.injectEndpoints({
                         body: payload
                     };
                 },
-                invalidatesTags: [TAG.LABEL]
             }),
             createLabel: build.mutation<CreateLabelResponse, CreateLabelRequest>({
                 query(payload) {
@@ -78,7 +72,6 @@ export const notesApi = emptyAxiosApi.injectEndpoints({
                         body: payload
                     };
                 },
-                invalidatesTags: [TAG.LABEL]
             }),
             deleteLabel: build.mutation<void, string>({
                 query(labelId) {
@@ -87,7 +80,6 @@ export const notesApi = emptyAxiosApi.injectEndpoints({
                         method: Method.DELETE
                     };
                 },
-                invalidatesTags: [TAG.LABEL]
             })
         };
     },

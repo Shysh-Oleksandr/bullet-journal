@@ -30,7 +30,7 @@ import NoteTypeInput from './NoteTypeInput';
 import OtherNotes from './OtherNotes';
 import SaveButton from './SaveButton';
 
-const DEFAULT_COLOR = '#04a9c6'
+const DEFAULT_COLOR = '#0891b2'
 
 interface NoteFormProps {
   isShort?: boolean;
@@ -51,9 +51,11 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
   const [fetchNoteById, { isLoading: isNoteLoading }] =
     notesApi.useLazyFetchNoteByIdQuery();
+  const [fetchNotes] =
+    notesApi.useLazyFetchNotesQuery();
   const [createNote] = notesApi.useCreateNoteMutation();
   const [updateNote] = notesApi.useUpdateNoteMutation();
-  const [deleteNote, { isLoading: isDeleting }] = notesApi.useDeleteNoteMutation();
+  const [deleteNote] = notesApi.useDeleteNoteMutation();
 
   const userId = useAppSelector(getUserId) ?? '';
   const isSidebarShown = useAppSelector(getIsSidebarShown);
@@ -80,6 +82,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
   const [modal, setModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [words, setWords] = useState(0);
 
   const resetState = () => {
@@ -178,10 +181,18 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     try {
       if (isNewNote) {
         const noteId = (await createNote(updateNoteData).unwrap()).note._id;
-        noteId && navigate(`/edit/${noteId}`);
+        if (noteId && !isShort) {
+          noteId && navigate(`/edit/${noteId}`);
+        }
+
+        if (isShort) {
+          resetState();
+        }
       } else {
         await updateNote(updateNoteData);
       }
+
+      fetchNotes(userId)
 
       withAlert && dispatch(setSuccessMsg(`The note is ${isNewNote ? "created" : "updated"}`));
     } catch (error) {
@@ -196,8 +207,12 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
   const deleteNoteHandler = async () => {
     try {
+      setIsDeleting(true);
       await deleteNote(_id);
 
+      await fetchNotes(userId);
+
+      setIsDeleting(false);
       dispatch(setSuccessMsg('Note has been deleted.'));
       navigate('/');
     } catch (error) {

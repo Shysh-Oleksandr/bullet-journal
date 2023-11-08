@@ -48,7 +48,7 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
 
     fetchNotes(user?._id);
     fetchLabels(user?._id);
-  }, [notes.length, user, fetchLabels, fetchNotes,]);
+  }, [notes.length, user, fetchLabels, fetchNotes]);
 
   return (
     <div

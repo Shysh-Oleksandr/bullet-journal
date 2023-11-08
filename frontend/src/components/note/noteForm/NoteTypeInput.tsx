@@ -19,6 +19,7 @@ interface NoteLabelInputProps {
 }
 
 const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInputProps) => {
+  const [fetchLabels] = notesApi.useLazyFetchLabelsQuery();
   const [createLabel] = notesApi.useCreateLabelMutation();
   const [deleteLabel] = notesApi.useDeleteLabelMutation();
 
@@ -75,6 +76,7 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
       };
 
       const { customLabel } = await createLabel(createLabelData).unwrap();
+      fetchLabels(userId);
 
       setCurrentCustomLabels(prev => [...prev, customLabel])
 
@@ -97,6 +99,7 @@ const NoteTypeInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInp
 
     try {
       deleteLabel(labelToDelete._id);
+      fetchLabels(userId);
 
       setCurrentCustomLabels(prev => prev.filter(item => item._id !== labelToDelete._id))
 
