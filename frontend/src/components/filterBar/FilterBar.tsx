@@ -1,12 +1,9 @@
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
-import { useAppSelector } from '../../app/hooks';
-import config from '../../config/config';
-import { fetchAllNotes, setShowFilterBar } from '../../features/journal/journalSlice';
-import { useDebounce, useFetchData } from '../../hooks';
-import ICustomLabel from '../../interfaces/customLabel';
-import { useAppDispatch } from './../../app/hooks';
-import INote from './../../interfaces/note';
+import { getCustomCategories, getCustomTypes, getIsFilterBarShown, getOldestNoteDate, setShowFilterBar } from '../../features/journal/journalSlice';
+import { Note } from '../../features/journal/types';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useAppDispatch, useAppSelector } from '../../store/helpers/storeHooks';
 import { SortOptions, filterOptions, getLastPeriodDate } from './../../utils/data';
 import { getContentWords } from './../../utils/functions';
 import FilterOption from './FilterOption';
@@ -17,19 +14,15 @@ interface FilterBarProps {
   setShowFullAddForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+// TODO: Handle correctly
 const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
   const dispatch = useAppDispatch();
 
-  const { user } = useAppSelector((store) => store.user);
-  const { oldestNoteDate } = useAppSelector((store) => store.journal);
-  const { isFilterBarShown } = useAppSelector((store) => store.journal);
+  const oldestNoteDate = useAppSelector(getOldestNoteDate);
+  const isFilterBarShown = useAppSelector(getIsFilterBarShown);
 
-  const [customLabels] = useFetchData<ICustomLabel>('GET', `${config.server.url}/customlabels/${user._id}`, 'customLabels');
-
-  const { allTypes, allCategories } = useMemo(() => ({
-    allTypes: customLabels.filter((label) => !label.isCategoryLabel),
-    allCategories: customLabels.filter((label) => label.isCategoryLabel),
-  }), [customLabels])
+  const allCategories = useAppSelector(getCustomCategories);
+  const allTypes = useAppSelector(getCustomTypes);
 
   const [wasReset, setWasReset] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,18 +40,14 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
   const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showAnyCategory, wasReset, oldestNoteDate, showAnyType, allTypes, allCategories };
   const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportanceMin, setImportanceMax, setShowAnyCategory, setShowAnyType };
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
-  const debouncedSortType = useDebounce(sortType, 500);
   const debouncedStartDate = useDebounce(startDate, 500);
   const debouncedEndDate = useDebounce(endDate, 500);
-  const debouncedShowAnyCategory = useDebounce(showAnyCategory, 500);
-  const debouncedShowAnyType = useDebounce(showAnyType, 500);
+
   const debouncedType = useDebounce(type, 500);
   const debouncedCategory = useDebounce(category, 500);
-  const debouncedImportanceMin = useDebounce(importanceMin, 500);
-  const debouncedImportanceMax = useDebounce(importanceMax, 500);
 
   const sort = useCallback(
-    (notes: INote[]) => {
+    (notes: Note[]) => {
       const sortedNotes = notes.sort((x, y) => {
         switch (sortType) {
           case SortOptions.NEWEST:
@@ -99,7 +88,7 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     },
     [sortType]);
 
-  const filter = (notes: INote[]) => {
+  const filter = (notes: Note[]) => {
     const filteredNotes = notes.filter((note) => {
       const titleFilter = note.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
       const typeFilter = showAnyType || (note.type && debouncedType.includes(note.type?.labelName));
@@ -128,37 +117,8 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
   };
 
   useEffect(() => {
-    dispatch(fetchAllNotes({ user, filter, sort }));
-  }, [
-    debouncedSortType,
-    debouncedStartDate,
-    debouncedEndDate,
-    debouncedType,
-    debouncedCategory,
-    debouncedImportanceMin,
-    debouncedImportanceMax,
-    debouncedSearchTerm,
-    debouncedShowAnyCategory,
-    debouncedShowAnyType
-  ]);
-
-  useEffect(() => {
     setStartDate(oldestNoteDate);
   }, [oldestNoteDate]);
-
-  // Choosing new added type.
-  useEffect(() => {
-    if (!type.includes(allTypes.map((label) => label.labelName).at(-1) || '')) {
-      setType((prev) => [...prev, allTypes.map((label) => label.labelName).at(-1) || '']);
-    }
-  }, [user.customNoteTypes]);
-
-  // Choosing new added category.
-  useEffect(() => {
-    if (!category.includes(allCategories.map((label) => label.labelName).at(-1) || '')) {
-      setCategory((prev) => [...prev, allCategories.map((label) => label.labelName).at(-1) || '']);
-    }
-  }, [user.customNoteCategories]);
 
   return (
     <div

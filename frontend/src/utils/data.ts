@@ -64,7 +64,7 @@ export const filterOptions: IFilterOption[] = [
     }
 ];
 
-export const getDateOptions = (veryStartDate: number) => {
+export const getDateOptions = (veryStartDate: number | null) => {
     return [
         {
             name: 'Any Date',

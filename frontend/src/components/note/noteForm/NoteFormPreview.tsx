@@ -1,11 +1,11 @@
 import React from 'react';
-import INote from '../../../interfaces/note';
 import NoteBody from '../NoteBody';
+import { Note } from '../../../features/journal/types';
 
 interface NoteFormPreviewProps {
     isShort?: boolean;
     startDate: number;
-    note: INote;
+    note: Note;
 }
 
 const NoteFormPreview = ({ isShort, startDate, note }: NoteFormPreviewProps) => {

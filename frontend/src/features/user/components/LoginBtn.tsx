@@ -1,15 +1,12 @@
-import React from 'react';
-
 interface LoginBtnProps {
     authenticating: boolean;
     onclick: () => void;
     icon: JSX.Element;
-    isLogin: boolean;
     className: string;
     providerName: string;
 }
 
-const LoginBtn = ({ authenticating, onclick, icon, isLogin, className, providerName }: LoginBtnProps) => {
+const LoginBtn = ({ authenticating, onclick, icon, className, providerName }: LoginBtnProps) => {
     return (
         <button
             disabled={authenticating}
