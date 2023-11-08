@@ -25,7 +25,8 @@ const create = (req: Request, res: Response, next: NextFunction) => {
         type: type ?? null,
         category,
         rating,
-        isStarred
+        isStarred,
+        isLocked: false
     });
 
     return note

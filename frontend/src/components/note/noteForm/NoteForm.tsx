@@ -1,5 +1,7 @@
+import { isAfter } from 'date-fns';
 import { ContentState, EditorState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
+import isEqual from "lodash.isequal";
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { AiFillLock, AiFillStar, AiFillUnlock } from 'react-icons/ai';
@@ -47,6 +49,8 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
 
   const noteId = params.noteID;
 
+  const isNewNote = !params.noteID;
+
   const noteData = useAppSelector(state => noteId ? getNoteById(state, noteId) : null);
 
   const [fetchNoteById, { isLoading: isNoteLoading }] =
@@ -61,20 +65,20 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
   const isSidebarShown = useAppSelector(getIsSidebarShown);
   const notes = useAppSelector(getNotes);
 
-  const [currentNote, setCurrentNote] = useState<Note | null>(noteData ?? null)
+  const [initialNote, setCurrentNote] = useState<Note | null>(noteData ?? null)
 
-  const [_id, setId] = useState(currentNote?._id ?? '');
-  const [title, setTitle] = useState(currentNote?.title ?? '');
-  const [startDate, setStartDate] = useState(currentNote?.startDate ?? new Date().getTime());
-  const [endDate, setEndDate] = useState(currentNote?.endDate ?? new Date().getTime());
-  const [content, setContent] = useState(currentNote?.content ?? '');
-  const [image, setImage] = useState(currentNote?.image ?? '');
-  const [color, setColor] = useState(currentNote?.color ?? DEFAULT_COLOR);
-  const [rating, setRating] = useState(currentNote?.rating ?? 1);
-  const [type, setType] = useState<CustomLabel | null>(currentNote?.type ?? null);
-  const [category, setCategory] = useState<CustomLabel[]>(currentNote?.category ?? []);
-  const [isLocked, setIsLocked] = useState(currentNote?.isLocked ?? false);
-  const [isStarred, setIsStarred] = useState(currentNote?.isStarred ?? false);
+  const [_id, setId] = useState(initialNote?._id ?? '');
+  const [title, setTitle] = useState(initialNote?.title ?? '');
+  const [startDate, setStartDate] = useState(initialNote?.startDate ?? new Date().getTime());
+  const [endDate, setEndDate] = useState(initialNote?.endDate ?? new Date().getTime());
+  const [content, setContent] = useState(initialNote?.content ?? '');
+  const [image, setImage] = useState(initialNote?.image ?? '');
+  const [color, setColor] = useState(initialNote?.color ?? DEFAULT_COLOR);
+  const [rating, setRating] = useState(initialNote?.rating ?? 1);
+  const [type, setType] = useState<CustomLabel | null>(initialNote?.type ?? null);
+  const [category, setCategory] = useState<CustomLabel[]>(initialNote?.category ?? []);
+  const [isLocked, setIsLocked] = useState(initialNote?.isLocked ?? false);
+  const [isStarred, setIsStarred] = useState(initialNote?.isStarred ?? false);
 
   const [editorState, setEditorState] = useState<EditorState>(EditorState.createEmpty());
   const [prevNote, setPrevNote] = useState<Note | null>(null);
@@ -84,6 +88,30 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [words, setWords] = useState(0);
+
+  const currentNote: Note = {
+    ...initialNote,
+    _id: initialNote?._id ?? '',
+    author: userId ?? "",
+    title: title.trim(),
+    content: content.trim(),
+    color,
+    startDate,
+    rating,
+    type,
+    category,
+    isStarred,
+    isLocked,
+  };
+
+  const [savedNote, setSavedNote] = useState(currentNote);
+
+  const hasChanges = !isEqual(savedNote, currentNote);
+
+  const hasChangesIfIgnoreLocked = !isEqual(
+    { ...savedNote, isLocked: false },
+    { ...initialNote, isLocked: false },
+  );
 
   const resetState = () => {
     setId('');
@@ -117,11 +145,12 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         }
 
         setCurrentNote(note);
+        setSavedNote(note);
 
         setId(note._id)
         setTitle(note.title);
         setStartDate(note.startDate);
-        // setEndDate(note.endDate);
+        setEndDate(note.endDate ?? new Date().getTime());
         setContent(note.content || '');
         setImage(note.image || '');
         setColor(note.color);
@@ -144,10 +173,15 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
   );
 
   const saveNoteHandler = async (shouldLock?: boolean, withAlert = true) => {
-    const isNewNote = !_id;
-
     if (!userId) {
       logging.error("The user doesn't have an id");
+
+      return;
+    }
+
+    if (isAfter(startDate, endDate)) {
+      withAlert && dispatch(setErrorMsg(("The start date cannot be later than the end date")));
+      logging.error("The start date cannot be later than the end date");
 
       return;
     }
@@ -155,27 +189,17 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     withAlert && dispatch(setErrorMsg(''));
     setIsSaving(true);
 
-    const newNoteData: Note = {
+    setSavedNote({
       ...currentNote,
-      _id: currentNote?._id ?? '',
-      author: userId ?? "",
-      title: title.trim(),
-      content: content.trim(),
-      color,
-      startDate,
-      rating,
-      type,
-      category,
-      isStarred,
-      isLocked,
-    };
+      isLocked: shouldLock ?? currentNote.isLocked,
+    });
 
     const updateNoteData: UpdateNoteRequest = {
-      ...newNoteData,
-      title: newNoteData.title || "Note",
+      ...currentNote,
+      title: currentNote.title || "Note",
       type: type?._id ?? null,
       category: category.map(item => item._id),
-      isLocked: shouldLock ?? newNoteData.isLocked,
+      isLocked: shouldLock ?? currentNote.isLocked,
     };
 
     try {
@@ -228,7 +252,15 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
   };
 
   const handleLockedClick = () => {
-    setIsLocked(!isLocked);
+    if (isLocked || !(hasChangesIfIgnoreLocked || (!isLocked && !savedNote.isLocked))) {
+      setIsLocked((prev) => !prev);
+
+      return;
+    }
+
+    setIsLocked(true);
+    saveNoteHandler(true, false);
+
     dispatch(setSuccessMsg(`Note was ${isLocked ? 'unlocked' : 'locked'}.`));
   };
 
@@ -305,11 +337,11 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
               }`}
             required={true}
           />
-          {!isShort && _id !== '' && <NoteSavingIndicator isSaving={isSaving} />}
+          {!isShort && _id !== '' && <NoteSavingIndicator isSaving={isSaving} isLocked={isLocked} hasChanges={hasChanges} />}
         </div>
         <div className="fl lg:flex-row flex-col border-bottom-lg-show mb-6">
-          <div className="fl xs:h-11 border-bottom-lg lg:w-auto w-full lg:justify-start xs:justify-between justify-center xs:flex-row flex-col lg:border-r-2 xlg:pr-4">
-            <NoteDate disabled={isSaving || isLocked} date={startDate} isStartDate={true} setDate={setStartDate} inputClassname="border-bottom-xs w-full fl justify-center" />
+          <div className="fl xs:h-12 border-bottom-lg lg:w-auto w-full lg:justify-start xs:justify-between justify-center xs:flex-row flex-col lg:border-r-2 xlg:pr-4">
+            <NoteDate disabled={isSaving || isLocked} date={startDate} isStartDate setDate={setStartDate} inputClassname="border-bottom-xs w-full fl justify-center" />
             <BsDashLg className="xlg:mx-6 lg:mx-1 mx-3 xs:block hidden xs:text-4xl text-xl" />
             <NoteDate disabled={isSaving || isLocked} date={endDate} isStartDate={false} setDate={setEndDate} inputClassname="xs:mt-0 mt-3" />
           </div>
@@ -360,7 +392,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
               e.preventDefault();
               saveNoteHandler();
             }}
-            disabled={isSaving || isLocked}
+            disabled={isSaving || isLocked || (!isNewNote && (!hasChanges || title.trim() === ""))}
             type="submit"
             icon={<RiSave3Fill className="mr-2" />}
             text={_id !== '' ? 'Update' : 'Create'}
