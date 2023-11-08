@@ -1,13 +1,13 @@
 import { AiFillStar } from 'react-icons/ai';
 import { useNavigate, useParams } from 'react-router-dom';
 import { setShowSidebar } from '../../features/journal/journalSlice';
-import { useWindowSize } from '../../hooks';
-import { useAppDispatch } from './../../app/hooks';
-import INote from './../../interfaces/note';
 import NoteInfo from './../note/NoteInfo';
+import { useAppDispatch } from '../../store/helpers/storeHooks';
+import { useWindowSize } from '../../hooks/useWindowSize';
+import { Note } from '../../features/journal/types';
 
 interface NoteSidebarPreviewProps {
-    note: INote;
+    note: Note;
 }
 
 const NoteSidebarPreview = ({ note }: NoteSidebarPreviewProps) => {

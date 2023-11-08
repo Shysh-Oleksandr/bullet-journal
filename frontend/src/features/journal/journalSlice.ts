@@ -1,76 +1,77 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
-import INote from '../../interfaces/note';
-import config from './../../config/config';
-import IUser from './../../interfaces/user';
-import { dateDiffInDays } from './../../utils/functions';
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../../store/store';
+import { User } from '../user/types';
+import { logout } from '../user/userSlice';
+import { notesApi } from './journalApi';
+import { CustomLabel, Note } from './types';
 
-export interface IJournalState {
-    notes: INote[];
-    loading: boolean;
-    isSidebarShown?: boolean;
-    isFilterBarShown?: boolean;
-    error: string;
-    success: string;
-    oldestNoteDate: number;
+export const STATE_KEY = 'journal';
+
+interface JournalState {
+    notes: Note[];
+    errorMsg: string | null;
+    successMsg: string | null;
+    labels: CustomLabel[];
+    isSidebarShown: boolean;
+    isFilterBarShown: boolean;
+    oldestNoteDate: number | null;
 }
 
-const initialState: IJournalState = {
+const initialState: JournalState = {
     notes: [],
-    loading: true,
-    isSidebarShown: (document.documentElement.clientWidth > 1023 && localStorage.getItem('isSidebarShown') === 'true') || false,
-    isFilterBarShown: (document.documentElement.clientWidth > 425 && localStorage.getItem('isFilterBarShown') === 'true') || false,
-    error: '',
-    success: '',
-    oldestNoteDate: 0
+    labels: [],
+    errorMsg: null,
+    successMsg: null,
+    isSidebarShown: document.documentElement.clientWidth > 1023 && localStorage.getItem('isSidebarShown') === 'true',
+    isFilterBarShown: document.documentElement.clientWidth > 425 && localStorage.getItem('isFilterBarShown') === 'true',
+    oldestNoteDate: null
 };
 
 export interface IFilterNotes {
-    user: IUser;
-    filter?: (notes: INote[]) => INote[];
-    sort?: (notes: INote[]) => INote[];
+    user: User;
+    filter?: (notes: Note[]) => Note[];
+    sort?: (notes: Note[]) => Note[];
 }
 
-export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', async ({ user, filter, sort }: IFilterNotes) => {
-    const response = await axios({
-        method: 'GET',
-        url: `${config.server.url}/notes/${user._id}`
-    });
+// export const fetchAllNotes = createAsyncThunk('journal/fetchAllNotesStatus', async ({ user, filter, sort }: IFilterNotes) => {
+//     const response = await axios({
+//         method: 'GET',
+//         url: `${config.server.url}/notes/${user._id}`
+//     });
 
-    if (response.status === 200 || response.status === 304) {
-        let notes = response.data.notes as INote[];
-        const oldestNoteDate = notes.sort((x, y) => y.startDate - x.startDate).at(-1)?.startDate;
-        notes = filter ? filter(notes) : notes;
-        const endNotes: INote[] = notes
-            .filter((note) => dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 >= 2)
-            .map((note) => {
-                // Adding end date notes.
-                const copyNote = JSON.parse(JSON.stringify(note));
-                copyNote.isEndNote = true;
-                const startDate = copyNote.startDate;
-                copyNote.startDate = copyNote.endDate;
-                copyNote.endDate = startDate;
-                return copyNote;
-            });
-        notes = [...notes, ...endNotes].filter((note) => note.startDate <= new Date().getTime());
+//     if (response.status === 200 || response.status === 304) {
+//         let notes = response.data.notes as Note[];
+//         const oldestNoteDate = notes.sort((x, y) => y.startDate - x.startDate).at(-1)?.startDate;
+//         notes = filter ? filter(notes) : notes;
+//         const endNotes: Note[] = notes
+//             .filter((note) => note.endDate && dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 >= 2)
+//             .map((note) => {
+//                 // Adding end date notes.
+//                 const copyNote = JSON.parse(JSON.stringify(note));
+//                 copyNote.isEndNote = true;
+//                 const startDate = copyNote.startDate;
+//                 copyNote.startDate = copyNote.endDate;
+//                 copyNote.endDate = startDate;
+//                 return copyNote;
+//             });
+//         notes = [...notes, ...endNotes].filter((note) => note.startDate <= new Date().getTime());
 
-        notes = sort ? sort(notes) : notes.sort((x, y) => y.startDate - x.startDate);
-        return { notes: notes, oldestNoteDate: oldestNoteDate };
-    } else {
-        return { notes: [] };
-    }
-});
+//         notes = sort ? sort(notes) : notes.sort((x, y) => y.startDate - x.startDate);
+//         return { notes: notes, oldestNoteDate: oldestNoteDate };
+//     } else {
+//         return { notes: [] };
+//     }
+// });
 
 export const journalSlice = createSlice({
-    name: 'journal',
+    name: STATE_KEY,
     initialState,
-    // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-        setNotes: (state, { payload }: PayloadAction<INote[]>) => {
-            state.notes = payload;
+        setErrorMsg: (state, { payload }: PayloadAction<string | null>) => {
+            state.errorMsg = payload;
         },
-        setError: (state, { payload }: PayloadAction<string>) => {
-            state.error = payload;
+        setSuccessMsg: (state, { payload }: PayloadAction<string | null>) => {
+            state.successMsg = payload;
         },
         setShowSidebar: (state, { payload }: PayloadAction<boolean>) => {
             state.isSidebarShown = payload;
@@ -79,28 +80,47 @@ export const journalSlice = createSlice({
         setShowFilterBar: (state, { payload }: PayloadAction<boolean>) => {
             state.isFilterBarShown = payload;
             localStorage.setItem('isFilterBarShown', payload.toString());
-        },
-        setSuccess: (state, { payload }: PayloadAction<string>) => {
-            state.success = payload;
         }
     },
     extraReducers: (builder) => {
         // Fetch all notes
-        builder.addCase(fetchAllNotes.pending, (state, action) => {
-            state.loading = true;
+        builder.addMatcher(notesApi.endpoints.fetchNotes.matchFulfilled, (state, action) => {
+            const { notes } = action.payload;
+
+            state.notes = notes;
+            state.oldestNoteDate = notes.at(-1)?.startDate ?? 0;
         });
-        builder.addCase(fetchAllNotes.fulfilled, (state, action) => {
-            state.notes = action.payload.notes;
-            state.loading = false;
-            if (!state.oldestNoteDate) state.oldestNoteDate = action.payload.oldestNoteDate ? action.payload.oldestNoteDate : state.oldestNoteDate;
+        builder.addMatcher(notesApi.endpoints.fetchLabels.matchFulfilled, (state, action) => {
+            state.labels = action.payload.customLabels;
         });
-        builder.addCase(fetchAllNotes.rejected, (state, action) => {
-            state.loading = false;
-            state.error = 'Unable to retreive notes.';
-        });
+        builder.addMatcher(logout.match, () => ({
+            ...initialState
+        }));
     }
 });
 
-export const { setNotes, setError, setSuccess, setShowFilterBar, setShowSidebar } = journalSlice.actions;
+export const { setErrorMsg, setSuccessMsg, setShowFilterBar, setShowSidebar } = journalSlice.actions;
 
 export default journalSlice.reducer;
+
+// Selectors
+export const getNotes = (state: RootState): Note[] => state[STATE_KEY].notes;
+
+export const getNoteById = createSelector([getNotes, (_, noteId: string) => noteId], (notes, noteId) => notes.find((note) => note._id === noteId));
+
+export const getOldestNoteDate = (state: RootState): number | null => state[STATE_KEY].oldestNoteDate;
+
+export const getIsSidebarShown = (state: RootState): boolean => state[STATE_KEY].isSidebarShown;
+export const getIsFilterBarShown = (state: RootState): boolean => state[STATE_KEY].isFilterBarShown;
+
+export const getErrorMsg = (state: RootState): string | null => state[STATE_KEY].errorMsg;
+export const getSuccessMsg = (state: RootState): string | null => state[STATE_KEY].successMsg;
+export const getInfoMessages = (state: RootState) => ({ successMsg: state[STATE_KEY].successMsg, errorMsg: state[STATE_KEY].errorMsg });
+
+export const getLabels = (state: RootState): CustomLabel[] => state[STATE_KEY].labels;
+
+export const getLabelsIds = createSelector(getLabels, (labels) => labels.map((label) => label._id));
+
+export const getCustomTypes = createSelector(getLabels, (labels) => labels.filter((label) => !label.isCategoryLabel));
+
+export const getCustomCategories = createSelector(getLabels, (labels) => labels.filter((label) => label.isCategoryLabel));

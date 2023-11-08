@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
-import INote from '../../interfaces/note';
 import { getDifferentColor, sanitizedData } from '../../utils/functions';
 import NoteInfo from './NoteInfo';
 import { dateDiffInDays } from './../../utils/functions';
 import { AiFillStar } from 'react-icons/ai';
 import { getTimeByDate } from '../../utils/getFormattedDate';
+import { Note } from '../../features/journal/types';
+import { Link } from 'react-router-dom';
 
 interface NoteBodyProps {
   onMouseEnter?: () => void;
@@ -14,19 +15,19 @@ interface NoteBodyProps {
   titleClassName?: string;
   contentClassName?: string;
   className?: string;
-  note: INote;
+  note: Note;
   showImage?: boolean;
 }
 
 const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName, className, contentClassName, note, showImage }: NoteBodyProps) => {
-  const noteTime = useMemo(() => dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1, [note.endDate, note.startDate]) ;
+  const noteTime = useMemo(() => note.endDate ? dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 : 0, [note.endDate, note.startDate]);
 
   return (
-    <div
+    <Link
       className={`note__preview relative rounded-lg shadow-md sm:pt-4 sm:pb-2 pt-3 pb-1 sm:px-8 px-6 transition-colors flex-between ${className}`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      onClick={onClick}
+      to={`/edit/${note._id}`}
       style={{ backgroundColor: bgColor || note.color, color: getDifferentColor(note.color, 185) }}
     >
       <div className="w-full">
@@ -64,7 +65,7 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
         </div>
       </div>
       {note.image && showImage && note.isEndNote && <div className="sm:w-64 w-56 sm:h-24 h-20 note__image rounded-md ml-4" style={{ backgroundImage: `url(${note.image})` }}></div>}
-    </div>
+    </Link>
   );
 };
 

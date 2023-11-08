@@ -1,10 +1,10 @@
 import React from 'react';
-import INote from '../../../interfaces/note';
 import OtherNoteBtn from './OtherNoteBtn';
+import { Note } from '../../../features/journal/types';
 
 interface OtherNotesProps {
-    prevNote: INote | null;
-    nextNote: INote | null;
+    prevNote: Note | null;
+    nextNote: Note | null;
 }
 const OtherNotes = ({ prevNote, nextNote }: OtherNotesProps) => {
     return (

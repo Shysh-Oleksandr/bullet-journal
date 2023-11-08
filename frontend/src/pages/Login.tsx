@@ -1,62 +1,57 @@
 import firebase from 'firebase/compat/app';
-import React, { useState } from 'react';
 import { BsGithub, BsGoogle } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../app/hooks';
-import CenterPiece from '../components/auth/CenterPiece';
-import LoginBtn from '../components/auth/LoginBtn';
 import InfoMessage from '../components/UI/InfoMessage';
 import Loading from '../components/UI/Loading';
 import { Providers } from '../config/firebase';
 import logging from '../config/logging';
-import { login } from '../features/user/userSlice';
-import { Authenticate, SignInWithSocialMedia as SocialMediaPopup } from '../modules/auth';
+import { authApi } from '../features/user/userApi';
+import { getAuthErrorMsg, getIsAuthenticating } from '../features/user/userSlice';
+import { useAppSelector } from '../store/helpers/storeHooks';
+import { auth } from '../config/firebase';
+import CenterPiece from '../features/user/components/CenterPiece';
+import LoginBtn from '../features/user/components/LoginBtn';
+
+const SocialMediaPopup = (provider: firebase.auth.AuthProvider) =>
+  new Promise<firebase.auth.UserCredential>((resolve, reject) => {
+    auth.signInWithPopup(provider)
+      .then((result) => resolve(result))
+      .catch((error) => reject(error));
+  });
+
+const isLogin = window.location.pathname.includes('login');
 
 const LoginPage = () => {
-  const [authenticating, setAuthenticating] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const isAuthenticating = useAppSelector(getIsAuthenticating);
+  const errorMsg = useAppSelector(getAuthErrorMsg);
+
+  const [login] = authApi.useLazyLoginQuery();
 
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
-  const isLogin = window.location.pathname.includes('login');
+  const SignInWithSocialMedia = async (provider: firebase.auth.AuthProvider) => {
+    try {
+      const response = await SocialMediaPopup(provider);
 
-  const SignInWithSocialMedia = (provider: firebase.auth.AuthProvider) => {
-    if (error !== '') setError('');
-    setAuthenticating(true);
+      const user = response?.user;
 
-    SocialMediaPopup(provider)
-      .then(async (result) => {
-        let user = result.user;
-        if (user) {
-          let uid = user.uid;
+      if (!user) {
+        logging.error("No user found");
 
-          try {
-            let fire_token = await user.getIdToken(true);
+        return;
+      }
 
-            Authenticate(uid, fire_token, (error, _user) => {
-              if (error) {
-                setError(error);
-                setAuthenticating(false);
-              } else if (_user) {
-                dispatch(login({ user: _user, fire_token }));
-                navigate('/');
-              }
-            });
-          } catch (error) {
-            setError('Invalid token.');
-            logging.error(error);
-            setAuthenticating(false);
-          }
-        } else {
-          setError('The identify provider is missing a lot of the necessary information. Please try another account or provider.');
-          setAuthenticating(false);
-        }
-      })
-      .catch((error) => {
-        setAuthenticating(false);
-        setError(error.message);
-      });
+      const { uid } = user;
+
+      const fire_token = await user.getIdToken();
+      const loginResponse = await login({ fire_token, uid });
+
+      if (loginResponse.data?.user) {
+        navigate('/');
+      }
+    } catch (error) {
+      logging.error(error);
+    }
   };
 
   return (
@@ -67,22 +62,20 @@ const LoginPage = () => {
           <div className="text-center">
             <LoginBtn
               className="disabled:bg-orange-900 bg-orange-600  hover:bg-orange-700"
-              authenticating={authenticating}
-              isLogin={isLogin}
+              authenticating={isAuthenticating}
               icon={<BsGoogle />}
               onclick={() => SignInWithSocialMedia(Providers.google)}
               providerName="Google"
             />
             <LoginBtn
               className="disabled:bg-gray-900 bg-gray-600  hover:bg-gray-700"
-              authenticating={authenticating}
-              isLogin={isLogin}
+              authenticating={isAuthenticating}
               icon={<BsGithub />}
               onclick={() => SignInWithSocialMedia(Providers.github)}
               providerName="Github"
             />
-            <InfoMessage message={error} isError={true} />
-            {authenticating && <Loading scaleSize={1.2} innerClassName='!pt-12 !pb-10'/>}
+            <InfoMessage message={errorMsg} isError={true} />
+            {isAuthenticating && <Loading scaleSize={1.2} innerClassName='!pt-12 !pb-10' />}
           </div>
         </div>
       </div>

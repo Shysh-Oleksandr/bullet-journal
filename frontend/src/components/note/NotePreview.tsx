@@ -1,11 +1,11 @@
 import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import INote from '../../interfaces/note';
 import { getDifferentColor } from '../../utils/functions';
 import NoteBody from './NoteBody';
+import { Note } from '../../features/journal/types';
 
 interface INotePreviewProps {
-  note: INote;
+  note: Note;
   previousNoteStartDate: number | null;
 }
 
@@ -27,7 +27,7 @@ const NotePreview = ({ note, previousNoteStartDate }: INotePreviewProps) => {
         onMouseLeave={() => setHover(false)}
         onClick={() => navigate(`/edit/${note._id}`)}
         bgColor={hover ? getDifferentColor(note.color, -10) : note.color}
-        titleClassName='hover:underline !cursor-pointer'
+        titleClassName='hover:underline'
         className={`cursor-pointer note__body sm:mt-8 mt-6`}
         note={note}
         showImage

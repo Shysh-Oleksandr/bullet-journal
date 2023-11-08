@@ -19,11 +19,6 @@ export default interface INote extends Document {
     isDefault?: boolean;
 }
 
-export interface INoteType {
-    name: string;
-    color?: string;
-}
-
 export type CreateDefaultNotePayload = Pick<INote, 'title' | 'startDate' | 'endDate' | 'content' | 'color' | 'rating' | 'isEndNote' | 'isLocked' | 'isStarred' | 'isDefault'>;
 
 export const DEFAULT_NOTES: CreateDefaultNotePayload[] = [
