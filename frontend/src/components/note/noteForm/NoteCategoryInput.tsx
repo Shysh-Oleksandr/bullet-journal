@@ -1,15 +1,15 @@
-import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 import { BsPlusLg } from 'react-icons/bs';
 import { IoIosColorPalette } from 'react-icons/io';
-import config from '../../../config/config';
-import { setErrorMsg, setSuccessMsg } from '../../../features/journal/journalSlice';
-import { useFetchData } from '../../../hooks';
-import { getCategoriesLabelName, getRandomColor } from '../../../utils/functions';
-import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
-import { getUserId } from '../../../features/user/userSlice';
+import { notesApi } from '../../../features/journal/journalApi';
+import { getCustomCategories, setErrorMsg, setSuccessMsg } from '../../../features/journal/journalSlice';
 import { CustomLabel } from '../../../features/journal/types';
+import { getUserId } from '../../../features/user/userSlice';
+import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
+import { getCategoriesLabelName, getRandomColor } from '../../../utils/functions';
+
+const labelName = 'category';
 
 interface NoteLabelInputProps {
   setLabel: React.Dispatch<React.SetStateAction<CustomLabel[]>>;
@@ -19,50 +19,25 @@ interface NoteLabelInputProps {
 }
 
 const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInputProps) => {
-  const userId = useAppSelector(getUserId) ?? '';
-  const [fetchLabels, setFetchLabels] = useState(false);
-  const [customLabels] = useFetchData<CustomLabel>('GET', `${config.server.url}/customlabels/${userId}`, 'customLabels', fetchLabels);
+  const [createLabel] = notesApi.useCreateLabelMutation();
+  const [deleteLabel] = notesApi.useDeleteLabelMutation();
 
-  const [currentCustomLabels, setCurrentCustomLabels] = useState<CustomLabel[]>([]);
+  const dispatch = useAppDispatch();
+
+  const userId = useAppSelector(getUserId) ?? '';
+  const labels = useAppSelector(getCustomCategories);
+
+  const [currentCustomLabels, setCurrentCustomLabels] = useState<CustomLabel[]>(labels);
   const [focused, setFocused] = useState(false);
+  const [inputLabel, setInputLabel] = useState(getCategoriesLabelName(label));
+  const [previousLabel, setPreviousLabel] = useState(inputLabel);
+  const [color, setColor] = useState(getRandomColor());
+
   const labelInputRef = useRef<HTMLInputElement>(null);
   const labelAddRef = useRef<HTMLButtonElement>(null);
 
-  const [inputLabel, setInputLabel] = useState(getCategoriesLabelName(label));
-
-  const [previousLabel, setPreviousLabel] = useState<string>(inputLabel);
-  const [color, setColor] = useState<string>(getRandomColor());
-  const labelName = 'category';
-  const dispatch = useAppDispatch();
-
   let addedLabel = '';
 
-  useEffect(() => {
-    const keyDownHandler = (event) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        if (document.activeElement === labelInputRef.current) {
-          labelAddRef.current?.click();
-        }
-      }
-    };
-
-    document.addEventListener('keydown', keyDownHandler);
-
-    return () => {
-      document.removeEventListener('keydown', keyDownHandler);
-    };
-  }, []);
-
-  useEffect(() => {
-    setInputLabel(getCategoriesLabelName(label));
-  }, [label]);
-
-  useEffect(() => {
-    if (currentCustomLabels.length > 0 || customLabels.length === 0) return;
-
-    setCurrentCustomLabels(customLabels.filter((label) => label.isCategoryLabel))
-  }, [currentCustomLabels.length, customLabels]);
 
   const onFocus = () => {
     setFocused(true);
@@ -87,66 +62,57 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
 
     if (newLabel.trim() === '') {
       dispatch(setErrorMsg(`Note ${labelName} cannot be empty.`));
-    } else if (!isNew) {
-      dispatch(setErrorMsg(`Note ${labelName} "${newLabel}" already exists.`));
-    } else {
-      try {
-        const response = await axios({
-          method: 'POST',
-          url: `${config.server.url}/customlabels/create`,
-          data: {
-            labelName: newLabel,
-            color: color,
-            isCategoryLabel: true,
-            user: userId
-          }
-        });
-
-        if (response.status === 201) {
-          dispatch(setSuccessMsg(`New ${labelName} "${newLabel}" added.`));
-          addedLabel = newLabel;
-          setFetchLabels(prev => !prev);
-
-          const newLabels = [...label, response.data.customLabel];
-          setCurrentCustomLabels(prev => [...prev, response.data.customLabel])
-          setLabel(newLabels);
-          setInputLabel(getCategoriesLabelName(newLabels));
-
-          setColor(getRandomColor());
-        } else {
-          dispatch(setErrorMsg(`Unable to create note ${labelName}.`));
-        }
-      } catch (error: any) {
-        dispatch(setErrorMsg(error.message));
-      }
-      labelInputRef.current?.blur();
+      return;
     }
+    if (!isNew) {
+      dispatch(setErrorMsg(`Note ${labelName} "${newLabel}" already exists.`));
+      return;
+    }
+
+    try {
+      const createLabelData = {
+        labelName: newLabel.trim(),
+        isCategoryLabel: true,
+        user: userId,
+        color,
+      };
+
+      const { customLabel } = await createLabel(createLabelData).unwrap();
+
+      addedLabel = newLabel;
+
+      const newLabels = [...label, customLabel];
+
+      setLabel(newLabels);
+      setCurrentCustomLabels(prev => [...prev, customLabel])
+      setInputLabel(getCategoriesLabelName(newLabels));
+      setColor(getRandomColor());
+
+      dispatch(setSuccessMsg(`New ${labelName} "${newLabel}" added.`));
+    } catch (error) {
+      dispatch(setErrorMsg(`Unable to create note ${labelName}.`));
+    }
+
+    labelInputRef.current?.blur();
   };
 
-  const deleteLabel = async (labelToDelete: CustomLabel) => {
+  const deleteLabelHandler = async (labelToDelete: CustomLabel) => {
     if (disabled) return;
 
     try {
-      const response = await axios({
-        method: 'DELETE',
-        url: `${config.server.url}/customlabels/${labelToDelete._id}`
-      });
+      deleteLabel(labelToDelete._id);
 
-      if (response.status === 200) {
-        dispatch(setSuccessMsg(`Note ${labelName} "${labelToDelete.labelName}" has been deleted.`));
-        setFetchLabels(!fetchLabels);
-        setCurrentCustomLabels(prev => prev.filter(item => item._id !== labelToDelete._id))
+      setCurrentCustomLabels(prev => prev.filter(item => item._id !== labelToDelete._id))
 
-        if (label.map((l) => l._id).includes(labelToDelete._id)) {
-          const newLabel = label.filter((label) => label._id !== labelToDelete._id);
-          setLabel(newLabel);
-          setInputLabel(getCategoriesLabelName(newLabel));
-        }
-      } else {
-        dispatch(setErrorMsg(`Unable to delete note ${labelName}.`));
+      dispatch(setSuccessMsg(`Note ${labelName} "${labelToDelete.labelName}" has been deleted.`));
+
+      if (label.map((l) => l._id).includes(labelToDelete._id)) {
+        const newLabel = label.filter((label) => label._id !== labelToDelete._id);
+        setLabel(newLabel);
+        setInputLabel(getCategoriesLabelName(newLabel));
       }
     } catch (error: any) {
-      dispatch(setErrorMsg(error.message));
+      dispatch(setErrorMsg(`Unable to delete note ${labelName}.`));
     }
   };
 
@@ -158,6 +124,33 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
     setLabel(newLabel);
     setInputLabel(getCategoriesLabelName(newLabel));
   };
+
+  useEffect(() => {
+    const keyDownHandler = (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        if (document.activeElement === labelInputRef.current) {
+          labelAddRef.current?.click();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', keyDownHandler);
+
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, []);
+
+  useEffect(() => {
+    setInputLabel(getCategoriesLabelName(label));
+  }, [label]);
+
+  useEffect(() => {
+    if(currentCustomLabels.length === 0) {
+      setCurrentCustomLabels(labels)
+    }
+  }, [currentCustomLabels.length, labels]);
 
   return (
     <div className="relative categories-form">
@@ -225,7 +218,7 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteLabel(customLabel);
+                  deleteLabelHandler(customLabel);
                 }}
                 className="absolute right-2 top-1/2 rounded-md -translate-y-1/2 text-xl p-[5px] transition-colors bg-cyan-800 hover:bg-cyan-900"
               >

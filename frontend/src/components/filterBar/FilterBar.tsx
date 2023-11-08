@@ -1,10 +1,7 @@
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
-import config from '../../config/config';
-import { getIsFilterBarShown, getOldestNoteDate, setShowFilterBar } from '../../features/journal/journalSlice';
-import { CustomLabel, Note } from '../../features/journal/types';
-import { getUserId } from '../../features/user/userSlice';
-import { useFetchData } from '../../hooks';
+import { getCustomCategories, getCustomTypes, getIsFilterBarShown, getOldestNoteDate, setShowFilterBar } from '../../features/journal/journalSlice';
+import { Note } from '../../features/journal/types';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useAppDispatch, useAppSelector } from '../../store/helpers/storeHooks';
 import { SortOptions, filterOptions, getLastPeriodDate } from './../../utils/data';
@@ -20,16 +17,11 @@ interface FilterBarProps {
 const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
   const dispatch = useAppDispatch();
 
-  const userId = useAppSelector(getUserId);
   const oldestNoteDate = useAppSelector(getOldestNoteDate);
   const isFilterBarShown = useAppSelector(getIsFilterBarShown);
 
-  const [customLabels] = useFetchData<CustomLabel>('GET', `${config.server.url}/customlabels/${userId ?? ''}`, 'customLabels');
-
-  const { allTypes, allCategories } = useMemo(() => ({
-    allTypes: customLabels.filter((label) => !label.isCategoryLabel),
-    allCategories: customLabels.filter((label) => label.isCategoryLabel),
-  }), [customLabels])
+  const allCategories = useAppSelector(getCustomCategories);
+  const allTypes = useAppSelector(getCustomTypes);
 
   const [wasReset, setWasReset] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
