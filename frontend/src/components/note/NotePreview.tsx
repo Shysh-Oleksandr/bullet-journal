@@ -27,7 +27,7 @@ const NotePreview = ({ note, previousNoteStartDate }: INotePreviewProps) => {
         onMouseLeave={() => setHover(false)}
         onClick={() => navigate(`/edit/${note._id}`)}
         bgColor={hover ? getDifferentColor(note.color, -10) : note.color}
-        titleClassName='hover:underline !cursor-pointer'
+        titleClassName='hover:underline'
         className={`cursor-pointer note__body sm:mt-8 mt-6`}
         note={note}
         showImage

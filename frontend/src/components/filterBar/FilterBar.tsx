@@ -14,6 +14,7 @@ interface FilterBarProps {
   setShowFullAddForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+// TODO: Handle correctly
 const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
   const dispatch = useAppDispatch();
 
@@ -39,15 +40,11 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
   const filterData = { sortType, startDate, endDate, type, category, importanceMin, importanceMax, showAnyCategory, wasReset, oldestNoteDate, showAnyType, allTypes, allCategories };
   const filterDataSetters = { setSortType, setStartDate, setEndDate, setType, setCategory, setImportanceMin, setImportanceMax, setShowAnyCategory, setShowAnyType };
   const debouncedSearchTerm = useDebounce(searchQuery, 500);
-  const debouncedSortType = useDebounce(sortType, 500);
   const debouncedStartDate = useDebounce(startDate, 500);
   const debouncedEndDate = useDebounce(endDate, 500);
-  const debouncedShowAnyCategory = useDebounce(showAnyCategory, 500);
-  const debouncedShowAnyType = useDebounce(showAnyType, 500);
+
   const debouncedType = useDebounce(type, 500);
   const debouncedCategory = useDebounce(category, 500);
-  const debouncedImportanceMin = useDebounce(importanceMin, 500);
-  const debouncedImportanceMax = useDebounce(importanceMax, 500);
 
   const sort = useCallback(
     (notes: Note[]) => {
@@ -119,41 +116,9 @@ const FilterBar = ({ filterBarRef, setShowFullAddForm }: FilterBarProps) => {
     setWasReset(!wasReset);
   };
 
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   // Handle filtering and sorting
-  //   dispatch(fetchAllNotes({ user, filter, sort }));
-  // }, [
-  //   debouncedSortType,
-  //   debouncedStartDate,
-  //   debouncedEndDate,
-  //   debouncedType,
-  //   debouncedCategory,
-  //   debouncedImportanceMin,
-  //   debouncedImportanceMax,
-  //   debouncedSearchTerm,
-  //   debouncedShowAnyCategory,
-  //   debouncedShowAnyType
-  // ]);
-
   useEffect(() => {
     setStartDate(oldestNoteDate);
   }, [oldestNoteDate]);
-
-  // Choosing new added type.
-  useEffect(() => {
-    if (!type.includes(allTypes.map((label) => label.labelName).at(-1) || '')) {
-      setType((prev) => [...prev, allTypes.map((label) => label.labelName).at(-1) || '']);
-    }
-  }, []); // TODO: handle dependency correctly
-
-  // Choosing new added category.
-  useEffect(() => {
-    if (!category.includes(allCategories.map((label) => label.labelName).at(-1) || '')) {
-      setCategory((prev) => [...prev, allCategories.map((label) => label.labelName).at(-1) || '']);
-    }
-  }, []); // TODO: handle dependency correctly
 
   return (
     <div

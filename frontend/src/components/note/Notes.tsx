@@ -10,6 +10,8 @@ import { useWindowSize } from '../../hooks/useWindowSize';
 import { Note } from '../../features/journal/types';
 import { getIsFilterBarShown, getIsSidebarShown } from '../../features/journal/journalSlice';
 
+const withFilterBar = false;
+
 interface NotesProps {
   notes: Note[];
 }
@@ -32,10 +34,10 @@ const Notes = ({ notes }: NotesProps) => {
 
   return (
     <div
-      style={{ paddingTop: isFilterBarShown ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 20 : 112) : 30 }}
+      style={{ paddingTop: isFilterBarShown && withFilterBar ? (filterBarRef.current ? filterBarRef.current.offsetHeight + 20 : 112) : 20 }}
       className={`notes ${isSidebarShown && width > 1024 ? 'small-padding-x' : 'padding-x'} transition-all duration-500 relative`}
     >
-      <FilterBar filterBarRef={filterBarRef} setShowFullAddForm={setShowFullAddForm} />
+      {withFilterBar && <FilterBar filterBarRef={filterBarRef} setShowFullAddForm={setShowFullAddForm} />}
 
       <h5 className="sm:text-2xl text-xl text-left lg:mb-2 md:mb-3 mb-6 text-slate-500 font-semibold">Add a quick note</h5>
       <div className="relative">
