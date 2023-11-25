@@ -9,7 +9,7 @@ const config = {
         measurementId: 'G-SGNH6PWV8L'
     },
     server: {
-        url: "http://192.168.0.103:8001" ?? process.env.REACT_APP_API_URL ?? 'http://localhost:8001' // Local ip: http://192.168.0.103:8001
+        url: process.env.REACT_APP_API_URL ?? 'http://localhost:8001' // Local ip: http://192.168.0.103:8001
     }
 };
 
