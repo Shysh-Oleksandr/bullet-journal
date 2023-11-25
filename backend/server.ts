@@ -72,4 +72,4 @@ router.use((req, res, next) => {
 });
 
 /** Listen */
-router.listen(config.server.port, config.server.host, () => logging.info(`Server is running ${config.server.host}:${config.server.port}`));
+router.listen(config.server.port, () => logging.info(`Server is running ${config.server.host}:${config.server.port}`));
