@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import logging from '../config/logging';
 import { CreateDefaultLabelPayload } from '../interfaces/customLabel';
 import CustomLabel from '../models/customLabel';
+import { sortByCreatedDate } from '../utils/sortByCreatedDate';
 
 const create = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to register customLabel...');
@@ -57,11 +58,7 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
 
     return CustomLabel.find({ user: author_id })
         .then((customLabels) => {
-          const sortedCustomLabels = customLabels.slice().sort((a, b) => {
-            if(!a.createdAt || !b.createdAt) return 1;
-
-            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-          })
+            const sortedCustomLabels = sortByCreatedDate(customLabels);
 
             return res.status(200).json({
                 count: customLabels.length,

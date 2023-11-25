@@ -30,5 +30,5 @@ const CustomLabelSchema = new mongoose_1.Schema({
     isCategoryLabel: { type: Boolean },
     isDefault: { type: Boolean },
     user: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User' }
-});
+}, { timestamps: true });
 exports.default = mongoose_1.default.model('CustomLabel', CustomLabelSchema);

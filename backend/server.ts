@@ -1,12 +1,13 @@
 import express from 'express';
-import logging from './config/logging';
-import config from './config/config';
-import mongoose from 'mongoose';
 import firebaseAdmin from 'firebase-admin';
+import mongoose from 'mongoose';
+import config from './config/config';
+import logging from './config/logging';
 import serviceAccountJson from './config/serviceAccountKey.json';
-import userRoutes from './routes/user';
-import noteRoutes from './routes/note';
 import customLabelRoutes from './routes/customLabel';
+import imageRoutes from './routes/image';
+import noteRoutes from './routes/note';
+import userRoutes from './routes/user';
 
 const router = express();
 
@@ -45,7 +46,7 @@ router.use(express.json());
 /** Rules of our API */
 router.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-user-id');
 
     if (req.method == 'OPTIONS') {
         res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
@@ -59,6 +60,7 @@ router.use((req, res, next) => {
 router.use('/users', userRoutes);
 router.use('/notes', noteRoutes);
 router.use('/customlabels', customLabelRoutes);
+router.use('/images', imageRoutes);
 
 /** Error handling */
 router.use((req, res, next) => {
@@ -70,4 +72,4 @@ router.use((req, res, next) => {
 });
 
 /** Listen */
-router.listen(config.server.port, () => logging.info(`Server is running ${config.server.host}:${config.server.port}`));
+router.listen(config.server.port, config.server.host, () => logging.info(`Server is running ${config.server.host}:${config.server.port}`));

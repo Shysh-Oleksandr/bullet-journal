@@ -22,12 +22,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importStar(require("mongoose"));
-const UserSchema = new mongoose_1.Schema({
-    uid: { type: String, unique: true },
-    name: { type: String }
-}, {
-    timestamps: true
-});
-exports.default = mongoose_1.default.model('User', UserSchema);
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+const express_1 = __importDefault(require("express"));
+const image_1 = __importDefault(require("../controllers/image"));
+const multer_1 = __importStar(require("multer"));
+const router = express_1.default.Router();
+const storage = (0, multer_1.memoryStorage)();
+const upload = (0, multer_1.default)({ storage });
+router.post('/create', image_1.default.create);
+router.patch('/update/:imageID', image_1.default.update);
+router.delete('', image_1.default.deleteImagesHandler);
+router.get('/:authorID', image_1.default.readAll);
+router.post('/upload', upload.single('image'), image_1.default.upload);
+router.post('/uploadMany', upload.array('images'), image_1.default.uploadMany);
+module.exports = router;

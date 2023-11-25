@@ -4,14 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const logging_1 = __importDefault(require("./config/logging"));
-const config_1 = __importDefault(require("./config/config"));
-const mongoose_1 = __importDefault(require("mongoose"));
 const firebase_admin_1 = __importDefault(require("firebase-admin"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const config_1 = __importDefault(require("./config/config"));
+const logging_1 = __importDefault(require("./config/logging"));
 const serviceAccountKey_json_1 = __importDefault(require("./config/serviceAccountKey.json"));
-const user_1 = __importDefault(require("./routes/user"));
-const note_1 = __importDefault(require("./routes/note"));
 const customLabel_1 = __importDefault(require("./routes/customLabel"));
+const image_1 = __importDefault(require("./routes/image"));
+const note_1 = __importDefault(require("./routes/note"));
+const user_1 = __importDefault(require("./routes/user"));
 const router = (0, express_1.default)();
 /** Connect to Firebase */
 let serviceAccount = serviceAccountKey_json_1.default;
@@ -41,7 +42,7 @@ router.use(express_1.default.json());
 /** Rules of our API */
 router.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-user-id');
     if (req.method == 'OPTIONS') {
         res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
         return res.status(200).json({});
@@ -52,6 +53,7 @@ router.use((req, res, next) => {
 router.use('/users', user_1.default);
 router.use('/notes', note_1.default);
 router.use('/customlabels', customLabel_1.default);
+router.use('/images', image_1.default);
 /** Error handling */
 router.use((req, res, next) => {
     const error = new Error('Not found');
@@ -60,4 +62,4 @@ router.use((req, res, next) => {
     });
 });
 /** Listen */
-router.listen(config_1.default.server.port, () => logging_1.default.info(`Server is running ${config_1.default.server.host}:${config_1.default.server.port}`));
+router.listen(config_1.default.server.port, config_1.default.server.host, () => logging_1.default.info(`Server is running ${config_1.default.server.host}:${config_1.default.server.port}`));

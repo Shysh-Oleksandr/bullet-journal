@@ -19,33 +19,19 @@ const note_1 = __importDefault(require("../controllers/note"));
 const customLabel_1 = __importDefault(require("../controllers/customLabel"));
 const note_2 = require("../interfaces/note");
 const customLabel_2 = require("../interfaces/customLabel");
-const firebase_admin_1 = __importDefault(require("firebase-admin"));
 const validate = (req, res, next) => {
-    logging_1.default.info('Token validated, returning user...');
-    let firebase = res.locals.firebase;
-    return user_1.default.findOne({ uid: firebase.uid })
+    logging_1.default.info('Try to validate token...');
+    const { uid } = req.body;
+    const fire_token = res.locals.fire_token;
+    return user_1.default.findOne({ uid })
         .then((user) => {
         if (user) {
-            return res.status(200).json({ user });
+            logging_1.default.info('Token validated, returning user and a fire token...');
+            return res.status(200).json({ user, fire_token });
         }
         else {
             return res.status(401).json({ message: 'user not found' });
         }
-    })
-        .catch((error) => {
-        logging_1.default.error(error);
-        return res.status(500).json({ error });
-    });
-};
-const refreshToken = (req, res, next) => {
-    logging_1.default.info('Trying to refresh the token by uid');
-    let { uid } = req.body;
-    firebase_admin_1.default
-        .auth()
-        .createCustomToken(uid)
-        .then((refreshToken) => {
-        logging_1.default.info(`Refresh token for user ${uid} is created, returning...`);
-        return res.status(200).json({ refreshToken });
     })
         .catch((error) => {
         logging_1.default.error(error);
@@ -89,8 +75,8 @@ const createDefaultDataForExistingUsers = (req, res, next) => __awaiter(void 0, 
 });
 const create = (req, res, next) => {
     logging_1.default.info('Attempting to register user...');
-    let { uid, name } = req.body;
-    let fire_token = res.locals.fire_token;
+    const { uid, name } = req.body;
+    const fire_token = res.locals.fire_token;
     const newUserId = new mongoose_1.default.Types.ObjectId();
     const user = new user_1.default({
         _id: newUserId,
@@ -145,8 +131,8 @@ const update = (req, res, next) => {
 };
 const login = (req, res, next) => {
     logging_1.default.info('Logging in user...');
-    let { uid } = req.body;
-    let fire_token = res.locals.fire_token;
+    const { uid } = req.body;
+    const fire_token = res.locals.fire_token;
     return user_1.default.findOne({ uid })
         .then((user) => {
         if (user) {
@@ -197,7 +183,6 @@ const readAll = (req, res, next) => {
 };
 exports.default = {
     validate,
-    refreshToken,
     create,
     login,
     read,
