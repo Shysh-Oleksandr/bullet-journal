@@ -4,30 +4,36 @@ import logging from '../config/logging';
 import { CreateDefaultNotePayload } from '../interfaces/note';
 import Note from '../models/note';
 import { obfuscateText, deobfuscateText } from '../utils/security';
+import imageController from '../controllers/image';
+import IImage from '../interfaces/image';
 
 const create = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to register note...');
 
-    let { title, author, startDate, endDate, content, color, image, type, category, rating, isStarred } = req.body;
+    let { title, author, startDate, endDate, content, color, images, type, category, rating, isStarred } = req.body;
 
     const obfTitle = obfuscateText(title);
     const obfContent = obfuscateText(content);
 
+    const newNoteId = new mongoose.Types.ObjectId();
+
     const note = new Note({
-        _id: new mongoose.Types.ObjectId(),
+        _id: newNoteId,
         title: obfTitle,
         author,
         startDate,
         endDate,
         content: obfContent,
         color,
-        image,
+        images,
         type: type ?? null,
         category,
         rating,
         isStarred,
         isLocked: false
     });
+
+    imageController.updateImagesNoteId(images, newNoteId.toString());
 
     return note
         .save()
@@ -76,6 +82,7 @@ const read = (req: Request, res: Response, next: NextFunction) => {
     return Note.findById(_id)
         .populate('type')
         .populate('category')
+        .populate('images')
         .then((note) => {
             if (note) {
                 const deobfTitle = deobfuscateText(note.title);
@@ -102,6 +109,7 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
     return Note.find({ author: author_id })
         .populate('type')
         .populate('category')
+        .populate('images')
         .exec()
         .then((notes) => {
             notes.forEach((note) => {
@@ -135,6 +143,7 @@ const query = (req: Request, res: Response, next: NextFunction) => {
     return Note.find({ title: { $regex: titleRegex }, author: author_id })
         .populate('type')
         .populate('category')
+        .populate('images')
         .exec()
         .then((notes) => {
             notes.forEach((note) => {
@@ -198,10 +207,12 @@ const update = (req: Request, res: Response, next: NextFunction) => {
 const deleteNote = (req: Request, res: Response, next: NextFunction) => {
     const _id = req.params.noteID;
 
-    logging.info(`Incoming delete for ${_id} ...`);
+    logging.info(`Incoming delete for note ${_id} ...`);
 
     return Note.findByIdAndDelete(_id)
         .then((note) => {
+            note?.images && imageController.deleteImages(note?.images);
+
             return res.status(200).json({ message: 'Note was deleted.' });
         })
         .catch((error) => {

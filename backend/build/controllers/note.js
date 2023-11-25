@@ -16,24 +16,29 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const logging_1 = __importDefault(require("../config/logging"));
 const note_1 = __importDefault(require("../models/note"));
 const security_1 = require("../utils/security");
+const image_1 = __importDefault(require("../controllers/image"));
 const create = (req, res, next) => {
     logging_1.default.info('Attempting to register note...');
-    let { title, author, startDate, endDate, content, color, image, type, category, rating } = req.body;
+    let { title, author, startDate, endDate, content, color, images, type, category, rating, isStarred } = req.body;
     const obfTitle = (0, security_1.obfuscateText)(title);
     const obfContent = (0, security_1.obfuscateText)(content);
+    const newNoteId = new mongoose_1.default.Types.ObjectId();
     const note = new note_1.default({
-        _id: new mongoose_1.default.Types.ObjectId(),
+        _id: newNoteId,
         title: obfTitle,
         author,
         startDate,
         endDate,
         content: obfContent,
         color,
-        image,
+        images,
         type: type !== null && type !== void 0 ? type : null,
         category,
-        rating
+        rating,
+        isStarred,
+        isLocked: false
     });
+    image_1.default.updateImagesNoteId(images, newNoteId.toString());
     return note
         .save()
         .then((newNote) => {
@@ -70,6 +75,7 @@ const read = (req, res, next) => {
     return note_1.default.findById(_id)
         .populate('type')
         .populate('category')
+        .populate('images')
         .then((note) => {
         var _a;
         if (note) {
@@ -94,6 +100,7 @@ const readAll = (req, res, next) => {
     return note_1.default.find({ author: author_id })
         .populate('type')
         .populate('category')
+        .populate('images')
         .exec()
         .then((notes) => {
         notes.forEach((note) => {
@@ -103,9 +110,10 @@ const readAll = (req, res, next) => {
             deobfTitle && note.set({ title: deobfTitle });
             deobfContent && note.set({ content: deobfContent });
         });
+        const sortedNotes = notes.slice().sort((a, b) => b.startDate - a.startDate);
         return res.status(200).json({
-            count: notes.length,
-            notes
+            count: sortedNotes.length,
+            notes: sortedNotes
         });
     })
         .catch((error) => {
@@ -121,6 +129,7 @@ const query = (req, res, next) => {
     return note_1.default.find({ title: { $regex: titleRegex }, author: author_id })
         .populate('type')
         .populate('category')
+        .populate('images')
         .exec()
         .then((notes) => {
         notes.forEach((note) => {
@@ -176,9 +185,10 @@ const update = (req, res, next) => {
 };
 const deleteNote = (req, res, next) => {
     const _id = req.params.noteID;
-    logging_1.default.info(`Incoming delete for ${_id} ...`);
+    logging_1.default.info(`Incoming delete for note ${_id} ...`);
     return note_1.default.findByIdAndDelete(_id)
         .then((note) => {
+        (note === null || note === void 0 ? void 0 : note.images) && image_1.default.deleteImages(note === null || note === void 0 ? void 0 : note.images);
         return res.status(200).json({ message: 'Note was deleted.' });
     })
         .catch((error) => {
@@ -193,5 +203,5 @@ exports.default = {
     readAll,
     query,
     update,
-    deleteNote,
+    deleteNote
 };

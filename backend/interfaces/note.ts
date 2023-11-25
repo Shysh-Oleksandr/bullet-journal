@@ -9,7 +9,7 @@ export default interface INote extends Document {
     endDate: number;
     content?: string;
     color: string;
-    image?: string;
+    images?: string[];
     type: ICustomLabel;
     category?: ICustomLabel;
     rating: number;

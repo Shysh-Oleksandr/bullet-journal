@@ -19,8 +19,6 @@ const SocialMediaPopup = (provider: firebase.auth.AuthProvider) =>
       .catch((error) => reject(error));
   });
 
-const isLogin = window.location.pathname.includes('login');
-
 const LoginPage = () => {
   const isAuthenticating = useAppSelector(getIsAuthenticating);
   const errorMsg = useAppSelector(getAuthErrorMsg);
@@ -28,6 +26,8 @@ const LoginPage = () => {
   const [login] = authApi.useLazyLoginQuery();
 
   const navigate = useNavigate();
+
+  const title = window.location.pathname.includes('login') ? 'Login' : 'Sign Up';
 
   const SignInWithSocialMedia = async (provider: firebase.auth.AuthProvider) => {
     try {
@@ -58,7 +58,7 @@ const LoginPage = () => {
     <CenterPiece>
       <div className="flex flex-col items-center justify-center">
         <div className="bg-white md:px-12 sm:px-8 px-4 py-8 lg:w-[40vw] md:w-[55vw] sm:w-[65vw] w-[90vw] rounded-lg shadow-xl">
-          <div className="sm:text-5xl text-4xl font-semibold text-center mt-4 mb-8">{isLogin ? 'Login' : 'Sign Up'}</div>
+          <div className="sm:text-5xl text-4xl font-semibold text-center mt-4 mb-8">{title}</div>
           <div className="text-center">
             <LoginBtn
               className="disabled:bg-orange-900 bg-orange-600  hover:bg-orange-700"

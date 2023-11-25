@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const logging_1 = __importDefault(require("../config/logging"));
 const customLabel_1 = __importDefault(require("../models/customLabel"));
+const sortByCreatedDate_1 = require("../utils/sortByCreatedDate");
 const create = (req, res, next) => {
     logging_1.default.info('Attempting to register customLabel...');
     let { labelName, color, isCategoryLabel, user } = req.body;
@@ -45,9 +46,10 @@ const readAll = (req, res, next) => {
     logging_1.default.info(`Incoming read all...`);
     return customLabel_1.default.find({ user: author_id })
         .then((customLabels) => {
+        const sortedCustomLabels = (0, sortByCreatedDate_1.sortByCreatedDate)(customLabels);
         return res.status(200).json({
             count: customLabels.length,
-            customLabels
+            customLabels: sortedCustomLabels
         });
     })
         .catch((error) => {
