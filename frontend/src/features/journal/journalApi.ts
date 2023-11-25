@@ -1,10 +1,32 @@
 import { emptyAxiosApi } from '../../store/api/emptyAxiosApi';
 import { Method } from '../../store/models';
-import { CreateLabelRequest, CreateLabelResponse, CreateNoteRequest, CreateNoteResponse, FetchLabelsResponse, FetchNoteByIdResponse, FetchNotesResponse, UpdateLabelRequest, UpdateNoteRequest } from './types';
+import {
+    CreateLabelRequest,
+    CreateLabelResponse,
+    CreateNoteRequest,
+    CreateNoteResponse,
+    FetchLabelsResponse,
+    FetchNoteByIdResponse,
+    FetchNotesResponse,
+    UpdateLabelRequest,
+    UpdateNoteRequest
+} from './types';
+
+const USER_ID = 123;
 
 export const notesApi = emptyAxiosApi.injectEndpoints({
     endpoints(build) {
         return {
+            uploadImages: build.query<{urls: string[]}, FormData>({
+                query(data) {
+                    return {
+                        url: `/images/uploadMany`,
+                        method: Method.POST,
+                        body: data,
+                        headers: { 'x-user-id': USER_ID.toString() }
+                    };
+                }
+            }),
             fetchNotes: build.query<FetchNotesResponse, string>({
                 query(userId) {
                     return {

@@ -20,7 +20,7 @@ const config = {
     },
     server: {
         host: 'localhost',
-        port: process.env.PORT || 8001
+        port: process.env.PORT ? +process.env.PORT : 8001
     },
     security: {
         charCodeShiftNumber: (_b = process.env.CHAR_CODE_SHIFT_NUMBER) !== null && _b !== void 0 ? _b : 1
