@@ -23,7 +23,7 @@ const NotePreview = ({ note, previousNoteStartDate }: INotePreviewProps) => {
       <NoteBody
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
-        bgColor={hover ? getDifferentColor(note.color, -10) : note.color}
+        bgColor={hover ? getDifferentColor(note.color, 5) : note.color}
         titleClassName='hover:underline'
         className={`cursor-pointer note__body sm:mt-8 mt-6`}
         note={note}

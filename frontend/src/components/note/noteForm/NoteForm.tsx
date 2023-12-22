@@ -384,25 +384,29 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
             <InputLabel htmlFor="noteCategoryInput" text="Categories" />
           </div>
         </div>
-        <NoteContentEditor disabled={isLocked} setEditorState={setEditorState} setContent={setContent}  editorState={editorState} isShort={isShort} />
+        <NoteContentEditor disabled={isLocked} setEditorState={setEditorState} setContent={setContent} editorState={editorState} isShort={isShort} />
         <div>
           <SaveButton
-            className={`bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-900 ${isShort ? 'mt-2 py-2' : 'mt-4'}`}
+            className={`${isShort ? 'mt-2 py-2' : 'mt-4'}`}
             onclick={(e) => {
               e.preventDefault();
               saveNoteHandler();
             }}
             disabled={isSaving || isLocked || (!isNewNote && (!hasChanges || title.trim() === ""))}
             type="submit"
+            bgColor='#0891b2'
+            disabledBgColor='#164E63'
             icon={<RiSave3Fill className="mr-2" />}
             text={_id !== '' ? 'Update' : 'Create'}
           />
           {_id !== '' && (
             <SaveButton
-              className="bg-red-600 hover:bg-red-700 mt-2 disabled:bg-red-900"
+              className="mt-2"
               onclick={() => setModal(true)}
               disabled={isSaving || isLocked}
               type="button"
+              bgColor='#c31515'
+              disabledBgColor='#7f1d1d'
               icon={<MdDelete className="mr-2" />}
               text="Delete"
             />
@@ -411,7 +415,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         {!isShort && _id && (prevNote || nextNote) && <OtherNotes prevNote={prevNote} nextNote={nextNote} />}
       </form>
       <NoteFormPreview isShort={isShort} startDate={startDate} note={{ _id, title, startDate, endDate, content, images, color, rating, category, type, isStarred, author: '' }} />
-      {_id !== '' && modal && <DeleteModal deleteNote={deleteNoteHandler} deleting={isDeleting} modal={modal} setModal={setModal} />}
+      {_id !== '' && modal && <DeleteModal deleteNote={deleteNoteHandler} deleting={isDeleting} setModal={setModal} />}
     </div>
   );
 };

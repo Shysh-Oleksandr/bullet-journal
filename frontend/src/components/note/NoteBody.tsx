@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { AiFillStar } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import { Note } from '../../features/journal/types';
-import { getDifferentColor, sanitizedData } from '../../utils/functions';
+import { getDifferentColor, getLinearGradientStyle, sanitizedData } from '../../utils/functions';
 import { getTimeByDate } from '../../utils/getFormattedDate';
 import { dateDiffInDays } from './../../utils/functions';
 import NoteImages from './NoteImages';
@@ -24,6 +24,8 @@ interface NoteBodyProps {
 const NoteBody = ({ onMouseEnter, onMouseLeave, bgColor, titleClassName, className, contentClassName, note }: NoteBodyProps) => {
   const noteTime = useMemo(() => note.endDate ? dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 : 0, [note.endDate, note.startDate]);
 
+  const color = bgColor ?? note.color ?? '#000';
+
   const { shouldDisplayTopSlider, shouldDisplaySideImages } = useMemo(() => {
     const imagesCount = note.images?.length;
 
@@ -39,14 +41,19 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, bgColor, titleClassName, classNa
     }
   }, [note.images?.length])
 
+  const [textColor, linearGradientStyle] = useMemo(
+    () => [getDifferentColor(color, 100), getLinearGradientStyle(color, 0, 25)],
+    [color],
+  );
+
 
   return (
     <Link
-      className={`note__preview relative rounded-[10px] overflow-hidden shadow-lg sm:pb-2 pb-1 ${shouldDisplayTopSlider ? "flex-col" : 'sm:pt-4 pt-3 sm:px-8 px-6'} transition-colors duration-300 flex-between ${className}`}
+      className={`note__preview relative rounded-[10px] shadow-lg sm:pb-2 pb-1 ${shouldDisplayTopSlider ? "flex-col" : 'sm:pt-4 pt-3 sm:px-8 px-6'} transition-colors duration-300 flex-between ${className}`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       to={`/edit/${note._id}`}
-      style={{ backgroundColor: bgColor || note.color, color: getDifferentColor(note.color, 185) }}
+      style={{ ...linearGradientStyle, color: textColor }}
     >
       {shouldDisplayTopSlider && <NoteImagesSlider images={note.images} />}
       <div className={`w-full ${shouldDisplayTopSlider ? "sm:px-8 px-6" : ""}`}>
