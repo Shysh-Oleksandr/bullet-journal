@@ -62,6 +62,11 @@ router.use('/notes', noteRoutes);
 router.use('/customlabels', customLabelRoutes);
 router.use('/images', imageRoutes);
 
+/** Special route for the cron job(for keeping the server constantly active) */
+router.get('/cron-job', (_, res) => {
+  res.send('Hello World!')
+})
+
 /** Error handling */
 router.use((req, res, next) => {
     const error = new Error('Not found');
