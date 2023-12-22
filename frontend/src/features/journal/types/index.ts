@@ -9,11 +9,18 @@ export type Note = {
     rating: number;
     isLocked?: boolean;
     isStarred?: boolean;
-    image?: string;
+    images?: Image[];
     isEndNote?: boolean;
     type: CustomLabel | null;
     category: CustomLabel[];
 };
+
+export interface Image {
+    url: string;
+    author: string; // userId
+    noteId?: string; // expected that `noteId` is always presented despite being optional
+    _id: string;
+}
 
 export interface CustomLabel {
     labelName: string;

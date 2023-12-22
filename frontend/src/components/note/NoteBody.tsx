@@ -1,43 +1,62 @@
-import React, { useMemo } from 'react';
-import { getDifferentColor, sanitizedData } from '../../utils/functions';
-import NoteInfo from './NoteInfo';
-import { dateDiffInDays } from './../../utils/functions';
+import { useMemo } from 'react';
 import { AiFillStar } from 'react-icons/ai';
-import { getTimeByDate } from '../../utils/getFormattedDate';
-import { Note } from '../../features/journal/types';
 import { Link } from 'react-router-dom';
+import { Note } from '../../features/journal/types';
+import { getDifferentColor, sanitizedData } from '../../utils/functions';
+import { getTimeByDate } from '../../utils/getFormattedDate';
+import { dateDiffInDays } from './../../utils/functions';
+import NoteImages from './NoteImages';
+import NoteImagesSlider from './NoteImagesSlider';
+import NoteInfo from './NoteInfo';
+
+const screenWidth = window.innerWidth;
 
 interface NoteBodyProps {
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
-  onClick?: () => void;
   bgColor?: string;
   titleClassName?: string;
   contentClassName?: string;
   className?: string;
   note: Note;
-  showImage?: boolean;
 }
 
-const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName, className, contentClassName, note, showImage }: NoteBodyProps) => {
+const NoteBody = ({ onMouseEnter, onMouseLeave, bgColor, titleClassName, className, contentClassName, note }: NoteBodyProps) => {
   const noteTime = useMemo(() => note.endDate ? dateDiffInDays(new Date(note.startDate), new Date(note.endDate)) + 1 : 0, [note.endDate, note.startDate]);
+
+  const { shouldDisplayTopSlider, shouldDisplaySideImages } = useMemo(() => {
+    const imagesCount = note.images?.length;
+
+    const shouldDisplayImages = !!imagesCount
+
+    if (!shouldDisplayImages) return { shouldDisplayTopSlider: false, shouldDisplaySideImages: false }
+
+    const shouldDisplayTopSlider = screenWidth < 600 || (screenWidth <= 768 && imagesCount > 1) || imagesCount > 2
+
+    return {
+      shouldDisplayTopSlider,
+      shouldDisplaySideImages: !shouldDisplayTopSlider
+    }
+  }, [note.images?.length])
+
 
   return (
     <Link
-      className={`note__preview relative rounded-lg shadow-md sm:pt-4 sm:pb-2 pt-3 pb-1 sm:px-8 px-6 transition-colors flex-between ${className}`}
+      className={`note__preview relative rounded-[10px] overflow-hidden shadow-lg sm:pb-2 pb-1 ${shouldDisplayTopSlider ? "flex-col" : 'sm:pt-4 pt-3 sm:px-8 px-6'} transition-colors duration-300 flex-between ${className}`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       to={`/edit/${note._id}`}
       style={{ backgroundColor: bgColor || note.color, color: getDifferentColor(note.color, 185) }}
     >
-      <div className="w-full">
-        <h3 className={`sm:text-3xl text-2xl font-bold mb-1 cursor-auto ${titleClassName}`}>{note.title}</h3>
+      {shouldDisplayTopSlider && <NoteImagesSlider images={note.images} />}
+      <div className={`w-full ${shouldDisplayTopSlider ? "sm:px-8 px-6" : ""}`}>
+        <h3 className={`sm:text-3xl text-2xl font-bold mb-1 ${titleClassName}`}>{note.title}</h3>
 
         {note.content && !note.isEndNote && (
           <>
             <div
               dangerouslySetInnerHTML={{ __html: sanitizedData(note.content.length > 150 ? note.content.slice(0, 150).concat('...') : note.content) }}
-              className={`sm:px-2 px-1 break-words sm:text-[1.25rem] text-lg min-h-[1.5rem] sm:!leading-6 !leading-5 h-auto ${contentClassName}`}
+              className={`sm:px-2 px-1 break-words sm:text-[1.25rem] text-lg min-h-[1.5rem] max-h-32 overflow-hidden sm:!leading-6 !leading-5 h-auto ${contentClassName}`}
             ></div>
           </>
         )}
@@ -52,7 +71,8 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
               return <NoteInfo text={category.labelName} key={category._id} color={note.color} />;
             })}
           </div>
-          {noteTime >= 2 && (
+          {/* Deprecated for now */}
+          {/* {noteTime >= 2 && (
             <div className="absolute sm:bottom-2 bottom-1 right-0 z-10">
               <NoteInfo text={`${noteTime} days`} color={note.color} className={`${note.isEndNote ? 'font-bold' : ''}`} />
             </div>
@@ -61,10 +81,10 @@ const NoteBody = ({ onMouseEnter, onMouseLeave, onClick, bgColor, titleClassName
             <div className="absolute top-2 right-0 z-10">
               <NoteInfo text="Ended" color={note.color} className="font-bold" />
             </div>
-          )}
+          )} */}
         </div>
       </div>
-      {note.image && showImage && note.isEndNote && <div className="sm:w-64 w-56 sm:h-24 h-20 note__image rounded-md ml-4" style={{ backgroundImage: `url(${note.image})` }}></div>}
+      {shouldDisplaySideImages && <NoteImages images={note.images} />}
     </Link>
   );
 };
