@@ -4,8 +4,12 @@ import { IoMdMenu } from 'react-icons/io';
 import { Link } from 'react-router-dom';
 import { getIsSidebarShown, setShowSidebar } from '../features/journal/journalSlice';
 import { logout } from '../features/user/userSlice';
-import { useAppDispatch, useAppSelector } from '../store/helpers/storeHooks';
 import { useWindowSize } from '../hooks/useWindowSize';
+import { useAppDispatch, useAppSelector } from '../store/helpers/storeHooks';
+import { getLinearGradientStyle } from '../utils/functions';
+
+const bgColor = "#0e7490"
+const linearGradientStyle = getLinearGradientStyle(bgColor)
 
 interface NavbarProps {
   topRef?: React.MutableRefObject<HTMLDivElement>;
@@ -20,7 +24,8 @@ const Navbar = ({ topRef }: NavbarProps) => {
   return (
     <div
       className={`flex sticky top-0 left-0 right-0 z-[999] shadow-lg items-center transition-all duration-500 justify-between ${isSidebarShown && width > 1024 ? 'small-padding-x' : 'padding-x'
-        } py-4 text-white bg-cyan-700 sm:h-[65px] h-[50px]`}
+        } py-4 text-white sm:h-[65px] h-[50px]`}
+      style={linearGradientStyle}
     >
       <button onClick={() => dispatch(setShowSidebar(!isSidebarShown))} className={`text-4xl transition-colors absolute left-4 top-1/2 -translate-y-1/2 hover:text-cyan-100`}>
         <IoMdMenu />

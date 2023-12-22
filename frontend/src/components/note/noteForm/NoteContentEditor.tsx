@@ -24,13 +24,12 @@ const getToolbarOptions = (isShort: boolean) => isShort
 interface NoteContentEditorProps {
   setEditorState: (value: React.SetStateAction<EditorState>) => void;
   setContent: (value: React.SetStateAction<string>) => void;
-  setImage: (value: React.SetStateAction<string>) => void;
   editorState: EditorState;
   disabled?: boolean;
   isShort?: boolean;
 }
 
-const NoteContentEditor = ({ setEditorState, setContent, setImage, editorState, isShort, disabled }: NoteContentEditorProps) => {
+const NoteContentEditor = ({ setEditorState, setContent, editorState, isShort, disabled }: NoteContentEditorProps) => {
   const toolbarOptions = useMemo(() => getToolbarOptions(!!isShort), [isShort])
 
   const onEditorStateChange = useCallback(
@@ -38,13 +37,8 @@ const NoteContentEditor = ({ setEditorState, setContent, setImage, editorState, 
       const newContent = draftToHtml(convertToRaw(newState.getCurrentContent()));
       setEditorState(newState);
       setContent(newContent);
-
-      const regex = /(?<=src=")(.*)(?=" alt)/g;
-      const images = newContent.match(regex);
-
-      images && setImage(images[0]);
     },
-    [setContent, setEditorState, setImage],
+    [setContent, setEditorState],
   );
 
 

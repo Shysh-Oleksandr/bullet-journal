@@ -72,7 +72,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
   const [startDate, setStartDate] = useState(initialNote?.startDate ?? new Date().getTime());
   const [endDate, setEndDate] = useState(initialNote?.endDate ?? new Date().getTime());
   const [content, setContent] = useState(initialNote?.content ?? '');
-  const [image, setImage] = useState(initialNote?.image ?? '');
+  const [images, setImages] = useState(initialNote?.images ?? []);
   const [color, setColor] = useState(initialNote?.color ?? DEFAULT_COLOR);
   const [rating, setRating] = useState(initialNote?.rating ?? 1);
   const [type, setType] = useState<CustomLabel | null>(initialNote?.type ?? null);
@@ -119,7 +119,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
     setStartDate(new Date().getTime());
     setEndDate(new Date().getTime());
     setContent('');
-    setImage('');
+    setImages([]);
     setColor(DEFAULT_COLOR);
     setRating(1);
     setType(null);
@@ -152,7 +152,7 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         setStartDate(note.startDate);
         setEndDate(note.endDate ?? new Date().getTime());
         setContent(note.content || '');
-        setImage(note.image || '');
+        setImages(note.images ?? []);
         setColor(note.color);
         setRating(note.rating);
         setType(note.type ?? null);
@@ -384,25 +384,29 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
             <InputLabel htmlFor="noteCategoryInput" text="Categories" />
           </div>
         </div>
-        <NoteContentEditor disabled={isLocked} setEditorState={setEditorState} setContent={setContent} setImage={setImage} editorState={editorState} isShort={isShort} />
+        <NoteContentEditor disabled={isLocked} setEditorState={setEditorState} setContent={setContent} editorState={editorState} isShort={isShort} />
         <div>
           <SaveButton
-            className={`bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-900 ${isShort ? 'mt-2 py-2' : 'mt-4'}`}
+            className={`${isShort ? 'mt-2 py-2' : 'mt-4'}`}
             onclick={(e) => {
               e.preventDefault();
               saveNoteHandler();
             }}
             disabled={isSaving || isLocked || (!isNewNote && (!hasChanges || title.trim() === ""))}
             type="submit"
+            bgColor='#0891b2'
+            disabledBgColor='#164E63'
             icon={<RiSave3Fill className="mr-2" />}
             text={_id !== '' ? 'Update' : 'Create'}
           />
           {_id !== '' && (
             <SaveButton
-              className="bg-red-600 hover:bg-red-700 mt-2 disabled:bg-red-900"
+              className="mt-2"
               onclick={() => setModal(true)}
               disabled={isSaving || isLocked}
               type="button"
+              bgColor='#c31515'
+              disabledBgColor='#7f1d1d'
               icon={<MdDelete className="mr-2" />}
               text="Delete"
             />
@@ -410,8 +414,8 @@ const NoteForm = ({ isShort, showFullAddForm, setShowFullAddForm }: NoteFormProp
         </div>
         {!isShort && _id && (prevNote || nextNote) && <OtherNotes prevNote={prevNote} nextNote={nextNote} />}
       </form>
-      <NoteFormPreview isShort={isShort} startDate={startDate} note={{ _id, title, startDate, endDate, content, image, color, rating, category, type, isStarred, author: '' }} />
-      {_id !== '' && modal && <DeleteModal deleteNote={deleteNoteHandler} deleting={isDeleting} modal={modal} setModal={setModal} />}
+      <NoteFormPreview isShort={isShort} startDate={startDate} note={{ _id, title, startDate, endDate, content, images, color, rating, category, type, isStarred, author: '' }} />
+      {_id !== '' && modal && <DeleteModal deleteNote={deleteNoteHandler} deleting={isDeleting} setModal={setModal} />}
     </div>
   );
 };
