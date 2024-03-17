@@ -13,6 +13,7 @@ const customLabel_1 = __importDefault(require("./routes/customLabel"));
 const image_1 = __importDefault(require("./routes/image"));
 const note_1 = __importDefault(require("./routes/note"));
 const user_1 = __importDefault(require("./routes/user"));
+const habit_1 = __importDefault(require("./routes/habit"));
 const router = (0, express_1.default)();
 /** Connect to Firebase */
 let serviceAccount = serviceAccountKey_json_1.default;
@@ -54,6 +55,11 @@ router.use('/users', user_1.default);
 router.use('/notes', note_1.default);
 router.use('/customlabels', customLabel_1.default);
 router.use('/images', image_1.default);
+router.use('/habits', habit_1.default);
+/** Special route for the cron job(for keeping the server constantly active) */
+router.get('/cron-job', (_, res) => {
+    res.send('Hello World!');
+});
 /** Error handling */
 router.use((req, res, next) => {
     const error = new Error('Not found');
@@ -62,4 +68,4 @@ router.use((req, res, next) => {
     });
 });
 /** Listen */
-router.listen(config_1.default.server.port, config_1.default.server.host, () => logging_1.default.info(`Server is running ${config_1.default.server.host}:${config_1.default.server.port}`));
+router.listen(config_1.default.server.port, () => logging_1.default.info(`Server is running ${config_1.default.server.host}:${config_1.default.server.port}`));
