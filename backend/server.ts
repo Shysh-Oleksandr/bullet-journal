@@ -8,6 +8,7 @@ import customLabelRoutes from './routes/customLabel';
 import imageRoutes from './routes/image';
 import noteRoutes from './routes/note';
 import userRoutes from './routes/user';
+import habitRoutes from './routes/habit';
 
 const router = express();
 
@@ -61,6 +62,7 @@ router.use('/users', userRoutes);
 router.use('/notes', noteRoutes);
 router.use('/customlabels', customLabelRoutes);
 router.use('/images', imageRoutes);
+router.use('/habits', habitRoutes);
 
 /** Special route for the cron job(for keeping the server constantly active) */
 router.get('/cron-job', (_, res) => {
