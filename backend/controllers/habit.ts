@@ -43,7 +43,7 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
 
     logging.info(`Incoming read all habits...`);
 
-    return Habit.find({ user: author_id })
+    return Habit.find({ author: author_id })
         .then((habits) => {
             const sortedHabits = sortByCreatedDate(habits);
 
