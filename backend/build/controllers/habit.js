@@ -39,7 +39,7 @@ const create = (req, res, next) => {
 const readAll = (req, res, next) => {
     const author_id = req.params.authorID;
     logging_1.default.info(`Incoming read all habits...`);
-    return habit_1.default.find({ user: author_id })
+    return habit_1.default.find({ author: author_id })
         .then((habits) => {
         const sortedHabits = (0, sortByCreatedDate_1.sortByCreatedDate)(habits);
         return res.status(200).json({
