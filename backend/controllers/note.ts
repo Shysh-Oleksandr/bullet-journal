@@ -5,7 +5,6 @@ import { CreateDefaultNotePayload } from '../interfaces/note';
 import Note from '../models/note';
 import { obfuscateText, deobfuscateText } from '../utils/security';
 import imageController from '../controllers/image';
-import IImage from '../interfaces/image';
 
 const create = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to register note...');
@@ -131,39 +130,7 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
             logging.error(error);
             return res.status(500).json({ error });
         });
-};
-
-const query = (req: Request, res: Response, next: NextFunction) => {
-    const { title } = req.query;
-    const author_id = req.params.authorID;
-
-    logging.info(`Incoming query...`);
-
-    const titleRegex = title ? new RegExp(title.toString(), 'i') : new RegExp('');
-    return Note.find({ title: { $regex: titleRegex }, author: author_id })
-        .populate('type')
-        .populate('category')
-        .populate('images')
-        .exec()
-        .then((notes) => {
-            notes.forEach((note) => {
-                const deobfTitle = deobfuscateText(note.title);
-                const deobfContent = deobfuscateText(note.content ?? '');
-
-                deobfTitle && note.set({ title: deobfTitle });
-                deobfContent && note.set({ content: deobfContent });
-            });
-
-            return res.status(200).json({
-                count: notes.length,
-                notes
-            });
-        })
-        .catch((error) => {
-            logging.error(error);
-            return res.status(500).json({ error });
-        });
-};
+}; 
 
 const update = (req: Request, res: Response, next: NextFunction) => {
     const _id = req.params.noteID;
@@ -226,7 +193,6 @@ export default {
     createDefaultNote,
     read,
     readAll,
-    query,
     update,
     deleteNote
 };

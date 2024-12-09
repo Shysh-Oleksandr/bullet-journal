@@ -10,7 +10,8 @@ export default interface IHabit extends Document {
     overallTarget: number;
     startDate: number;
     frequency: {
-        weekdays: number[];
+      days: number;
+      period: IHabitPeriods;
     };
     color?: string;
     habitType: IHabitTypes;
@@ -30,4 +31,9 @@ export enum IHabitTypes {
     CHECK = 'CHECK',
     AMOUNT = 'AMOUNT',
     TIME = 'TIME'
+}
+
+export enum IHabitPeriods {
+  WEEK = "week",
+  MONTH = "month",
 }

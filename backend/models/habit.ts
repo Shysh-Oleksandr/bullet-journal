@@ -1,20 +1,24 @@
 import mongoose, { Schema } from 'mongoose';
-import IHabit, { IHabitTypes } from '../interfaces/habit';
+import IHabit, { IHabitPeriods, IHabitTypes } from '../interfaces/habit';
 
 const HabitSchema: Schema = new Schema(
     {
         label: { type: String },
         author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         description: { type: String },
-        startDate: { type: Number },
         streakTarget: { type: Number },
         overallTarget: { type: Number },
         amountTarget: { type: Number },
         units: { type: String },
         color: { type: String },
         frequency: {
-            weekdays: [{ type: Number }]
-        },
+          days: { type: Number, default: 7 },
+          period: {
+            type: String,
+            enum: IHabitPeriods,
+            default: IHabitPeriods.WEEK,
+          }
+        }, 
         habitType: {
           type: String,
           enum: IHabitTypes,
