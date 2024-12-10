@@ -9,7 +9,7 @@ const habit_1 = __importDefault(require("../models/habit"));
 const sortByCreatedDate_1 = require("../utils/sortByCreatedDate");
 const create = (req, res, next) => {
     logging_1.default.info('Attempting to register habit...');
-    let { label, color, description, author, amountTarget, units, streakTarget, overallTarget, startDate, frequency, habitType, logs } = req.body;
+    let { label, color, description, author, amountTarget, units, streakTarget, overallTarget, frequency, habitType, logs } = req.body;
     const habit = new habit_1.default({
         _id: new mongoose_1.default.Types.ObjectId(),
         label,
@@ -20,7 +20,6 @@ const create = (req, res, next) => {
         units,
         streakTarget,
         overallTarget,
-        startDate,
         frequency,
         habitType,
         logs
@@ -46,6 +45,18 @@ const readAll = (req, res, next) => {
             count: habits.length,
             habits: sortedHabits
         });
+    })
+        .catch((error) => {
+        logging_1.default.error(error);
+        return res.status(500).json({ error });
+    });
+};
+const read = (req, res, next) => {
+    const _id = req.params.habitID;
+    logging_1.default.info(`Incoming read for habit ${_id} ...`);
+    return habit_1.default.findById(_id)
+        .then((habit) => {
+        return res.status(200).json({ habit });
     })
         .catch((error) => {
         logging_1.default.error(error);
@@ -94,6 +105,7 @@ const deleteHabit = (req, res, next) => {
 };
 exports.default = {
     create,
+    read,
     readAll,
     update,
     deleteHabit

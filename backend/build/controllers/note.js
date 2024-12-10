@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -121,34 +132,6 @@ const readAll = (req, res, next) => {
         return res.status(500).json({ error });
     });
 };
-const query = (req, res, next) => {
-    const { title } = req.query;
-    const author_id = req.params.authorID;
-    logging_1.default.info(`Incoming query...`);
-    const titleRegex = title ? new RegExp(title.toString(), 'i') : new RegExp('');
-    return note_1.default.find({ title: { $regex: titleRegex }, author: author_id })
-        .populate('type')
-        .populate('category')
-        .populate('images')
-        .exec()
-        .then((notes) => {
-        notes.forEach((note) => {
-            var _a;
-            const deobfTitle = (0, security_1.deobfuscateText)(note.title);
-            const deobfContent = (0, security_1.deobfuscateText)((_a = note.content) !== null && _a !== void 0 ? _a : '');
-            deobfTitle && note.set({ title: deobfTitle });
-            deobfContent && note.set({ content: deobfContent });
-        });
-        return res.status(200).json({
-            count: notes.length,
-            notes
-        });
-    })
-        .catch((error) => {
-        logging_1.default.error(error);
-        return res.status(500).json({ error });
-    });
-};
 const update = (req, res, next) => {
     const _id = req.params.noteID;
     logging_1.default.info(`Incoming update for ${_id} ...`);
@@ -161,9 +144,12 @@ const update = (req, res, next) => {
             const content = (_b = req.body) === null || _b === void 0 ? void 0 : _b.content;
             const obfTitle = (0, security_1.obfuscateText)(title);
             const obfContent = (0, security_1.obfuscateText)(content);
-            note.set(req.body);
+            const _c = req.body, { _id, __v } = _c, rest = __rest(_c, ["_id", "__v"]);
+            note.set(rest);
             obfTitle && note.set({ title: obfTitle });
             obfContent && note.set({ content: obfContent });
+            delete note.__v;
+            delete note._id;
             note.save()
                 .then((newNote) => {
                 logging_1.default.info(`Note updated...`);
@@ -201,7 +187,6 @@ exports.default = {
     createDefaultNote,
     read,
     readAll,
-    query,
     update,
     deleteNote
 };
