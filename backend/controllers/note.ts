@@ -147,10 +147,14 @@ const update = (req: Request, res: Response, next: NextFunction) => {
                 const obfTitle = obfuscateText(title);
                 const obfContent = obfuscateText(content);
 
-                note.set(req.body);
+                const {_id, __v, ...rest} = req.body;
+                note.set(rest);
 
                 obfTitle && note.set({ title: obfTitle });
                 obfContent && note.set({ content: obfContent });
+
+                delete note.__v;
+                delete note._id;
 
                 note.save()
                     .then((newNote) => {

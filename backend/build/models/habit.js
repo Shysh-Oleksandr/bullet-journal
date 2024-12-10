@@ -29,14 +29,18 @@ const HabitSchema = new mongoose_1.Schema({
     label: { type: String },
     author: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User' },
     description: { type: String },
-    startDate: { type: Number },
     streakTarget: { type: Number },
     overallTarget: { type: Number },
     amountTarget: { type: Number },
     units: { type: String },
     color: { type: String },
     frequency: {
-        weekdays: [{ type: Number }]
+        days: { type: Number, default: 7 },
+        period: {
+            type: String,
+            enum: habit_1.IHabitPeriods,
+            default: habit_1.IHabitPeriods.WEEK,
+        }
     },
     habitType: {
         type: String,
