@@ -67,7 +67,7 @@ const createDefaultNote = (noteData, author, type, category) => __awaiter(void 0
     logging_1.default.info('Attempting to create a default note...');
     const note = new note_1.default(Object.assign(Object.assign({ _id: new mongoose_1.default.Types.ObjectId() }, noteData), { author,
         type,
-        category }));
+        category, startDate: new Date().getTime() }));
     const obfTitle = (0, security_1.obfuscateText)(note.title);
     const obfContent = (0, security_1.obfuscateText)((_a = note.content) !== null && _a !== void 0 ? _a : '');
     obfTitle && note.set({ title: obfTitle });
