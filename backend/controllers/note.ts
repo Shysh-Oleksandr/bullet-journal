@@ -55,7 +55,8 @@ const createDefaultNote = async (noteData: CreateDefaultNotePayload, author: str
         ...noteData,
         author,
         type,
-        category
+        category,
+        startDate: new Date().getTime(),
     });
 
     const obfTitle = obfuscateText(note.title);
