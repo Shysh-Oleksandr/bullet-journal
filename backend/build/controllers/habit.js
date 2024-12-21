@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -6,10 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const logging_1 = __importDefault(require("../config/logging"));
 const habit_1 = __importDefault(require("../models/habit"));
-const sortByCreatedDate_1 = require("../utils/sortByCreatedDate");
-const create = (req, res, next) => {
+const create = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     logging_1.default.info('Attempting to register habit...');
     let { label, color, description, author, amountTarget, units, streakTarget, overallTarget, frequency, habitType, logs } = req.body;
+    const order = yield habit_1.default.countDocuments({ author }).exec();
     const habit = new habit_1.default({
         _id: new mongoose_1.default.Types.ObjectId(),
         label,
@@ -22,7 +31,8 @@ const create = (req, res, next) => {
         overallTarget,
         frequency,
         habitType,
-        logs
+        logs,
+        order
     });
     return habit
         .save()
@@ -34,16 +44,38 @@ const create = (req, res, next) => {
         logging_1.default.error(error);
         return res.status(500).json({ error });
     });
+});
+const reorder = (req, res, next) => {
+    logging_1.default.info(`Incoming reorder habits...`);
+    const habitsIds = req.body;
+    if (!habitsIds || !Array.isArray(habitsIds)) {
+        return res.status(400).send({ message: 'Invalid request body.' });
+    }
+    const bulkOps = habitsIds.map((habitId, index) => ({
+        updateOne: {
+            filter: { _id: new mongoose_1.default.Types.ObjectId(habitId) },
+            update: { $set: { order: index } } // Use $set to update the "order" field
+        }
+    }));
+    return habit_1.default.collection
+        .bulkWrite(bulkOps)
+        .then((result) => {
+        logging_1.default.info(`BulkWrite result: ${JSON.stringify(result)}`);
+        return res.status(200).send({ message: 'Habits reordered successfully.' });
+    })
+        .catch((error) => {
+        logging_1.default.error(error);
+        return res.status(500).json({ error });
+    });
 };
 const readAll = (req, res, next) => {
     const author_id = req.params.authorID;
     logging_1.default.info(`Incoming read all habits...`);
-    return habit_1.default.find({ author: author_id })
+    return habit_1.default.find({ author: author_id }).sort({ order: 1 })
         .then((habits) => {
-        const sortedHabits = (0, sortByCreatedDate_1.sortByCreatedDate)(habits);
         return res.status(200).json({
             count: habits.length,
-            habits: sortedHabits
+            habits: habits
         });
     })
         .catch((error) => {
@@ -105,6 +137,7 @@ const deleteHabit = (req, res, next) => {
 };
 exports.default = {
     create,
+    reorder,
     read,
     readAll,
     update,

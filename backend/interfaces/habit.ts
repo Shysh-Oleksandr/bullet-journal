@@ -9,6 +9,8 @@ export default interface IHabit extends Document {
     streakTarget: number;
     overallTarget: number;
     startDate: number;
+    isArchived?: boolean;
+    order?: number;
     frequency: {
       days: number;
       period: IHabitPeriods;

@@ -34,6 +34,8 @@ const HabitSchema = new mongoose_1.Schema({
     amountTarget: { type: Number },
     units: { type: String },
     color: { type: String },
+    isArchived: { type: Boolean, default: false },
+    order: { type: Number },
     frequency: {
         days: { type: Number, default: 7 },
         period: {
