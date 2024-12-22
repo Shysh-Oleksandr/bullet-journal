@@ -31,7 +31,9 @@ const HabitSchema: Schema = new Schema(
                 date: { type: Number },
                 percentageCompleted: { type: Number },
                 amount: { type: Number },
-                amountTarget: { type: Number }
+                amountTarget: { type: Number },
+                note: { type: String },
+                isManuallyOptional: { type: Boolean, default: false }
             }
         ],
         id: { type: String, unique: true }

@@ -27,6 +27,8 @@ export type IHabitLog = {
     percentageCompleted: number;
     amount?: number;
     amountTarget?: number;
+    note?: string;
+    isManuallyOptional?: boolean;
 };
 
 export enum IHabitTypes {
