@@ -9,6 +9,9 @@ import imageRoutes from './routes/image';
 import noteRoutes from './routes/note';
 import userRoutes from './routes/user';
 import habitRoutes from './routes/habit';
+import groupRoutes from './routes/group';
+import projectRoutes from './routes/project';
+import taskRoutes from './routes/task';
 
 const router = express();
 
@@ -63,6 +66,9 @@ router.use('/notes', noteRoutes);
 router.use('/customlabels', customLabelRoutes);
 router.use('/images', imageRoutes);
 router.use('/habits', habitRoutes);
+router.use('/groups', groupRoutes);
+router.use('/projects', projectRoutes);
+router.use('/tasks', taskRoutes);
 
 /** Special route for the cron job(for keeping the server constantly active) */
 router.get('/cron-job', (_, res) => {
