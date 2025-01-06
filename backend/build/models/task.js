@@ -28,10 +28,12 @@ const TaskSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     dueDate: { type: Number },
     author: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: true },
-    projectId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Project' },
+    groupId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Group' },
     color: { type: String },
     isCompleted: { type: Boolean, default: false },
-    percentageCompleted: { type: Number },
+    target: { type: Number },
+    units: { type: String },
+    completedAmount: { type: Number },
     parentTaskId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Task' },
 });
 exports.default = mongoose_1.default.model('Task', TaskSchema);

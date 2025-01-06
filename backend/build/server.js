@@ -15,7 +15,6 @@ const note_1 = __importDefault(require("./routes/note"));
 const user_1 = __importDefault(require("./routes/user"));
 const habit_1 = __importDefault(require("./routes/habit"));
 const group_1 = __importDefault(require("./routes/group"));
-const project_1 = __importDefault(require("./routes/project"));
 const task_1 = __importDefault(require("./routes/task"));
 const router = (0, express_1.default)();
 /** Connect to Firebase */
@@ -60,7 +59,6 @@ router.use('/customlabels', customLabel_1.default);
 router.use('/images', image_1.default);
 router.use('/habits', habit_1.default);
 router.use('/groups', group_1.default);
-router.use('/projects', project_1.default);
 router.use('/tasks', task_1.default);
 /** Special route for the cron job(for keeping the server constantly active) */
 router.get('/cron-job', (_, res) => {
