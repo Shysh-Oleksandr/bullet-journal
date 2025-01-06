@@ -2,22 +2,23 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import logging from '../config/logging';
 import Task from '../models/task';
-import Project from '../models/project';
 
 const create = async (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to create task...');
 
-    const { name, parentTaskId, author, dueDate, color, projectId, isCompleted, percentageCompleted } = req.body;
+    const { name, parentTaskId, author, dueDate, color, groupId, isCompleted, target, units, completedAmount } = req.body;
 
     const task = new Task({
         _id: new mongoose.Types.ObjectId(),
         name,
         author,
         dueDate,
+        groupId,
         color,
-        projectId,
         isCompleted,
-        percentageCompleted,
+        target,
+        units,
+        completedAmount,
         parentTaskId
     });
 

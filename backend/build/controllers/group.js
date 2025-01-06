@@ -15,21 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const logging_1 = __importDefault(require("../config/logging"));
 const group_1 = __importDefault(require("../models/group"));
-const project_1 = __importDefault(require("../models/project"));
 const task_1 = __importDefault(require("../models/task"));
-const getAllElements = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const authorID = req.params.authorID;
-    try {
-        const groups = yield group_1.default.find({ author: new mongoose_1.default.Types.ObjectId(authorID) });
-        const projects = yield project_1.default.find({ author: new mongoose_1.default.Types.ObjectId(authorID) });
-        const tasks = yield task_1.default.find({ author: new mongoose_1.default.Types.ObjectId(authorID) });
-        return res.status(200).json({ groups, projects, tasks });
-    }
-    catch (error) {
-        logging_1.default.error(error);
-        return res.status(500).json({ error });
-    }
-});
 const create = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     logging_1.default.info('Attempting to create group...');
     const { name, color, parentGroupId, author } = req.body;
@@ -106,7 +92,7 @@ const deleteGroup = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     const _id = req.params.groupID;
     logging_1.default.info(`Deleting group ${_id}...`);
     // Delete all associated elements
-    yield project_1.default.deleteMany({ groupId: _id });
+    yield task_1.default.deleteMany({ groupId: _id });
     yield group_1.default.deleteMany({ parentGroupId: _id });
     return group_1.default.findByIdAndDelete(_id)
         .then(() => {
@@ -122,6 +108,5 @@ exports.default = {
     read,
     readAll,
     update,
-    deleteGroup,
-    getAllElements
+    deleteGroup
 };
