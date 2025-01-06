@@ -2,23 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import logging from '../config/logging';
 import Group from '../models/group';
-import Project from '../models/project';
 import Task from '../models/task';
-
-const getAllElements = async (req: Request, res: Response, next: NextFunction) => {
-    const authorID = req.params.authorID;
-
-    try {
-        const groups = await Group.find({ author: new mongoose.Types.ObjectId(authorID) });
-        const projects = await Project.find({ author: new mongoose.Types.ObjectId(authorID) });
-        const tasks = await Task.find({ author: new mongoose.Types.ObjectId(authorID) });
-
-        return res.status(200).json({ groups, projects, tasks });
-    } catch (error) {
-        logging.error(error);
-        return res.status(500).json({ error });
-    }
-};
 
 const create = async (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to create group...');
@@ -110,7 +94,7 @@ const deleteGroup = async (req: Request, res: Response, next: NextFunction) => {
     logging.info(`Deleting group ${_id}...`);
 
     // Delete all associated elements
-    await Project.deleteMany({ groupId: _id });
+    await Task.deleteMany({ groupId: _id });
     await Group.deleteMany({ parentGroupId: _id });
 
     return Group.findByIdAndDelete(_id)
@@ -128,6 +112,5 @@ export default {
     read,
     readAll,
     update,
-    deleteGroup,
-    getAllElements
+    deleteGroup
 };

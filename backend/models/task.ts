@@ -5,10 +5,12 @@ const TaskSchema = new Schema<ITask>({
     name: { type: String, required: true },
     dueDate: { type: Number },
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    projectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Project' },
+    groupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group' },
     color: { type: String },
     isCompleted: { type: Boolean, default: false },
-    percentageCompleted: { type: Number },
+    target: { type: Number },
+    units: { type: String },
+    completedAmount: { type: Number },
     parentTaskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
 });
 

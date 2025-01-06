@@ -10,5 +10,4 @@ router.patch('/update/:groupID', group_1.default.update);
 router.delete('/:groupID', group_1.default.deleteGroup);
 router.get('/read/:groupID', group_1.default.read);
 router.get('/:authorID', group_1.default.readAll);
-router.get('/get-elements/:authorID', group_1.default.getAllElements);
 module.exports = router;
