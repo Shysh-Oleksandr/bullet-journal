@@ -15,7 +15,14 @@ export interface ITask extends Document {
     groupId?: mongoose.Types.ObjectId;
     isCompleted: boolean;
     parentTaskId?: mongoose.Types.ObjectId | null;
+    type: ITaskTypes;
     target?: number;
     units?: string;
     completedAmount?: number;
+    isArchived?: boolean;
+}
+
+export enum ITaskTypes {
+  CHECK = "check",
+  AMOUNT = "amount",
 }

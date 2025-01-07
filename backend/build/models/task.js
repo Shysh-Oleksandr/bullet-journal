@@ -24,6 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
+const task_1 = require("../interfaces/task");
 const TaskSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     dueDate: { type: Number },
@@ -31,9 +32,15 @@ const TaskSchema = new mongoose_1.Schema({
     groupId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Group' },
     color: { type: String },
     isCompleted: { type: Boolean, default: false },
+    type: {
+        type: String,
+        enum: task_1.ITaskTypes,
+        default: task_1.ITaskTypes.CHECK
+    },
     target: { type: Number },
     units: { type: String },
     completedAmount: { type: Number },
     parentTaskId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Task' },
+    isArchived: { type: Boolean, default: false }
 });
 exports.default = mongoose_1.default.model('Task', TaskSchema);
