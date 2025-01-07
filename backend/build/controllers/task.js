@@ -17,7 +17,7 @@ const logging_1 = __importDefault(require("../config/logging"));
 const task_1 = __importDefault(require("../models/task"));
 const create = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     logging_1.default.info('Attempting to create task...');
-    const { name, parentTaskId, author, dueDate, color, groupId, isCompleted, target, units, completedAmount } = req.body;
+    const { name, parentTaskId, author, dueDate, color, groupId, isCompleted, isArchived, target, units, completedAmount } = req.body;
     const task = new task_1.default({
         _id: new mongoose_1.default.Types.ObjectId(),
         name,
@@ -29,7 +29,8 @@ const create = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         target,
         units,
         completedAmount,
-        parentTaskId
+        parentTaskId,
+        isArchived
     });
     return task
         .save()
