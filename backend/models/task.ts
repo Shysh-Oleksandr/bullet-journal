@@ -17,7 +17,8 @@ const TaskSchema = new Schema<ITask>({
     units: { type: String },
     completedAmount: { type: Number },
     parentTaskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
-    isArchived: { type: Boolean, default: false }
+    isArchived: { type: Boolean, default: false },
+    completedAt: { type: Number }
 });
 
 export default mongoose.model<ITask>('Task', TaskSchema);

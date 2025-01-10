@@ -5,6 +5,7 @@ export interface IGroup extends Document {
     color: string;
     author: mongoose.Types.ObjectId;
     parentGroupId?: mongoose.Types.ObjectId | null;
+    isArchived?: boolean;
 }
 
 export interface ITask extends Document {
@@ -20,6 +21,7 @@ export interface ITask extends Document {
     units?: string;
     completedAmount?: number;
     isArchived?: boolean;
+    completedAt?: number | null;
 }
 
 export enum ITaskTypes {

@@ -6,6 +6,7 @@ const GroupSchema = new Schema<IGroup>({
   name: { type: String, required: true },
   color: { type: String, required: true },
   parentGroupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group' },
+  isArchived: { type: Boolean, default: false }
 });
 
 export default mongoose.model<IGroup>('Group', GroupSchema);

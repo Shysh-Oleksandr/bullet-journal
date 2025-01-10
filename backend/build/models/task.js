@@ -41,6 +41,7 @@ const TaskSchema = new mongoose_1.Schema({
     units: { type: String },
     completedAmount: { type: Number },
     parentTaskId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Task' },
-    isArchived: { type: Boolean, default: false }
+    isArchived: { type: Boolean, default: false },
+    completedAt: { type: Number }
 });
 exports.default = mongoose_1.default.model('Task', TaskSchema);
