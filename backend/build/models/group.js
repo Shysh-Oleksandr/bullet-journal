@@ -29,5 +29,6 @@ const GroupSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     color: { type: String, required: true },
     parentGroupId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Group' },
+    isArchived: { type: Boolean, default: false }
 });
 exports.default = mongoose_1.default.model('Group', GroupSchema);
