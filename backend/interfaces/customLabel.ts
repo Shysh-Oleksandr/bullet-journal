@@ -3,9 +3,11 @@ import IUser from './user';
 export default interface ICustomLabel extends Document {
     labelName: string;
     color: string;
-    isCategoryLabel: boolean;
+    isCategoryLabel?: boolean;
     isDefault?: boolean;
     user: IUser;
+    labelFor: "Note" | "Task";
+    refId?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }

@@ -6,6 +6,6 @@ const router = express.Router();
 router.post('/create', controller.create);
 router.patch('/update/:customLabelID', controller.update);
 router.delete('/:customLabelID', controller.deleteCustomLabel);
-router.get('/:authorID', controller.readAll);
+router.get('/:authorID', controller.getCustomLabels);
 
 export = router;

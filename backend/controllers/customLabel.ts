@@ -8,14 +8,16 @@ import { sortByCreatedDate } from '../utils/sortByCreatedDate';
 const create = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to register customLabel...');
 
-    let { labelName, color, isCategoryLabel, user } = req.body;
+    let { labelName, color, isCategoryLabel, user, labelFor, refId } = req.body;
 
     const customLabel = new CustomLabel({
         _id: new mongoose.Types.ObjectId(),
         labelName,
         color,
         isCategoryLabel,
-        user
+        user,
+        labelFor,
+        refId
     });
 
     return customLabel
@@ -51,12 +53,13 @@ const createDefaultLabel = (defaultLabel: CreateDefaultLabelPayload, user: strin
     return customLabel._id;
 };
 
-const readAll = (req: Request, res: Response, next: NextFunction) => {
+const getCustomLabels = (req: Request, res: Response, next: NextFunction) => {
     const author_id = req.params.authorID;
+    const { labelFor } = req.query
 
     logging.info(`Incoming read all...`);
 
-    return CustomLabel.find({ user: author_id })
+    return CustomLabel.find({user: author_id, labelFor: labelFor || 'Note'})
         .then((customLabels) => {
             const sortedCustomLabels = sortByCreatedDate(customLabels);
 
@@ -120,7 +123,7 @@ const deleteCustomLabel = (req: Request, res: Response, next: NextFunction) => {
 export default {
     create,
     createDefaultLabel,
-    readAll,
+    getCustomLabels,
     update,
     deleteCustomLabel
 };
