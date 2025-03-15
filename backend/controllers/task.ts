@@ -6,11 +6,12 @@ import Task from '../models/task';
 const create = async (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to create task...');
 
-    const { name, parentTaskId, author, dueDate, color, groupId, isCompleted, isArchived, target, units, completedAmount, type } = req.body;
+    const { name, description, parentTaskId, author, dueDate, color, groupId, isCompleted, isArchived, target, units, completedAmount, type, customLabels} = req.body;
 
     const task = new Task({
         _id: new mongoose.Types.ObjectId(),
         name,
+        description,
         author,
         dueDate,
         groupId,
@@ -21,7 +22,8 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
         completedAmount,
         parentTaskId,
         isArchived,
-        type
+        type,
+        customLabels
     });
 
     return task

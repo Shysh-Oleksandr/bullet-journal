@@ -7,12 +7,13 @@ import Task from '../models/task';
 const create = async (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to create group...');
 
-    const { name, color, parentGroupId, author } = req.body;
+    const { name, description, color, parentGroupId, author } = req.body;
 
     const group = new Group({
         _id: new mongoose.Types.ObjectId(),
         author,
         name,
+        description,
         color,
         parentGroupId
     });

@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
+import ICustomLabel from './customLabel';
 
 export interface IGroup extends Document {
     name: string;
+    description?: string;
     color: string;
     author: mongoose.Types.ObjectId;
     parentGroupId?: mongoose.Types.ObjectId | null;
@@ -10,6 +12,7 @@ export interface IGroup extends Document {
 
 export interface ITask extends Document {
     name: string;
+    description?: string;
     author: mongoose.Types.ObjectId;
     dueDate?: number;
     color: string;
@@ -22,6 +25,7 @@ export interface ITask extends Document {
     completedAmount?: number;
     isArchived?: boolean;
     completedAt?: number | null;
+    customLabels: ICustomLabel[];
 }
 
 export enum ITaskTypes {
