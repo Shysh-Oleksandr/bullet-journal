@@ -11,7 +11,7 @@ export default interface INote extends Document {
     color: string;
     images?: string[];
     type: ICustomLabel;
-    category?: ICustomLabel;
+    category?: ICustomLabel[];
     rating: number;
     isEndNote?: boolean;
     isLocked?: boolean;
