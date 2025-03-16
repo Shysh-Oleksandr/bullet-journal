@@ -8,6 +8,7 @@ export interface IGroup extends Document {
     author: mongoose.Types.ObjectId;
     parentGroupId?: mongoose.Types.ObjectId | null;
     isArchived?: boolean;
+    customLabels: ICustomLabel[];
 }
 
 export interface ITask extends Document {
