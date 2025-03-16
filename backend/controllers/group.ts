@@ -7,7 +7,7 @@ import Task from '../models/task';
 const create = async (req: Request, res: Response, next: NextFunction) => {
     logging.info('Attempting to create group...');
 
-    const { name, description, color, parentGroupId, author } = req.body;
+    const { name, description, color, parentGroupId, author, customLabels } = req.body;
 
     const group = new Group({
         _id: new mongoose.Types.ObjectId(),
@@ -15,7 +15,8 @@ const create = async (req: Request, res: Response, next: NextFunction) => {
         name,
         description,
         color,
-        parentGroupId
+        parentGroupId,
+        customLabels
     });
 
     return group
@@ -36,6 +37,7 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
     logging.info('Reading all groups...');
 
     return Group.find({ author: author_id })
+        .populate('customLabels')
         .then((groups) => {
             return res.status(200).json(groups);
         })
@@ -51,6 +53,7 @@ const read = (req: Request, res: Response, next: NextFunction) => {
     logging.info(`Reading group ${_id}...`);
 
     return Group.findById(_id)
+        .populate('customLabels')
         .then((group) => {
             return res.status(200).json({ group });
         })
