@@ -55,11 +55,11 @@ const createDefaultLabel = (defaultLabel: CreateDefaultLabelPayload, user: strin
 
 const getCustomLabels = (req: Request, res: Response, next: NextFunction) => {
     const author_id = req.params.authorID;
-    const { labelFor } = req.query
+    const { labelFor } = req.query;
 
     logging.info(`Incoming read all...`);
 
-    return CustomLabel.find({user: author_id, labelFor: labelFor || 'Note'})
+    return CustomLabel.find(labelFor ? { user: author_id, labelFor: labelFor } : { user: author_id })
         .then((customLabels) => {
             const sortedCustomLabels = sortByCreatedDate(customLabels);
 

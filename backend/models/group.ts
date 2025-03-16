@@ -7,7 +7,8 @@ const GroupSchema = new Schema<IGroup>({
   description: { type: String },
   color: { type: String, required: true },
   parentGroupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group' },
-  isArchived: { type: Boolean, default: false }
+  isArchived: { type: Boolean, default: false },
+  customLabels: [{ type: mongoose.Schema.Types.ObjectId, ref: 'CustomLabel' }],
 });
 
 export default mongoose.model<IGroup>('Group', GroupSchema);

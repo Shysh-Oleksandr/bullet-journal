@@ -6,49 +6,91 @@ export default interface ICustomLabel extends Document {
     isCategoryLabel?: boolean;
     isDefault?: boolean;
     user: IUser;
-    labelFor: "Note" | "Task";
+    labelFor: 'Type' | 'Category' | 'Task';
     refId?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
-export type CreateDefaultLabelPayload = Pick<ICustomLabel, 'labelName' | 'color' | 'isCategoryLabel' | 'isDefault'>;
+export type CreateDefaultLabelPayload = Pick<ICustomLabel, 'labelName' | 'color' | 'isDefault' | 'labelFor'>;
 
 export const DEFAULT_LABELS: CreateDefaultLabelPayload[] = [
     {
         labelName: 'Note',
         color: '#0891b2',
-        isCategoryLabel: false,
-        isDefault: true
+        isDefault: true,
+        labelFor: 'Type'
     },
     {
         labelName: 'Event',
         color: '#FEC0CE',
-        isCategoryLabel: false,
-        isDefault: true
+        isDefault: true,
+        labelFor: 'Type'
     },
     {
         labelName: 'Diary',
         color: '#4A2545',
-        isCategoryLabel: false,
-        isDefault: true
+        isDefault: true,
+        labelFor: 'Type'
     },
     {
         labelName: 'Study',
         color: '#1B998B',
-        isCategoryLabel: true,
-        isDefault: true
+        isDefault: true,
+        labelFor: 'Category'
     },
     {
         labelName: 'Travel',
         color: '#4F518C',
-        isCategoryLabel: true,
-        isDefault: true
+        isDefault: true,
+        labelFor: 'Category'
     },
     {
-        labelName: 'Dream',
+        labelName: 'Work',
         color: '#FCDE9C',
-        isCategoryLabel: true,
-        isDefault: true
+        isDefault: true,
+        labelFor: 'Category'
+    },
+    {
+        labelName: 'To Do',
+        color: '#0891b2',
+        isDefault: true,
+        labelFor: 'Task'
+    },
+    {
+        labelName: 'In Progress',
+        color: '#e3a605',
+        isDefault: true,
+        labelFor: 'Task'
+    },
+    {
+        labelName: 'On Hold',
+        color: '#4A2545',
+        isDefault: true,
+        labelFor: 'Task'
+    },
+    {
+        labelName: 'Completed',
+        color: '#12995c',
+        isDefault: true,
+        labelFor: 'Task'
+    },
+    {
+        labelName: 'High Priority',
+        color: '#c21111',
+        isDefault: true,
+        labelFor: 'Task'
+    },
+    {
+        labelName: 'Medium Priority',
+        color: '#c9939f',
+        isDefault: true,
+        labelFor: 'Task'
+    },
+    {
+        labelName: 'Low Priority',
+        color: '#4eabd4',
+        isDefault: true,
+        labelFor: 'Task'
     }
 ];

@@ -8,7 +8,7 @@ const CustomLabelSchema: Schema = new Schema(
         isCategoryLabel: { type: Boolean },
         isDefault: { type: Boolean }, 
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        labelFor: { type: String, enum: ['Note', 'Task'], required: true, default: 'Note' },
+        labelFor: { type: String, enum: ['Type', 'Category', 'Task'], required: true},
         refId: { type: mongoose.Schema.Types.ObjectId, refPath: 'labelFor' }
     },
     { timestamps: true }
