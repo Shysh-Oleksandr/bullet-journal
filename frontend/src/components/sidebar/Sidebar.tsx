@@ -11,6 +11,7 @@ import { useWindowSize } from '../../hooks/useWindowSize';
 import { useAppDispatch, useAppSelector } from '../../store/helpers/storeHooks';
 import FilterSearchInput from '../filterBar/FilterSearchInput';
 import NoteSidebarPreview from './NoteSidebarPreview';
+import { useFetchNoteLabels } from '../../features/journal/hooks/useFetchNoteLabels';
 
 const isEditPage = window.location.pathname.includes('edit');
 
@@ -21,11 +22,12 @@ interface SidebarProps {
 const Sidebar = ({ sidebarRef }: SidebarProps) => {
   const [fetchNotes] =
     notesApi.useLazyFetchNotesQuery();
-  const [fetchLabels] = notesApi.useLazyFetchLabelsQuery();
-
-  const user = useAppSelector(getUserData);
-  const isSidebarShown = useAppSelector(getIsSidebarShown);
-  const notes = useAppSelector(getNotes);
+    
+    const user = useAppSelector(getUserData);
+    const isSidebarShown = useAppSelector(getIsSidebarShown);
+    const notes = useAppSelector(getNotes);
+    
+  const fetchLabels = useFetchNoteLabels(user?._id || '')
 
   const dispatch = useAppDispatch();
   const [width] = useWindowSize();
@@ -46,8 +48,8 @@ const Sidebar = ({ sidebarRef }: SidebarProps) => {
   useEffect(() => {
     if (!user || notes.length > 0) return;
 
-    fetchNotes(user?._id);
-    fetchLabels(user?._id);
+    fetchNotes(user._id);
+    fetchLabels();
   }, [notes.length, user, fetchLabels, fetchNotes]);
 
   return (

@@ -4,10 +4,11 @@ import { BsPlusLg } from 'react-icons/bs';
 import { IoIosColorPalette } from 'react-icons/io';
 import { notesApi } from '../../../features/journal/journalApi';
 import { getCustomCategories, setErrorMsg, setSuccessMsg } from '../../../features/journal/journalSlice';
-import { CustomLabel } from '../../../features/journal/types';
+import { CustomLabel, LabelFor } from '../../../features/journal/types';
 import { getUserId } from '../../../features/user/userSlice';
 import { useAppDispatch, useAppSelector } from '../../../store/helpers/storeHooks';
 import { getCategoriesLabelName, getRandomColor } from '../../../utils/functions';
+import { useFetchNoteLabels } from '../../../features/journal/hooks/useFetchNoteLabels';
 
 const labelName = 'category';
 
@@ -19,7 +20,7 @@ interface NoteLabelInputProps {
 }
 
 const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabelInputProps) => {
-  const [fetchLabels] = notesApi.useLazyFetchLabelsQuery();
+
   const [createLabel] = notesApi.useCreateLabelMutation();
   const [deleteLabel] = notesApi.useDeleteLabelMutation();
 
@@ -27,6 +28,8 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
 
   const userId = useAppSelector(getUserId) ?? '';
   const labels = useAppSelector(getCustomCategories);
+
+  const fetchLabels = useFetchNoteLabels(userId)
 
   const [currentCustomLabels, setCurrentCustomLabels] = useState<CustomLabel[]>(labels);
   const [focused, setFocused] = useState(false);
@@ -75,11 +78,12 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
         labelName: newLabel.trim(),
         isCategoryLabel: true,
         user: userId,
+        labelFor: "Category" as LabelFor,
         color,
       };
 
       const { customLabel } = await createLabel(createLabelData).unwrap();
-      fetchLabels(userId);
+      fetchLabels();
 
       addedLabel = newLabel;
 
@@ -103,7 +107,7 @@ const NoteCategoryInput = ({ label, setLabel, setNoteColor, disabled }: NoteLabe
 
     try {
       deleteLabel(labelToDelete._id);
-      fetchLabels(userId);
+      fetchLabels();
 
       setCurrentCustomLabels(prev => prev.filter(item => item._id !== labelToDelete._id))
 
