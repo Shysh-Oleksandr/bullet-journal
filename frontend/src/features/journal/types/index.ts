@@ -26,6 +26,7 @@ export interface CustomLabel {
     labelName: string;
     color: string;
     isCategoryLabel: boolean;
+    labelFor: LabelFor;
     user: string; // userId
     _id: string;
 }
@@ -41,9 +42,15 @@ export type FetchNoteByIdResponse = {
 
 export type CreateNoteResponse = FetchNoteByIdResponse;
 
+export type LabelFor = "Type" | "Category" | "Task";
+
 export type FetchLabelsResponse = {
     count: number;
     customLabels: CustomLabel[];
+};
+export type FetchLabelsRequestPayload = {
+    userId: string;
+    labelFor: LabelFor;
 };
 
 export type UpdateNoteRequest = Omit<Note, 'type' | 'category'> & {
