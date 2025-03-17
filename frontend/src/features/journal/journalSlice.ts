@@ -11,7 +11,8 @@ interface JournalState {
     notes: Note[];
     errorMsg: string | null;
     successMsg: string | null;
-    labels: CustomLabel[];
+    types: CustomLabel[];
+    categories: CustomLabel[];
     isSidebarShown: boolean;
     isFilterBarShown: boolean;
     oldestNoteDate: number | null;
@@ -19,7 +20,8 @@ interface JournalState {
 
 const initialState: JournalState = {
     notes: [],
-    labels: [],
+    types: [],
+    categories: [],
     errorMsg: null,
     successMsg: null,
     isSidebarShown: document.documentElement.clientWidth > 1023 && localStorage.getItem('isSidebarShown') === 'true',
@@ -91,7 +93,12 @@ export const journalSlice = createSlice({
             state.oldestNoteDate = notes.at(-1)?.startDate ?? 0;
         });
         builder.addMatcher(notesApi.endpoints.fetchLabels.matchFulfilled, (state, action) => {
-            state.labels = action.payload.customLabels;
+            if (action.meta.arg.originalArgs.labelFor === 'Type') {
+                state.types = action.payload.customLabels;
+            }
+            if (action.meta.arg.originalArgs.labelFor === 'Category') {
+                state.categories = action.payload.customLabels;
+            }
         });
         builder.addMatcher(logout.match, () => ({
             ...initialState
@@ -117,10 +124,5 @@ export const getErrorMsg = (state: RootState): string | null => state[STATE_KEY]
 export const getSuccessMsg = (state: RootState): string | null => state[STATE_KEY].successMsg;
 export const getInfoMessages = (state: RootState) => ({ successMsg: state[STATE_KEY].successMsg, errorMsg: state[STATE_KEY].errorMsg });
 
-export const getLabels = (state: RootState): CustomLabel[] => state[STATE_KEY].labels;
-
-export const getLabelsIds = createSelector(getLabels, (labels) => labels.map((label) => label._id));
-
-export const getCustomTypes = createSelector(getLabels, (labels) => labels.filter((label) => !label.isCategoryLabel));
-
-export const getCustomCategories = createSelector(getLabels, (labels) => labels.filter((label) => label.isCategoryLabel));
+export const getCustomTypes = (state: RootState): CustomLabel[] => state[STATE_KEY].types;
+export const getCustomCategories = (state: RootState): CustomLabel[] => state[STATE_KEY].categories;

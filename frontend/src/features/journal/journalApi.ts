@@ -5,6 +5,7 @@ import {
     CreateLabelResponse,
     CreateNoteRequest,
     CreateNoteResponse,
+    FetchLabelsRequestPayload,
     FetchLabelsResponse,
     FetchNoteByIdResponse,
     FetchNotesResponse,
@@ -69,10 +70,10 @@ export const notesApi = emptyAxiosApi.injectEndpoints({
                     };
                 },
             }),
-            fetchLabels: build.query<FetchLabelsResponse, string>({
-                query(userId) {
+            fetchLabels: build.query<FetchLabelsResponse, FetchLabelsRequestPayload>({
+                query({userId, labelFor}) {
                     return {
-                        url: `/customlabels/${userId}`,
+                        url: `/customlabels/${userId}?labelFor=${labelFor}`,
                         method: Method.GET
                     };
                 },
