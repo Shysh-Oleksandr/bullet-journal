@@ -7,8 +7,12 @@ import { User } from './user.model';
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
+  async findById(id: string): Promise<User | null> {
+    return this.userModel.findById(id).lean().exec();
+  }
+
   async findByUid(uid: string): Promise<User | null> {
-    return this.userModel.findOne({ uid }).exec();
+    return this.userModel.findOne({ uid }).lean().exec();
   }
 
   async create(userData: Partial<User>) {

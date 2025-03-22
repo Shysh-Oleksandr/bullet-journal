@@ -1,8 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
+
+interface JwtPayload {
+  email: string;
+  sub: string;
+  iat: number;
+  exp: number;
+}
 
 @Controller('auth')
 export class AuthController {
@@ -17,17 +22,17 @@ export class AuthController {
   }
 
   @Post('refresh')
-  refreshToken(@Req() req: Request) {
-    const token = req.headers['authorization']?.split(' ')[1];
-
+  refreshToken(@Body('token') token: string) {
     if (!token) {
       throw new Error('No token provided');
     }
 
-    const decoded = this.jwtService.verify(token, { ignoreExpiration: true });
+    const decoded = this.jwtService.verify<JwtPayload>(token, {
+      ignoreExpiration: true,
+    });
     return this.authService.generateJwt({
       email: decoded.email,
-      sub: decoded.sub,
+      _id: decoded.sub,
     });
   }
 }
