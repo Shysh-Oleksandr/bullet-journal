@@ -92,4 +92,8 @@ export class ImagesService {
 
     return result.deletedCount || 0;
   }
+
+  async deleteImages(imageIds: string[]): Promise<void> {
+    await this.imageModel.deleteMany({ _id: { $in: imageIds } }).exec();
+  }
 }

@@ -184,6 +184,13 @@ export class NotesService {
 
   async remove(id: string): Promise<boolean> {
     const result = await this.noteModel.findByIdAndDelete(id).exec();
+
+    if (result?.images) {
+      await this.imagesService.deleteImages(
+        result.images.map((imageId) => imageId.toString()),
+      );
+    }
+
     return !!result;
   }
 
