@@ -4,6 +4,9 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import configuration from './config';
+import { NotesModule } from './notes/notes.module';
+import { CustomLabelsModule } from './custom-labels/custom-labels.module';
+import { ImagesModule } from './images/images.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import configuration from './config';
     }),
     AuthModule,
     UsersModule,
+    NotesModule,
+    CustomLabelsModule,
+    ImagesModule,
   ],
 })
 export class AppModule {}

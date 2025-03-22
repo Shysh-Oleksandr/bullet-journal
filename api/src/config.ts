@@ -9,4 +9,7 @@ export default () => ({
   mongo: {
     url: process.env.MONGO_URL,
   },
+  security: {
+    charCodeShiftNumber: process.env.CHAR_CODE_SHIFT_NUMBER,
+  },
 });
