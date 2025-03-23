@@ -12,9 +12,11 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       whitelist: true,
-      forbidNonWhitelisted: true,
+      forbidNonWhitelisted: false,
     }),
   );
+
+  app.setGlobalPrefix('api');
 
   app.enableCors();
   console.log(`Starting server on port ${port}...`);

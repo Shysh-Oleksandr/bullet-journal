@@ -9,6 +9,7 @@ import { CustomLabelsModule } from './custom-labels/custom-labels.module';
 import { ImagesModule } from './images/images.module';
 import { TasksModule } from './tasks/tasks.module';
 import { GroupsModule } from './groups/groups.module';
+import { HabitsModule } from './habits/habits.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { GroupsModule } from './groups/groups.module';
     ImagesModule,
     TasksModule,
     GroupsModule,
+    HabitsModule,
   ],
 })
 export class AppModule {}
