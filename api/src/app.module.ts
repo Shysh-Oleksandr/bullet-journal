@@ -7,6 +7,8 @@ import configuration from './config';
 import { NotesModule } from './notes/notes.module';
 import { CustomLabelsModule } from './custom-labels/custom-labels.module';
 import { ImagesModule } from './images/images.module';
+import { TasksModule } from './tasks/tasks.module';
+import { GroupsModule } from './groups/groups.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { ImagesModule } from './images/images.module';
     NotesModule,
     CustomLabelsModule,
     ImagesModule,
+    TasksModule,
+    GroupsModule,
   ],
 })
 export class AppModule {}
