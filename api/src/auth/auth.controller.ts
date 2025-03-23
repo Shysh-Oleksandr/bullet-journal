@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 
@@ -34,5 +34,11 @@ export class AuthController {
       email: decoded.email,
       _id: decoded.sub,
     });
+  }
+
+  /** Special route for the cron job(for keeping the server constantly active) */
+  @Get('cron-job')
+  cronJob() {
+    return 'Hello World!';
   }
 }
