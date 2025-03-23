@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@nestjs/cli':
+        specifier: ^11.0.0
+        version: 11.0.5(@swc/cli@0.6.0(@swc/core@1.11.10)(chokidar@4.0.3))(@swc/core@1.11.10)(@types/node@22.13.10)
       '@nestjs/common':
         specifier: ^11.0.1
         version: 11.0.11(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -63,9 +66,6 @@ importers:
       '@eslint/js':
         specifier: ^9.18.0
         version: 9.22.0
-      '@nestjs/cli':
-        specifier: ^11.0.0
-        version: 11.0.5(@swc/cli@0.6.0(@swc/core@1.11.10)(chokidar@4.0.3))(@swc/core@1.11.10)(@types/node@22.13.10)
       '@nestjs/schematics':
         specifier: ^11.0.0
         version: 11.0.2(chokidar@4.0.3)(typescript@5.8.2)
