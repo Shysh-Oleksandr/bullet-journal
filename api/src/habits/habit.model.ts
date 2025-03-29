@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { HabitLogSchema } from './habit-log.model';
+import { HabitLog } from './habit-log.model';
 
 export enum HabitPeriod {
-  DAY = 'day',
   WEEK = 'week',
   MONTH = 'month',
 }
@@ -15,10 +16,10 @@ export enum HabitType {
 
 @Schema()
 export class HabitFrequency {
-  @Prop({ type: [Number], default: [0, 1, 2, 3, 4, 5, 6] })
-  days: number[];
+  @Prop({ type: Number, default: 7 })
+  days: number;
 
-  @Prop({ type: String, enum: HabitPeriod, default: HabitPeriod.DAY })
+  @Prop({ type: String, enum: HabitPeriod, default: HabitPeriod.WEEK })
   period: HabitPeriod;
 }
 
@@ -59,6 +60,12 @@ export class Habit extends Document {
 
   @Prop({ type: HabitFrequencySchema, default: () => ({}) })
   frequency: HabitFrequency;
+
+  @Prop({ type: [HabitLogSchema], default: [] })
+  logs: HabitLog[];
+
+  @Prop({ type: [HabitLogSchema], default: [] })
+  oldLogs: HabitLog[];
 
   @Prop({
     type: String,

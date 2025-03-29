@@ -24,10 +24,15 @@ export class HabitsService {
   }
 
   async findAll(authorId: string) {
-    return this.habitModel
+    const habits = await this.habitModel
       .find({ author: new Types.ObjectId(authorId) })
       .sort({ order: 1 })
       .exec();
+
+    for (const habit of habits) {
+      habit.logs = await this.habitLogModel.find({ habitId: habit._id }).exec();
+    }
+    return habits;
   }
 
   async findOne(id: string) {
