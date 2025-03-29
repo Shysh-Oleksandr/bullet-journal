@@ -58,4 +58,8 @@ export class HabitLogsService {
       })
       .exec();
   }
+
+  async findAllLogs() {
+    return this.habitLogModel.find({}).exec();
+  }
 }

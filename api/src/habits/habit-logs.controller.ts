@@ -32,6 +32,12 @@ export class HabitLogsController {
     }
   }
 
+  @Get('all')
+  async getAllLogs() {
+    const habitLogs = await this.habitLogsService.findAllLogs();
+    return habitLogs;
+  }
+
   @Get('habit/:habitId')
   async findAllForHabit(@Param('habitId') habitId: string) {
     try {
