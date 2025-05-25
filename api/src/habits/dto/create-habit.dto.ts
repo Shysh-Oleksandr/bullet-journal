@@ -1,5 +1,5 @@
+import { Type } from 'class-transformer';
 import {
-  IsArray,
   IsBoolean,
   IsEnum,
   IsNumber,
@@ -8,9 +8,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { HabitPeriod, HabitType } from '../habit.model';
-import { CreateHabitLogDto } from './create-habit-log.dto';
 
 export class HabitFrequencyDto {
   @IsNumber()
@@ -67,10 +65,4 @@ export class CreateHabitDto {
   @IsEnum(HabitType)
   @IsOptional()
   habitType?: HabitType;
-
-  @IsArray()
-  @IsOptional()
-  @ValidateNested({ each: true })
-  @Type(() => CreateHabitLogDto)
-  logs?: CreateHabitLogDto[];
 }
