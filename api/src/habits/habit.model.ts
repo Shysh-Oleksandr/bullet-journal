@@ -26,6 +26,77 @@ export class HabitFrequency {
 export const HabitFrequencySchema =
   SchemaFactory.createForClass(HabitFrequency);
 
+@Schema()
+export class HabitStreak {
+  @Prop({ type: Date })
+  startDate: Date;
+  @Prop({ type: Date })
+  endDate: Date;
+  @Prop({ type: Number, default: 0 })
+  numberOfLogs: number;
+}
+
+export const HabitStreakSchema = SchemaFactory.createForClass(HabitStreak);
+
+@Schema()
+export class HabitCalendarData {
+  @Prop({ required: true })
+  date: string;
+
+  @Prop({ required: true, default: false })
+  isOptional: boolean;
+
+  @Prop({ type: Object, required: true })
+  streakState: {
+    displayRightLine: boolean;
+    displayLeftLine: boolean;
+  };
+
+  @Prop({ required: true })
+  percentageCompleted: number;
+
+  @Prop({ required: false })
+  amount?: number;
+
+  @Prop({ required: false })
+  note?: string;
+
+  @Prop({ required: false, default: false })
+  isManuallyOptional: boolean;
+}
+
+export const HabitCalendarDataSchema =
+  SchemaFactory.createForClass(HabitCalendarData);
+
+@Schema()
+export class CachedMetrics {
+  @Prop({ type: Number, default: 0 })
+  currentStreak: number;
+
+  @Prop({ type: Number, default: 0 })
+  longestStreak: number;
+
+  @Prop({ type: Number, default: 0 })
+  overallCompletions: number;
+
+  @Prop({ type: Number, default: null })
+  oldestLogDate: number;
+
+  @Prop({ type: Number, default: null })
+  firstCompletedLogDate: number;
+
+  @Prop({ type: [HabitStreakSchema], default: [] })
+  bestStreaks?: HabitStreak[];
+
+  @Prop({ type: Object, default: {} })
+  calendarData?: Record<string, HabitCalendarData>;
+
+  @Prop({ type: Number, default: null })
+  lastCalendarDataUpdate?: number;
+}
+
+export const CachedMetricsSchema = SchemaFactory.createForClass(CachedMetrics);
+
 @Schema({ timestamps: true })
 export class Habit extends Document {
   @Prop({ required: true })
@@ -62,10 +133,10 @@ export class Habit extends Document {
   frequency: HabitFrequency;
 
   @Prop({ type: [HabitLogSchema], default: [] })
-  logs: HabitLog[];
+  featuredLogs: HabitLog[];
 
-  @Prop({ type: [HabitLogSchema], default: [] })
-  oldLogs: HabitLog[];
+  @Prop({ type: CachedMetricsSchema, default: () => ({}) })
+  cachedMetrics: CachedMetrics;
 
   @Prop({
     type: String,
