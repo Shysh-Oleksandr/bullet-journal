@@ -4,10 +4,14 @@ import { Provider } from 'react-redux';
 import App from './App';
 import './index.css';
 import { store } from './store/store';
+import { QueryClientProvider } from 'react-query';
+import { queryClient } from './store/queryClient';
 
 ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.getElementById('root')
+    <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+            <App />
+        </QueryClientProvider>
+    </Provider>,
+    document.getElementById('root')
 );
