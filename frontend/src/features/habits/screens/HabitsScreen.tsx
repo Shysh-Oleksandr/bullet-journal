@@ -15,11 +15,6 @@ import HabitItem from '../components/habitItem/HabitItem';
 import HabitsProgressBar from '../components/habitsHeader/HabitsProgressBar';
 import HabitsWeekCalendar from '../components/habitsHeader/HabitsWeekCalendar';
 
-const contentContainerStyle = {
-    paddingTop: 20,
-    paddingBottom: 90,
-    paddingHorizontal: 16
-};
 
 const HabitsScreen = (): JSX.Element => {
     const navigate = useNavigate();
@@ -41,7 +36,7 @@ const HabitsScreen = (): JSX.Element => {
         <>
             <HeaderBar
                 leadingContent={(textColor) => (
-                    <div onClick={() => navigate('/')}>
+                    <div onClick={() => navigate('/')} className="cursor-pointer px-1 hover:opacity-80 transition-opacity">
                         <MdArrowBack size={26} color={textColor} />
                     </div>
                 )}
@@ -68,27 +63,29 @@ const HabitsScreen = (): JSX.Element => {
             <HabitsProgressBar selectedDate={selectedDate} mandatoryHabits={activeHabits} />
             {/* <AddButton contentItem={ContentItem.HABIT} /> */}
             <div className="flex-1 px-4 bg-gradient-to-b from-[#D4E0F1] via-[#d0dae8] to-[#D4E0F1]">
-                <div className="overflow-y-auto" style={contentContainerStyle}>
-                    <HabitsWeekCalendar activeHabits={activeHabits} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+                <div className="overflow-y-auto pt-5 pb-8">
+                    <div className="xs:max-w-[calc(min(90%,500px))] sm:max-w-[calc(min(90%,850px))] md:max-w-[calc(min(90%,850px))] lg:max-w-5xl xl:max-w-7xl mx-auto">
+                        <HabitsWeekCalendar activeHabits={activeHabits} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
 
-                    {isLoading ? (
-                        <div className="pt-2 flex justify-center">
-                            <Loading className="my-4" />
-                        </div>
-                    ) : activeHabits.length > 0 ? (
-                        <>
-                            {activeHabits.map((habit) => (
-                                <HabitItem key={habit._id} habit={habit} selectedDate={selectedDate} />
-                            ))}
-                        </>
-                    ) : (
-                        <div className="flex flex-col items-center">
-                            <Typography fontWeight="semibold" fontSize="lg">
-                                No habits yet
-                            </Typography>
-                            {/* <Button label="Add Habit" marginTop={10} labelProps={{ fontSize: 'xl', fontWeight: 'bold' }} onClick={navigateToCreateHabitScreen} bgColor="#0891b2" /> */}
-                        </div>
-                    )}
+                        {isLoading ? (
+                            <div className="pt-2 flex justify-center">
+                                <Loading className="my-4" />
+                            </div>
+                        ) : activeHabits.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                                {activeHabits.map((habit) => (
+                                    <HabitItem key={habit._id} habit={habit} selectedDate={selectedDate} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center">
+                                <Typography fontWeight="semibold" fontSize="lg">
+                                    No habits yet
+                                </Typography>
+                                {/* <Button label="Add Habit" marginTop={10} labelProps={{ fontSize: 'xl', fontWeight: 'bold' }} onClick={navigateToCreateHabitScreen} bgColor="#0891b2" /> */}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </>

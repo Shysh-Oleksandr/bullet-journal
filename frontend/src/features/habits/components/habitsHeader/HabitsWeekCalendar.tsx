@@ -34,11 +34,11 @@ const HabitsWeekCalendar = ({ selectedDate, activeHabits, setSelectedDate }: Pro
   
 
     return (
-        <div className="mb-5 w-full">
+        <div className="mb-5 w-full xs:max-w-sm xs:mx-auto">
             <div className="flex justify-between items-center">
                 <div>
                     <button
-                        className={`flex items-center ${isTodaySelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:opacity-80'}`}
+                        className={`flex items-center ${isTodaySelected ? 'opacity-50 transition-opacity cursor-not-allowed' : 'cursor-pointer hover:opacity-80'}`}
                         disabled={isTodaySelected}
                         onClick={() => setSelectedDate(today)}
                     >
@@ -52,11 +52,11 @@ const HabitsWeekCalendar = ({ selectedDate, activeHabits, setSelectedDate }: Pro
                         {format(selectedDate, 'dd MMM yyyy')}
                     </Typography>
                 </div>
-                <div className='flex items-center gap-2 '>
-                    <div className='cursor-pointer hover:opacity-80' onClick={() => onArrowPress(false)}>
+                <div className='flex items-center'>
+                    <div className='cursor-pointer transition-opacity hover:opacity-80 p-1' onClick={() => onArrowPress(false)}>
                         <MdArrowBack color={theme.colors.cyan500} size={theme.fontSizes.xxxl} />
                     </div>
-                    <div className='cursor-pointer hover:opacity-80' onClick={() => !isTodaySelected && onArrowPress(true)}>
+                    <div className='cursor-pointer transition-opacity hover:opacity-80 p-1' onClick={() => !isTodaySelected && onArrowPress(true)}>
                         <MdArrowForward color={isTodaySelected ? theme.colors.gray : theme.colors.cyan500} size={theme.fontSizes.xxxl} />
                     </div>
                 </div>

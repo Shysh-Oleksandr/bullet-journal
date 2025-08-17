@@ -48,6 +48,13 @@ body,
     -webkit-text-size-adjust: 100%;
 }
 
+body {
+  -webkit-touch-callout: none; /* Disables the callout menu on touch and hold */
+  -webkit-user-select: none; /* Prevents text selection */
+  -webkit-tap-highlight-color: transparent; /* Prevents the blue highlight on touch */
+  user-select: none; /* Prevents text selection */
+}
+
 input,
 button,
 textarea {
