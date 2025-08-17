@@ -1,6 +1,7 @@
 import LoginPage from '../pages/Login';
 import EditPage from '../pages/EditPage';
 import HomePage from '../pages/HomePage';
+import HabitsScreen from '../features/habits/screens/HabitsScreen';
 
 interface IRoute {
     path: string;
@@ -47,6 +48,15 @@ const mainRoutes: IRoute[] = [
     }
 ];
 
-const routes: IRoute[] = [...authRoutes, ...noteRoutes, ...mainRoutes];
+const habitsRoutes: IRoute[] = [
+    {
+        path: '/habits',
+        name: 'Habits',
+        auth: true,
+        component: HabitsScreen
+    }
+];
+
+const routes: IRoute[] = [...authRoutes, ...noteRoutes, ...mainRoutes, ...habitsRoutes];
 
 export default routes;

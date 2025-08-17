@@ -8,4 +8,8 @@ export class HabitSummaryQueryDto {
   @IsOptional()
   @IsString()
   endDate?: string;
+
+  @IsOptional()
+  @IsString()
+  userId?: string; // Workaround for the web app TODO: remove it
 }
