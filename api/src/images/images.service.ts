@@ -7,10 +7,14 @@ import {
   CreateMultipleImagesDto,
 } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
+import { S3UploadService } from './s3-upload.service';
 
 @Injectable()
 export class ImagesService {
-  constructor(@InjectModel(Image.name) private imageModel: Model<Image>) {}
+  constructor(
+    @InjectModel(Image.name) private imageModel: Model<Image>,
+    private readonly s3UploadService: S3UploadService,
+  ) {}
 
   async create(
     createImageDto: CreateImageDto,
@@ -28,9 +32,16 @@ export class ImagesService {
     createMultipleImagesDto: CreateMultipleImagesDto,
     authorId: string,
   ): Promise<Image[]> {
+    const noteId = createMultipleImagesDto.noteId
+      ? new Types.ObjectId(createMultipleImagesDto.noteId as unknown as string)
+      : undefined;
     const newImages = createMultipleImagesDto.urls.map(
       (url) =>
-        new this.imageModel({ url, author: new Types.ObjectId(authorId) }),
+        new this.imageModel({
+          url,
+          author: new Types.ObjectId(authorId),
+          ...(noteId && { noteId }),
+        }),
     );
     return this.imageModel.insertMany(newImages);
   }
@@ -83,6 +94,21 @@ export class ImagesService {
 
   async removeMany(imageIds: string[]): Promise<number> {
     if (!imageIds || !imageIds.length) return 0;
+
+    const images = await this.imageModel
+      .find({ _id: { $in: imageIds.map((id) => new Types.ObjectId(id)) } })
+      .exec();
+
+    for (const img of images) {
+      const url = (img as unknown as { url?: string }).url;
+      if (url) {
+        try {
+          await this.s3UploadService.deleteByUrl(url);
+        } catch (err) {
+          console.error('Failed to delete image from S3:', url, err);
+        }
+      }
+    }
 
     const result = await this.imageModel
       .deleteMany({

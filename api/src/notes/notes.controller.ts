@@ -17,7 +17,7 @@ import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RequestWithUser } from '../common/types';
-import { PaginationDto } from './dto/pagination.dto';
+import { PaginationFiltersDto } from './dto/pagination-filters.dto';
 
 @Controller('notes')
 @UseGuards(JwtAuthGuard)
@@ -51,12 +51,40 @@ export class NotesController {
   @Get('paginated')
   async findAllPaginated(
     @Req() req: RequestWithUser,
-    @Query() paginationDto: PaginationDto,
+    @Query() dto: PaginationFiltersDto,
   ) {
     try {
-      const { page = 1, limit = 10 } = paginationDto;
+      const { page = 1, limit = 10 } = dto;
+      const filters =
+        dto.search != null ||
+        (dto.typeIds?.length ?? 0) > 0 ||
+        (dto.categoryIds?.length ?? 0) > 0 ||
+        dto.dateFrom != null ||
+        dto.dateTo != null ||
+        dto.ratingMin != null ||
+        dto.ratingMax != null ||
+        dto.isStarred === true ||
+        dto.withImages === true
+          ? {
+              search: dto.search,
+              typeIds: dto.typeIds,
+              categoryIds: dto.categoryIds,
+              dateFrom: dto.dateFrom,
+              dateTo: dto.dateTo,
+              ratingMin: dto.ratingMin,
+              ratingMax: dto.ratingMax,
+              isStarred: dto.isStarred,
+              withImages: dto.withImages,
+            }
+          : undefined;
+
       const { notes, total, totalPages } =
-        await this.notesService.findAllPaginated(req.user.userId, page, limit);
+        await this.notesService.findAllPaginated(
+          req.user.userId,
+          page,
+          limit,
+          filters,
+        );
 
       return {
         data: notes,
