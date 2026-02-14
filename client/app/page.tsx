@@ -17,7 +17,7 @@ import { DatePickerInput } from "@mantine/dates";
 import { useDebouncedValue } from "@mantine/hooks";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { NoteCard } from "@/components/NoteCard";
 import { NotesPagination } from "@/components/NotesPagination";
@@ -95,7 +95,7 @@ function buildQueryString(state: FilterParams): string {
   return s ? `?${s}` : "";
 }
 
-export default function HomePage() {
+function HomePageContent() {
   const user = useAuthStore((state) => state.user);
   const authChecked = useAuthStore((state) => state.authChecked);
   const router = useRouter();
@@ -431,5 +431,19 @@ export default function HomePage() {
         <GoogleSignInButton />
       </Stack>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader size="lg" />
+        </div>
+      }
+    >
+      <HomePageContent />
+    </Suspense>
   );
 }
