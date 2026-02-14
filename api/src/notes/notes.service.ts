@@ -198,20 +198,74 @@ export class NotesService {
     authorId: string,
     page: number = 1,
     limit: number = 10,
+    filters?: {
+      search?: string;
+      typeIds?: string[];
+      categoryIds?: string[];
+      dateFrom?: number;
+      dateTo?: number;
+      ratingMin?: number;
+      ratingMax?: number;
+      isStarred?: boolean;
+      withImages?: boolean;
+    },
   ): Promise<{ notes: Note[]; total: number; totalPages: number }> {
     const skip = (page - 1) * limit;
+    const query: Record<string, unknown> = {
+      author: new Types.ObjectId(authorId),
+    };
+
+    if (filters?.search?.trim()) {
+      const plainTerm = filters.search.trim();
+      const obfuscatedTerm = this.securityService.obfuscateText(plainTerm);
+      const escaped = obfuscatedTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(escaped, 'i');
+      query.title = { $regex: regex };
+    }
+    if (filters?.typeIds?.length) {
+      query.type = { $in: filters.typeIds.map((id) => new Types.ObjectId(id)) };
+    }
+    if (filters?.categoryIds?.length) {
+      query.category = {
+        $in: filters.categoryIds.map((id) => new Types.ObjectId(id)),
+      };
+    }
+    if (filters?.dateFrom != null || filters?.dateTo != null) {
+      query.startDate = {};
+      if (filters.dateFrom != null) {
+        (query.startDate as Record<string, number>).$gte = filters.dateFrom;
+      }
+      if (filters.dateTo != null) {
+        (query.startDate as Record<string, number>).$lte = filters.dateTo;
+      }
+    }
+    if (filters?.ratingMin != null || filters?.ratingMax != null) {
+      query.rating = {};
+      if (filters.ratingMin != null) {
+        (query.rating as Record<string, number>).$gte = filters.ratingMin;
+      }
+      if (filters.ratingMax != null) {
+        (query.rating as Record<string, number>).$lte = filters.ratingMax;
+      }
+    }
+    if (filters?.isStarred === true) {
+      query.isStarred = true;
+    }
+    if (filters?.withImages === true) {
+      query['images.0'] = { $exists: true };
+    }
 
     const [notes, total] = await Promise.all([
       this.noteModel
-        .find({ author: authorId })
+        .find(query)
         .populate('type')
         .populate('category')
         .populate('images')
-        .sort({ startDate: -1 }) // Sort by startDate in descending order
+        .sort({ startDate: -1 })
         .skip(skip)
         .limit(limit)
         .exec(),
-      this.noteModel.countDocuments({ author: authorId }).exec(),
+      this.noteModel.countDocuments(query).exec(),
     ]);
 
     this.deobfuscateNotes(notes);

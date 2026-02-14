@@ -16,7 +16,7 @@ const config = {
     },
     server: {
         host: 'localhost', // Local ip from `ipconfig getifaddr en0`: 192.168.0.103
-        port: process.env.PORT || 8001
+        port: process.env.PORT || 8002
     },
     security: {
         charCodeShiftNumber: process.env.CHAR_CODE_SHIFT_NUMBER ?? 1
