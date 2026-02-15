@@ -4,6 +4,7 @@ import { Badge, Box, Card, Text, useMantineColorScheme } from "@mantine/core";
 import { format } from "date-fns";
 import Link from "next/link";
 import Image from "next/image";
+import { memo } from "react";
 
 import type { Note } from "@/lib/notes/types";
 import { cn } from "@/lib/utils";
@@ -11,9 +12,13 @@ import { cn } from "@/lib/utils";
 const MAX_CONTENT_SYMBOLS = 260;
 const DEFAULT_COLOR = "#0891b2";
 
-/** Replace <br> tags with space so block boundaries don't run together, then strip tags. */
+/** Insert space after block tags and <br> so adjacent blocks don't run together, then strip tags. */
 function stripHtml(html: string): string {
-  const withSpaces = html.replace(/<br\s*\/?>/gi, " ");
+  let withSpaces = html.replace(/<br\s*\/?>/gi, " ");
+  withSpaces = withSpaces.replace(
+    /<\/(p|h[1-6]|div|li|blockquote|tr)\s*>/gi,
+    "</$1> ",
+  );
   if (typeof document === "undefined") {
     return withSpaces
       .replace(/<[^>]*>/g, "")
@@ -45,7 +50,7 @@ export interface NoteCardProps {
   preview?: boolean;
 }
 
-export function NoteCard({ note, preview }: NoteCardProps) {
+function NoteCardComponent({ note, preview }: NoteCardProps) {
   const { colorScheme } = useMantineColorScheme();
   const color = note.color || DEFAULT_COLOR;
   const labels = [...(note.type ? [note.type] : []), ...(note.category ?? [])];
@@ -82,12 +87,7 @@ export function NoteCard({ note, preview }: NoteCardProps) {
                   key={img._id}
                   className={`relative w-full h-[150px] bg-zinc-100 dark:bg-zinc-800 ${i === 2 ? "hidden md:block" : ""}`}
                 >
-                  <Image
-                    src={img.url}
-                    alt=""
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={img.url} alt="" fill className="object-cover" />
                 </div>
               ))}
             </div>
@@ -128,7 +128,7 @@ export function NoteCard({ note, preview }: NoteCardProps) {
               key={label._id}
               component="span"
               style={{
-                borderLeft: `3px solid ${label.color || "#64748b"}`,
+                background: `linear-gradient(to bottom right, ${label.color || "#64748b"}70 10%, ${colorScheme === "dark" ? "#1e293b" : "#f1f5f9"}`,
               }}
               className={cn(
                 "inline-flex rounded py-0.5 pl-1.5 pr-2 text-xs font-medium",
@@ -152,3 +152,6 @@ export function NoteCard({ note, preview }: NoteCardProps) {
     </Link>
   );
 }
+
+export const NoteCard = memo(NoteCardComponent);
+NoteCard.displayName = "NoteCard";

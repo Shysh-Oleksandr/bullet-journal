@@ -14,9 +14,9 @@ import {
   Text,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure, useLocalStorage } from "@mantine/hooks";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { NoteCard } from "@/components/NoteCard";
 import { BlockNoteEditor } from "@/components/notes/BlockNoteEditor";
@@ -38,7 +38,7 @@ import {
 } from "@/lib/notes/api";
 import type { CustomLabel, Note } from "@/lib/notes/types";
 import { cn } from "@/lib/utils";
-import { Plus, Save, Star, Trash } from "lucide-react";
+import { ChevronDown, Plus, Save, Star, Trash } from "lucide-react";
 
 const DEFAULT_COLOR = "#868e96";
 const DEFAULT_RATING = 0;
@@ -94,6 +94,38 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [currentImages, setCurrentImages] = useState<NoteImageItem[]>([]);
 
+  const formStateRef = useRef({
+    content: "",
+    startDate: 0,
+    color: DEFAULT_COLOR,
+    rating: DEFAULT_RATING,
+    isStarred: false,
+    typeId: null as string | null,
+    categoryIds: [] as string[],
+    currentImages: [] as NoteImageItem[],
+  });
+  useEffect(() => {
+    formStateRef.current = {
+      content,
+      startDate: startDateValue?.getTime() ?? Date.now(),
+      color,
+      rating,
+      isStarred,
+      typeId,
+      categoryIds,
+      currentImages,
+    };
+  }, [
+    content,
+    startDateValue,
+    color,
+    rating,
+    isStarred,
+    typeId,
+    categoryIds,
+    currentImages,
+  ]);
+
   const handleNoteImages = useHandleNoteImages();
   const [deleteModalOpen, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
@@ -103,6 +135,13 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
     createCategoryOpen,
     { open: openCreateCategory, close: closeCreateCategory },
   ] = useDisclosure(false);
+
+  const [isMetadataOpen, setIsMetadataOpen] = useLocalStorage({
+    key: "noteFormMetadataOpen",
+    defaultValue: true,
+  });
+  const [metadataTransitionEnabled, setMetadataTransitionEnabled] =
+    useState(false);
 
   const { data: typeLabels = [] } = useLabelsQuery("Type");
   const { data: categoryLabels = [] } = useLabelsQuery("Category");
@@ -151,16 +190,19 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
   }, [typeLabels, categoryLabels]);
 
   const handleSave = useCallback(async () => {
+    const state = formStateRef.current;
+    const startDateTs = state.startDate || Date.now();
     const basePayload = {
-      title: extractTitleFromEditorHtml(content),
-      content: content || undefined,
-      startDate,
-      color: color || undefined,
-      rating,
-      isStarred,
-      type: typeId,
-      category: categoryIds,
+      title: extractTitleFromEditorHtml(state.content),
+      content: state.content || undefined,
+      startDate: startDateTs,
+      color: state.color || undefined,
+      rating: state.rating,
+      isStarred: state.isStarred,
+      type: state.typeId,
+      category: state.categoryIds,
     };
+    const imagesToSave = state.currentImages;
 
     if (mode === "create") {
       try {
@@ -168,7 +210,7 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
           ...basePayload,
           images: [],
         });
-        const newImages = await handleNoteImages(currentImages, note);
+        const newImages = await handleNoteImages(imagesToSave, note);
         if (newImages.length) {
           await updateMutation.mutateAsync({
             id: note._id,
@@ -185,7 +227,7 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
 
     if (initialNote?._id) {
       try {
-        const newImages = await handleNoteImages(currentImages, initialNote);
+        const newImages = await handleNoteImages(imagesToSave, initialNote);
         await updateMutation.mutateAsync({
           id: initialNote._id,
           ...basePayload,
@@ -197,14 +239,6 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
       }
     }
   }, [
-    content,
-    startDate,
-    color,
-    rating,
-    isStarred,
-    typeId,
-    categoryIds,
-    currentImages,
     mode,
     initialNote,
     handleNoteImages,
@@ -224,255 +258,336 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
     }
   }, [mode, initialNote?._id, deleteMutation, closeDeleteModal, router]);
 
+  useEffect(() => {
+    if (mode === "create") {
+      setIsMetadataOpen(true);
+    }
+  }, [mode]);
+
   const isSaving = createMutation.isPending || updateMutation.isPending;
   const isDeleting = deleteMutation.isPending;
 
-  const previewNote: Note = {
-    _id: initialNote?._id ?? "preview",
-    author: initialNote?.author ?? "",
-    title: extractTitleFromEditorHtml(content),
-    content: content || "",
-    color: color || DEFAULT_COLOR,
+  const [debouncedContent] = useDebouncedValue(content, 400);
+
+  const previewNote = useMemo((): Note => {
+    const savedImages = currentImages.filter(
+      (item): item is Note["images"][number] => !isNewImageItem(item),
+    );
+    return {
+      _id: initialNote?._id ?? "preview",
+      author: initialNote?.author ?? "",
+      title: extractTitleFromEditorHtml(debouncedContent),
+      content: debouncedContent || "",
+      color: color || DEFAULT_COLOR,
+      startDate,
+      rating,
+      isLocked: initialNote?.isLocked ?? false,
+      isStarred,
+      images: savedImages,
+      type: typeId ? (labelByValue.get(typeId) ?? null) : null,
+      category: categoryIds
+        .map((id) => labelByValue.get(id))
+        .filter((l): l is CustomLabel => !!l),
+    };
+  }, [
+    debouncedContent,
+    color,
     startDate,
     rating,
-    isLocked: initialNote?.isLocked ?? false,
     isStarred,
-    images: currentImages.filter(
-      (item): item is Note["images"][number] => !isNewImageItem(item),
-    ),
-    type: typeId ? (labelByValue.get(typeId) ?? null) : null,
-    category: categoryIds
-      .map((id) => labelByValue.get(id))
-      .filter((l): l is CustomLabel => !!l),
-  };
+    currentImages,
+    typeId,
+    categoryIds,
+    labelByValue,
+    initialNote?._id,
+    initialNote?.author,
+    initialNote?.isLocked,
+  ]);
+
+  const onFormSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      (document.activeElement as HTMLElement)?.blur();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          handleSave();
+        });
+      });
+    },
+    [handleSave],
+  );
 
   return (
     <Container size="md" className="mx-auto max-w-2xl px-4 sm:py-6 py-4">
-      <Group
-        wrap="wrap"
-        align="flex-end"
-        className="sm:gap-x-3! gap-x-2! gap-y-0!"
-      >
-        <div className="flex items-end gap-1">
-          <Select
-            label="Type"
-            placeholder="Select type"
-            data={typeSelectData}
-            value={typeId}
-            onChange={setTypeId}
-            searchable
-            clearable
-            nothingFoundMessage="No type found"
-            style={{ minWidth: 180 }}
-            renderOption={({ option }) => {
-              const label = labelByValue.get(option.value);
-              return (
-                <Group gap="xs">
-                  {label && (
-                    <Box
-                      w={12}
-                      h={12}
-                      style={{
-                        backgroundColor: label.color || "#868e96",
-                        borderRadius: 4,
-                        flexShrink: 0,
-                      }}
-                    />
-                  )}
-                  <span>{option.label}</span>
-                </Group>
-              );
-            }}
-          />
+      <form onSubmit={onFormSubmit} noValidate>
+        <div className="flex items-center justify-between">
+          <Text size="sm" fw={500} c="dimmed">
+            Metadata
+          </Text>
           <Button
+            type="button"
+            size="xs"
             variant="light"
-            size="sm"
-            className="px-2!"
-            onClick={openCreateType}
+            onClick={() => {
+              setMetadataTransitionEnabled(true);
+              setIsMetadataOpen(!isMetadataOpen);
+            }}
           >
-            <Plus />
+            <ChevronDown
+              size={16}
+              className={cn(
+                metadataTransitionEnabled &&
+                  "transition-transform duration-300",
+                isMetadataOpen ? "rotate-180" : "",
+              )}
+            />
           </Button>
         </div>
-        <NoteImagesField
-          value={currentImages}
-          onChange={setCurrentImages}
-          disabled={isSaving}
-        />
-        <ColorInput
-          label="Color"
-          value={color}
-          onChange={setColor}
-          format="hex"
-          withPreview
-          style={{ width: 130 }}
-        />
-        <DateTimePicker
-          label="Date & time"
-          value={startDateValue}
-          onChange={(v) => setStartDateValue(typeof v === "string" ? (v ? new Date(v) : null) : v)}
-          placeholder="Pick date and time"
-          style={{ width: 200 }}
-        />
-        <NumberInput
-          label="Rating"
-          min={0}
-          max={10}
-          value={rating}
-          onChange={(v) => setRating(Number(v) ?? 0)}
-          style={{ width: 62 }}
-        />
-
-        <Button
-          variant="subtle"
-          size="sm"
-          className="px-2!"
-          onClick={() => setIsStarred(!isStarred)}
+        <div
+          className={cn(
+            "overflow-hidden",
+            metadataTransitionEnabled &&
+              "transition-[max-height,margin] duration-300 ease-in-out",
+            isMetadataOpen
+              ? "lg:max-h-[130px] sm:max-h-[200px] max-h-[260px]"
+              : "max-h-0 mb-2",
+          )}
         >
-          <Star
-            className={cn(
-              "transition-colors",
-              isStarred ? "text-yellow-500" : "text-zinc-500",
-            )}
-          />
-        </Button>
-      </Group>
-
-      <Group
-        gap="xs"
-        align="flex-end"
-        justify="flex-end"
-        className="mb-2 mt-2"
-        flex={1}
-      >
-        <MultiSelect
-          placeholder="Select categories"
-          data={categorySelectData}
-          value={categoryIds}
-          onChange={setCategoryIds}
-          searchable
-          nothingFoundMessage="No category found"
-          style={{ minWidth: 220 }}
-          flex={1}
-          hidePickedOptions
-          renderOption={({ option }) => {
-            const label = labelByValue.get(option.value);
-            return (
-              <Group gap="xs">
-                {label && (
-                  <Box
-                    w={12}
-                    h={12}
-                    style={{
-                      backgroundColor: label.color || "#868e96",
-                      borderRadius: 4,
-                      flexShrink: 0,
-                    }}
-                  />
-                )}
-                <span>{option.label}</span>
-              </Group>
-            );
-          }}
-        />
-        <Button
-          variant="light"
-          size="sm"
-          className="px-2!"
-          onClick={openCreateCategory}
-        >
-          <Plus />
-        </Button>
-      </Group>
-
-      <NoteImagesList
-        value={currentImages}
-        onChange={setCurrentImages}
-        disabled={isSaving}
-      />
-
-      <BlockNoteEditor
-        initialHtml={
-          mode === "edit" && initialNote
-            ? getInitialEditorHtml(initialNote)
-            : mode === "create"
-              ? EMPTY_NOTE_HTML
-              : undefined
-        }
-        onChange={setContent}
-        editable
-      />
-
-      <Group gap="sm" className="w-full mb-4 mt-2">
-        <Button
-          type="button"
-          loading={isSaving}
-          onClick={handleSave}
-          onPointerDown={() => {
-            (document.activeElement as HTMLElement)?.blur();
-          }}
-          variant="filled"
-          flex={1}
-          size="md"
-          className="bg-linear-to-br! bg-cyan-700/50 from-cyan-800/80 to-sky-800/70 hover:bg-cyan-600! text-white transition-all duration-300"
-        >
-          <Save className="mr-1.5" size={20} />
-          {mode === "create" ? "Create" : "Save"}
-        </Button>
-        {mode === "edit" && (
-          <Button
-            color="red"
-            variant="light"
-            loading={isDeleting}
-            onClick={openDeleteModal}
-            size="md"
+          <Group
+            wrap="wrap"
+            align="flex-end"
+            className="sm:gap-x-3! gap-x-2! gap-y-0!"
           >
-            <Trash className="mr-1.5" size={20} />
-            Delete
-          </Button>
-        )}
-      </Group>
+            <div className="flex items-end gap-1">
+              <Select
+                label="Type"
+                placeholder="Select type"
+                data={typeSelectData}
+                value={typeId}
+                onChange={setTypeId}
+                searchable
+                clearable
+                size="md"
+                nothingFoundMessage="No type found"
+                style={{ minWidth: 140 }}
+                renderOption={({ option }) => {
+                  const label = labelByValue.get(option.value);
+                  return (
+                    <Group gap="xs">
+                      {label && (
+                        <Box
+                          w={12}
+                          h={12}
+                          style={{
+                            backgroundColor: label.color || "#868e96",
+                            borderRadius: 4,
+                            flexShrink: 0,
+                          }}
+                        />
+                      )}
+                      <span>{option.label}</span>
+                    </Group>
+                  );
+                }}
+              />
+              <Button
+                type="button"
+                variant="light"
+                size="md"
+                className="px-2!"
+                onClick={openCreateType}
+              >
+                <Plus />
+              </Button>
+            </div>
+            <NoteImagesField
+              value={currentImages}
+              onChange={setCurrentImages}
+              disabled={isSaving}
+            />
+            <ColorInput
+              label="Color"
+              value={color}
+              onChange={setColor}
+              format="hex"
+              size="md"
+              style={{ width: 150 }}
+            />
+            <DateTimePicker
+              label="Date & time"
+              value={startDateValue}
+              onChange={(v) =>
+                setStartDateValue(
+                  typeof v === "string" ? (v ? new Date(v) : null) : v,
+                )
+              }
+              placeholder="Pick date and time"
+              size="md"
+              style={{ width: 170 }}
+            />
+            <NumberInput
+              label="Rating"
+              min={0}
+              max={10}
+              value={rating}
+              onChange={(v) => setRating(Number(v) ?? 0)}
+              size="md"
+              style={{ width: 62 }}
+            />
 
-      <CreateLabelModal
-        opened={createTypeOpen}
-        onClose={closeCreateType}
-        labelFor="Type"
-        onCreated={(label) => setTypeId(label._id)}
-      />
-      <CreateLabelModal
-        opened={createCategoryOpen}
-        onClose={closeCreateCategory}
-        labelFor="Category"
-        onCreated={(label) => setCategoryIds((prev) => [...prev, label._id])}
-      />
+            <Button
+              type="button"
+              variant="subtle"
+              size="md"
+              className="px-2!"
+              onClick={() => setIsStarred(!isStarred)}
+            >
+              <Star
+                className={cn(
+                  "transition-colors",
+                  isStarred ? "text-yellow-500" : "text-zinc-500",
+                )}
+              />
+            </Button>
+          </Group>
 
-      <Modal
-        opened={deleteModalOpen}
-        onClose={closeDeleteModal}
-        title="Delete note?"
-        centered
-      >
-        <p className="text-zinc-600 dark:text-zinc-400">
-          This cannot be undone.
-        </p>
-        <Group justify="flex-end" mt="md" gap="sm">
-          <Button variant="default" onClick={closeDeleteModal}>
-            Cancel
+          <Group
+            gap="xs"
+            align="flex-end"
+            justify="flex-end"
+            className="mb-2 mt-2"
+            flex={1}
+          >
+            <MultiSelect
+              placeholder="Select categories"
+              data={categorySelectData}
+              value={categoryIds}
+              onChange={setCategoryIds}
+              searchable
+              nothingFoundMessage="No category found"
+              style={{ minWidth: 220 }}
+              flex={1}
+              size="md"
+              hidePickedOptions
+              renderOption={({ option }) => {
+                const label = labelByValue.get(option.value);
+                return (
+                  <Group gap="xs">
+                    {label && (
+                      <Box
+                        w={12}
+                        h={12}
+                        style={{
+                          backgroundColor: label.color || "#868e96",
+                          borderRadius: 4,
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
+                    <span>{option.label}</span>
+                  </Group>
+                );
+              }}
+            />
+            <Button
+              type="button"
+              variant="light"
+              size="md"
+              className="px-2!"
+              onClick={openCreateCategory}
+            >
+              <Plus />
+            </Button>
+          </Group>
+
+          <NoteImagesList
+            value={currentImages}
+            onChange={setCurrentImages}
+            disabled={isSaving}
+          />
+        </div>
+
+        <BlockNoteEditor
+          initialHtml={
+            mode === "edit" && initialNote
+              ? getInitialEditorHtml(initialNote)
+              : mode === "create"
+                ? EMPTY_NOTE_HTML
+                : undefined
+          }
+          onChange={setContent}
+          editable
+        />
+
+        <Group gap="sm" className="w-full mb-4 mt-2">
+          <Button
+            type="submit"
+            loading={isSaving}
+            variant="filled"
+            flex={1}
+            size="md"
+            className="bg-linear-to-br! bg-cyan-700/50 from-cyan-800/80 to-sky-800/70 hover:bg-cyan-600! text-white transition-all duration-300"
+          >
+            <Save className="mr-1.5" size={20} />
+            {mode === "create" ? "Create" : "Save"}
           </Button>
-          <Button color="red" loading={isDeleting} onClick={handleDelete}>
-            Delete
-          </Button>
+          {mode === "edit" && (
+            <Button
+              type="button"
+              color="red"
+              variant="light"
+              loading={isDeleting}
+              onClick={openDeleteModal}
+              size="md"
+            >
+              <Trash className="mr-1.5" size={20} />
+              Delete
+            </Button>
+          )}
         </Group>
-      </Modal>
 
-      <Stack
-        gap="xs"
-        className="border-t border-zinc-200 pt-4 dark:border-zinc-700"
-      >
-        <Text size="sm" fw={500} c="dimmed">
-          Preview
-        </Text>
-        <NoteCard note={previewNote} preview />
-      </Stack>
+        <CreateLabelModal
+          opened={createTypeOpen}
+          onClose={closeCreateType}
+          labelFor="Type"
+          onCreated={(label) => setTypeId(label._id)}
+        />
+        <CreateLabelModal
+          opened={createCategoryOpen}
+          onClose={closeCreateCategory}
+          labelFor="Category"
+          onCreated={(label) => setCategoryIds((prev) => [...prev, label._id])}
+        />
+
+        <Modal
+          opened={deleteModalOpen}
+          onClose={closeDeleteModal}
+          title="Delete note?"
+          centered
+        >
+          <p className="text-zinc-600 dark:text-zinc-400">
+            This cannot be undone.
+          </p>
+          <Group justify="flex-end" mt="md" gap="sm">
+            <Button variant="default" onClick={closeDeleteModal}>
+              Cancel
+            </Button>
+            <Button color="red" loading={isDeleting} onClick={handleDelete}>
+              Delete
+            </Button>
+          </Group>
+        </Modal>
+
+        <Stack
+          gap="xs"
+          className="border-t border-zinc-200 pt-4 dark:border-zinc-700"
+        >
+          <Text size="sm" fw={500} c="dimmed">
+            Preview
+          </Text>
+          <NoteCard note={previewNote} preview />
+        </Stack>
+      </form>
     </Container>
   );
 }

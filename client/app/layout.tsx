@@ -16,9 +16,8 @@ import "@mantine/dates/styles.css";
 import "./globals.css";
 
 const theme = createTheme({
-  primaryColor: 'blue', // Options: red, teal, violet, etc.
+  primaryColor: "blue", // Options: red, teal, violet, etc.
 });
-
 
 export const metadata: Metadata = {
   title: "Bullet Journal",
@@ -54,8 +53,6 @@ export default function RootLayout({
     <html lang="en" {...mantineHtmlProps} suppressHydrationWarning>
       <head>
         <ColorSchemeScript defaultColorScheme="auto" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-
       </head>
       <body
         className={`antialiased ${lato.className}`}

@@ -53,6 +53,7 @@ export function NoteImagesField({
   return (
     <FileInput
       label="Images"
+      size="md"
       accept={ACCEPT_IMAGES}
       multiple
       placeholder="Add images"
@@ -61,6 +62,7 @@ export function NoteImagesField({
       disabled={disabled}
       clearable={false}
       style={{ minWidth: "102px" }}
+      className="truncate"
       flex={1}
     />
   );

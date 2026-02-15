@@ -140,6 +140,8 @@ function HomePageContent() {
     key: "isFiltersOpen",
     defaultValue: false,
   });
+  const [filtersTransitionEnabled, setFiltersTransitionEnabled] =
+    useState(false);
 
   const [debouncedSearch] = useDebouncedValue(search, 400);
   const [debouncedRatingRange] = useDebouncedValue(ratingRange, 300);
@@ -286,7 +288,7 @@ function HomePageContent() {
     return (
       <div className="min-h-screen py-4 sm:py-6">
         <Container size="md">
-          <div className="sm:mb-6 mb-3 flex flex-wrap items-center justify-between gap-4">
+          <div className="sm:mb-4 mb-3 flex flex-wrap items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">
               Hello, {user.name}!
             </h1>
@@ -308,7 +310,10 @@ function HomePageContent() {
             <Button
               size="xs"
               variant="light"
-              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+              onClick={() => {
+                setFiltersTransitionEnabled(true);
+                setIsFiltersOpen(!isFiltersOpen);
+              }}
             >
               <ChevronDown
                 size={16}
@@ -321,8 +326,10 @@ function HomePageContent() {
           </div>
           <div
             className={cn(
-              "overflow-hidden transition-[max-height,margin] duration-300 ease-in-out",
-              isFiltersOpen ? "max-h-[200px] mb-4" : "max-h-0 mb-0",
+              "overflow-hidden",
+              filtersTransitionEnabled &&
+                "transition-[max-height,margin] sm:duration-300 duration-500 ease-in-out",
+              isFiltersOpen ? "sm:max-h-[200px] max-h-[370px] mb-4" : "max-h-0 mb-0",
             )}
           >
             <Box className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-3 dark:border-zinc-700 dark:bg-zinc-800/50 w-full">
@@ -337,9 +344,9 @@ function HomePageContent() {
                   leftSection={<Search size={14} />}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  size="sm"
+                  size="md"
                   flex={1}
-                  className="min-w-[100px] md:min-w-[150px] flex-1"
+                  className="min-w-[200px] md:min-w-[200px] flex-1"
                 />
                 <MultiSelect
                   placeholder="Type"
@@ -349,11 +356,11 @@ function HomePageContent() {
                     setTypeIds(v);
                     setPage(1);
                   }}
-                  size="sm"
+                  size="md"
                   clearable
                   searchable
                   nothingFoundMessage="No type found"
-                  className="w-[120px] sm:w-[130px] one-line-input"
+                  className="w-[153px] sm:w-[220px] one-line-input"
                 />
                 <MultiSelect
                   placeholder="Category"
@@ -363,11 +370,11 @@ function HomePageContent() {
                     setCategoryIds(v);
                     setPage(1);
                   }}
-                  size="sm"
+                  size="md"
                   clearable
                   searchable
                   nothingFoundMessage="No category found"
-                  className="w-[120px] sm:w-[130px] one-line-input"
+                  className="w-[153px] sm:w-[220px] one-line-input"
                 />
                 <Group align="center" gap="xs">
                   <DatePickerInput
@@ -378,7 +385,7 @@ function HomePageContent() {
                       setDateRange(v);
                       setPage(1);
                     }}
-                    size="sm"
+                    size="md"
                     className="w-[200px] min-w-0"
                   />
                 </Group>
@@ -395,13 +402,13 @@ function HomePageContent() {
                     step={1}
                     value={ratingRange}
                     onChange={setRatingRange}
-                    size="sm"
+                    size="md"
                     className="mt-1"
                   />
                 </Box>
                 <Group gap="md" align="end">
                   <Switch
-                    size="sm"
+                    size="md"
                     label="Starred"
                     checked={isStarred}
                     onChange={(e) => {
@@ -410,7 +417,7 @@ function HomePageContent() {
                     }}
                   />
                   <Switch
-                    size="sm"
+                    size="md"
                     label="With images"
                     checked={withImages}
                     onChange={(e) => {
@@ -433,7 +440,7 @@ function HomePageContent() {
             </Box>
           </div>
 
-          <Text size="xs" c="dimmed" mb={4}>
+          <Text size="sm" c="dimmed" mb={4}>
             <b>{totalNotes}</b> notes found
           </Text>
 
