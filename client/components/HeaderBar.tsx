@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
   Container,
@@ -16,8 +17,16 @@ import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { useAuthStore } from "@/lib/auth/store";
 
 export function HeaderBar() {
+  const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   return (
     <header
@@ -31,12 +40,13 @@ export function HeaderBar() {
           <Link
             href="/"
             className="text-inherit no-underline flex items-center gap-2"
+            onClick={handleLogoClick}
           >
             <Image
               src="/icon-192x192.png"
               alt="Bullet Journal"
-              width={32}
-              height={32}
+              width={40}
+              height={40}
             />
             <Text fw={700} size="xl" className="sm:block hidden">
               Bullet Journal

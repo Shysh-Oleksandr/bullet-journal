@@ -26,7 +26,6 @@ export function useHandleNoteImages() {
       savedNote: Note | null,
     ): Promise<Image[]> => {
       const savedImages = savedNote?.images ?? [];
-      const savedIds = new Set(savedImages.map((i) => i._id));
       const currentSaved = currentImages.filter(
         (item): item is Image => !isNewImageItem(item),
       );
@@ -50,8 +49,6 @@ export function useHandleNoteImages() {
         });
       }
 
-      // Preserve order: map currentImages to final Image[]
-      const unchanged = savedImages.filter((img) => currentSavedIds.has(img._id));
       const result: Image[] = [];
       let uploadedIndex = 0;
       for (const item of currentImages) {

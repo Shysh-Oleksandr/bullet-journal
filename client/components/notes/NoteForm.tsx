@@ -404,8 +404,12 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
 
       <Group gap="sm" className="w-full mb-4 mt-2">
         <Button
+          type="button"
           loading={isSaving}
           onClick={handleSave}
+          onPointerDown={() => {
+            (document.activeElement as HTMLElement)?.blur();
+          }}
           variant="filled"
           flex={1}
           size="md"

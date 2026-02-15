@@ -1,8 +1,14 @@
 "use client";
 
-import { useCreateBlockNote } from "@blocknote/react";
+import {
+  AddBlockButton,
+  SideMenu,
+  SideMenuController,
+  useCreateBlockNote,
+} from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import { useCallback, useEffect, useRef } from "react";
+import { useMediaQuery } from "@mantine/hooks";
 
 export interface BlockNoteEditorProps {
   initialHtml?: string;
@@ -18,6 +24,8 @@ export function BlockNoteEditor({
   const editor = useCreateBlockNote();
   const initialHtmlApplied = useRef(false);
   const prevInitialHtml = useRef(initialHtml);
+
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
     if (prevInitialHtml.current !== initialHtml) {
@@ -61,8 +69,19 @@ export function BlockNoteEditor({
       <BlockNoteView
         editor={editor}
         editable={editable}
-        className="rounded-md border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 [&_.bn-editor]:min-h-[300px] [&_.bn-editor]:py-1 focus-within:border-blue-500 dark:focus-within:border-blue-400"
-      />
+        sideMenu={!isMobile}
+        className="rounded-md border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 [&_.bn-editor]:min-h-[300px] [&_.bn-editor]:py-1 [&_.bn-editor]:pr-3! [&_.bn-editor]:sm:pr-8! [&_.bn-editor]:pl-[27px]! [&_.bn-editor]:sm:pl-[54px]! focus-within:border-blue-500 dark:focus-within:border-blue-400"
+      >
+        {isMobile && (
+          <SideMenuController
+            sideMenu={(props) => (
+              <SideMenu {...props}>
+                <AddBlockButton />
+              </SideMenu>
+            )}
+          />
+        )}
+      </BlockNoteView>
     </div>
   );
 }

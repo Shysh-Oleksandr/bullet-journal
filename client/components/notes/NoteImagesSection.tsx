@@ -45,6 +45,7 @@ export function NoteImagesField({
         file,
       }));
       onChange([...value, ...newItems]);
+      (document.activeElement as HTMLElement)?.blur();
     },
     [value, onChange],
   );
@@ -142,7 +143,7 @@ export function NoteImagesList({
 
   return (
     <>
-      <Group gap="sm" wrap="wrap">
+      <Group gap="sm" wrap="wrap" className="mb-2">
         {value.map((item, index) => {
           const src = getPreviewUrl(item);
           return (
@@ -182,7 +183,7 @@ export function NoteImagesList({
                   removeAt(index);
                 }}
                 disabled={disabled}
-                className="absolute right-1 top-1 cursor-pointer rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity hover:bg-black/80 group-hover:opacity-100 focus:opacity-100 focus:outline-none disabled:pointer-events-none"
+                className="absolute right-1 top-1 cursor-pointer rounded-full bg-black/60 p-1 text-white md:opacity-0 transition-opacity hover:bg-black/80 group-hover:md:opacity-100 opacity-100 focus:opacity-100 focus:outline-none disabled:pointer-events-none"
                 aria-label="Remove image"
               >
                 <X size={14} />

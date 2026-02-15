@@ -10,7 +10,7 @@ if (!existsSync(publicDir)) mkdirSync(publicDir, { recursive: true });
 
 const sizes = [192, 512];
 const buffer = await sharp({
-  create: { width: 512, height: 512, channels: 3, background: { r: 30, g: 58, b: 138 } },
+  create: { width: 512, height: 512, channels: 3, background: { r: 255, g: 255, b: 255 } },
 })
   .png()
   .toBuffer();

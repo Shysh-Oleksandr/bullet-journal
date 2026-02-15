@@ -2,6 +2,7 @@
 
 import {
   Box,
+  Button,
   Container,
   Group,
   Loader,
@@ -14,19 +15,27 @@ import {
   Title,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue, useLocalStorage } from "@mantine/hooks";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { NoteCard } from "@/components/NoteCard";
 import { NotesPagination } from "@/components/NotesPagination";
 import { useLabelsQuery } from "@/lib/custom-labels/api";
 import { useAuthStore } from "@/lib/auth/store";
 import { type NotesFilters, usePaginatedNotesQuery } from "@/lib/notes/api";
-import { Plus, Search } from "lucide-react";
+import { ChevronDown, Plus, Search } from "lucide-react";
 import Image from "next/image";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { cn } from "@/lib/utils";
 
 function dateToStartOfDay(value: string): number | undefined {
   if (!value) return undefined;
@@ -54,7 +63,7 @@ type FilterParams = {
 };
 
 function parseFiltersFromParams(
-  sp: ReturnType<typeof useSearchParams>
+  sp: ReturnType<typeof useSearchParams>,
 ): FilterParams {
   const q = sp.get("q") ?? "";
   const types = sp.get("types");
@@ -70,8 +79,12 @@ function parseFiltersFromParams(
     categoryIds: categories ? categories.split(",").filter(Boolean) : [],
     dateRange: [dateFrom, dateTo],
     ratingRange: [
-      ratingMin != null ? Math.min(10, Math.max(1, parseInt(ratingMin, 10) || 1)) : DEFAULT_RATING[0],
-      ratingMax != null ? Math.min(10, Math.max(1, parseInt(ratingMax, 10) || 10)) : DEFAULT_RATING[1],
+      ratingMin != null
+        ? Math.min(10, Math.max(1, parseInt(ratingMin, 10) || 1))
+        : DEFAULT_RATING[0],
+      ratingMax != null
+        ? Math.min(10, Math.max(1, parseInt(ratingMax, 10) || 10))
+        : DEFAULT_RATING[1],
     ],
     isStarred: sp.get("starred") === "1",
     withImages: sp.get("images") === "1",
@@ -83,11 +96,14 @@ function buildQueryString(state: FilterParams): string {
   const params = new URLSearchParams();
   if (state.search.trim()) params.set("q", state.search.trim());
   if (state.typeIds.length) params.set("types", state.typeIds.join(","));
-  if (state.categoryIds.length) params.set("categories", state.categoryIds.join(","));
+  if (state.categoryIds.length)
+    params.set("categories", state.categoryIds.join(","));
   if (state.dateRange[0]) params.set("dateFrom", state.dateRange[0]);
   if (state.dateRange[1]) params.set("dateTo", state.dateRange[1]);
-  if (state.ratingRange[0] > 1) params.set("ratingMin", String(state.ratingRange[0]));
-  if (state.ratingRange[1] < 10) params.set("ratingMax", String(state.ratingRange[1]));
+  if (state.ratingRange[0] > 1)
+    params.set("ratingMin", String(state.ratingRange[0]));
+  if (state.ratingRange[1] < 10)
+    params.set("ratingMax", String(state.ratingRange[1]));
   if (state.isStarred) params.set("starred", "1");
   if (state.withImages) params.set("images", "1");
   if (state.page > 1) params.set("page", String(state.page));
@@ -102,16 +118,28 @@ function HomePageContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const initial = useMemo(() => parseFiltersFromParams(searchParams), [searchParams]);
+  const initial = useMemo(
+    () => parseFiltersFromParams(searchParams),
+    [searchParams],
+  );
 
   const [page, setPage] = useState(initial.page);
   const [search, setSearch] = useState(initial.search);
   const [typeIds, setTypeIds] = useState<string[]>(initial.typeIds);
   const [categoryIds, setCategoryIds] = useState<string[]>(initial.categoryIds);
-  const [dateRange, setDateRange] = useState<[string | null, string | null]>(initial.dateRange);
-  const [ratingRange, setRatingRange] = useState<[number, number]>(initial.ratingRange);
+  const [dateRange, setDateRange] = useState<[string | null, string | null]>(
+    initial.dateRange,
+  );
+  const [ratingRange, setRatingRange] = useState<[number, number]>(
+    initial.ratingRange,
+  );
   const [isStarred, setIsStarred] = useState(initial.isStarred);
   const [withImages, setWithImages] = useState(initial.withImages);
+
+  const [isFiltersOpen, setIsFiltersOpen] = useLocalStorage({
+    key: "isFiltersOpen",
+    defaultValue: false,
+  });
 
   const [debouncedSearch] = useDebouncedValue(search, 400);
   const [debouncedRatingRange] = useDebouncedValue(ratingRange, 300);
@@ -256,13 +284,13 @@ function HomePageContent() {
 
   if (user) {
     return (
-      <div className="min-h-screen px-4 py-6">
+      <div className="min-h-screen py-4 sm:py-6">
         <Container size="md">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="sm:mb-6 mb-3 flex flex-wrap items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">
               Hello, {user.name}!
             </h1>
-            <div className="flex items-center gap-2">
+            <div className="items-center gap-2 hidden sm:flex">
               <Link
                 href="/notes/new"
                 className="rounded-lg border border-zinc-300 bg-white flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
@@ -273,112 +301,137 @@ function HomePageContent() {
             </div>
           </div>
 
-          <Box className="mb-4 rounded-lg border border-zinc-200 bg-zinc-50/50 p-3 dark:border-zinc-700 dark:bg-zinc-800/50 w-full">
-            <Group
-              align="flex-end"
-              wrap="wrap"
-              gap="xs"
-              className="mb-1 w-full"
+          <div className="flex items-center justify-between mb-1">
+            <Text size="sm" fw={500} c="dimmed">
+              Filters
+            </Text>
+            <Button
+              size="xs"
+              variant="light"
+              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
             >
-              <TextInput
-                placeholder="Search title"
-                leftSection={<Search size={14} />}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                size="xs"
-                flex={1}
-                className="min-w-[100px] md:min-w-[150px] flex-1"
+              <ChevronDown
+                size={16}
+                className={cn(
+                  "transition-transform duration-300",
+                  isFiltersOpen ? "rotate-180" : "",
+                )}
               />
-              <MultiSelect
-                placeholder="Type"
-                data={typeSelectData}
-                value={typeIds}
-                onChange={(v) => {
-                  setTypeIds(v);
-                  setPage(1);
-                }}
-                size="xs"
-                clearable
-                searchable
-                nothingFoundMessage="No type found"
-                className="w-[120px] sm:w-[130px] one-line-input"
-              />
-              <MultiSelect
-                placeholder="Category"
-                data={categorySelectData}
-                value={categoryIds}
-                onChange={(v) => {
-                  setCategoryIds(v);
-                  setPage(1);
-                }}
-                size="xs"
-                clearable
-                searchable
-                nothingFoundMessage="No category found"
-                className="w-[120px] sm:w-[130px] one-line-input"
-              />
-              <Group align="center" gap="xs">
-                <DatePickerInput
-                  type="range"
-                  placeholder="Start date – End date"
-                  value={dateRange}
-                  onChange={(v: [string | null, string | null]) => {
-                    setDateRange(v);
+            </Button>
+          </div>
+          <div
+            className={cn(
+              "overflow-hidden transition-[max-height,margin] duration-300 ease-in-out",
+              isFiltersOpen ? "max-h-[200px] mb-4" : "max-h-0 mb-0",
+            )}
+          >
+            <Box className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-3 dark:border-zinc-700 dark:bg-zinc-800/50 w-full">
+              <Group
+                align="flex-end"
+                wrap="wrap"
+                gap="xs"
+                className="mb-1 w-full"
+              >
+                <TextInput
+                  placeholder="Search title"
+                  leftSection={<Search size={14} />}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  size="sm"
+                  flex={1}
+                  className="min-w-[100px] md:min-w-[150px] flex-1"
+                />
+                <MultiSelect
+                  placeholder="Type"
+                  data={typeSelectData}
+                  value={typeIds}
+                  onChange={(v) => {
+                    setTypeIds(v);
                     setPage(1);
                   }}
-                  size="xs"
-                  className="w-[200px] min-w-0"
+                  size="sm"
+                  clearable
+                  searchable
+                  nothingFoundMessage="No type found"
+                  className="w-[120px] sm:w-[130px] one-line-input"
                 />
+                <MultiSelect
+                  placeholder="Category"
+                  data={categorySelectData}
+                  value={categoryIds}
+                  onChange={(v) => {
+                    setCategoryIds(v);
+                    setPage(1);
+                  }}
+                  size="sm"
+                  clearable
+                  searchable
+                  nothingFoundMessage="No category found"
+                  className="w-[120px] sm:w-[130px] one-line-input"
+                />
+                <Group align="center" gap="xs">
+                  <DatePickerInput
+                    type="range"
+                    placeholder="Start date – End date"
+                    value={dateRange}
+                    onChange={(v: [string | null, string | null]) => {
+                      setDateRange(v);
+                      setPage(1);
+                    }}
+                    size="sm"
+                    className="w-[200px] min-w-0"
+                  />
+                </Group>
               </Group>
-            </Group>
-            <Group align="end" wrap="wrap" gap="sm">
-              <Box className="w-full min-w-0 sm:w-[180px]">
-                <Text size="xs" c="dimmed" mb={4}>
-                  Rating {ratingRange[0]}–{ratingRange[1]}
-                </Text>
-                <RangeSlider
-                  min={1}
-                  max={10}
-                  minRange={0}
-                  step={1}
-                  value={ratingRange}
-                  onChange={setRatingRange}
-                  size="xs"
-                  className="mt-1"
-                />
-              </Box>
-              <Group gap="md" align="end">
-                <Switch
-                  size="xs"
-                  label="Starred"
-                  checked={isStarred}
-                  onChange={(e) => {
-                    setIsStarred(e.currentTarget.checked);
-                    setPage(1);
-                  }}
-                />
-                <Switch
-                  size="xs"
-                  label="With images"
-                  checked={withImages}
-                  onChange={(e) => {
-                    setWithImages(e.currentTarget.checked);
-                    setPage(1);
-                  }}
-                />
+              <Group align="end" wrap="wrap" gap="sm">
+                <Box className="w-full min-w-0 sm:w-[180px]">
+                  <Text size="xs" c="dimmed" mb={4}>
+                    Rating {ratingRange[0]}–{ratingRange[1]}
+                  </Text>
+                  <RangeSlider
+                    min={1}
+                    max={10}
+                    minRange={0}
+                    step={1}
+                    value={ratingRange}
+                    onChange={setRatingRange}
+                    size="sm"
+                    className="mt-1"
+                  />
+                </Box>
+                <Group gap="md" align="end">
+                  <Switch
+                    size="sm"
+                    label="Starred"
+                    checked={isStarred}
+                    onChange={(e) => {
+                      setIsStarred(e.currentTarget.checked);
+                      setPage(1);
+                    }}
+                  />
+                  <Switch
+                    size="sm"
+                    label="With images"
+                    checked={withImages}
+                    onChange={(e) => {
+                      setWithImages(e.currentTarget.checked);
+                      setPage(1);
+                    }}
+                  />
+                </Group>
+                {filters != null && (
+                  <Text
+                    size="xs"
+                    c="blue"
+                    className="cursor-pointer hover:underline!"
+                    onClick={clearFilters}
+                  >
+                    Clear filters
+                  </Text>
+                )}
               </Group>
-              {filters != null && (
-                <Text
-                  size="xs"
-                  c="blue"
-                  className="cursor-pointer hover:underline!"
-                  onClick={clearFilters}
-                >
-                  Clear filters
-                </Text>
-              )}
-            </Group>
-          </Box>
+            </Box>
+          </div>
 
           <Text size="xs" c="dimmed" mb={4}>
             <b>{totalNotes}</b> notes found
