@@ -36,9 +36,10 @@ export class ImagesService {
       ? new Types.ObjectId(createMultipleImagesDto.noteId as unknown as string)
       : undefined;
     const newImages = createMultipleImagesDto.urls.map(
-      (url) =>
+      (url, i) =>
         new this.imageModel({
           url,
+          mimeType: createMultipleImagesDto.mimeTypes?.[i],
           author: new Types.ObjectId(authorId),
           ...(noteId && { noteId }),
         }),

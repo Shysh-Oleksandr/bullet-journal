@@ -21,9 +21,35 @@ import { X } from "lucide-react";
 import { ImageLightbox } from "@/components/notes/ImageLightbox";
 
 const ACCEPT_IMAGES = "image/png,image/jpeg,image/webp,image/gif";
+const ACCEPT_VIDEOS = "video/mp4,video/webm,video/ogg,video/quicktime";
+const ACCEPT_MEDIA = `${ACCEPT_IMAGES},${ACCEPT_VIDEOS}`;
 
 export function fileKey(file: File): string {
   return `${file.name}-${file.size}-${file.lastModified}`;
+}
+
+function isVideoItem(item: NoteImageItem): boolean {
+  if (isNewImageItem(item)) return item.file.type.startsWith("video/");
+  return (item as Image).mimeType?.startsWith("video/") ?? false;
+}
+
+function VideoThumbnail({ src, onClick }: { src: string; onClick: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const handleLoadedMetadata = useCallback(() => {
+    if (videoRef.current) videoRef.current.currentTime = 0.001;
+  }, []);
+  return (
+    <video
+      ref={videoRef}
+      src={src}
+      muted
+      playsInline
+      preload="metadata"
+      onLoadedMetadata={handleLoadedMetadata}
+      onClick={onClick}
+      style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 4, display: "block" }}
+    />
+  );
 }
 
 export interface NoteImagesFieldProps {
@@ -52,11 +78,11 @@ export function NoteImagesField({
 
   return (
     <FileInput
-      label="Images"
+      label="Media"
       size="md"
-      accept={ACCEPT_IMAGES}
+      accept={ACCEPT_MEDIA}
       multiple
-      placeholder="Add images"
+      placeholder="Add images or videos"
       value={undefined}
       onChange={addFiles}
       disabled={disabled}
@@ -136,6 +162,16 @@ export function NoteImagesList({
     [value, getPreviewUrl],
   );
 
+  const lightboxMimeTypes = useMemo(
+    () =>
+      value
+        .filter((item) => !!getPreviewUrl(item))
+        .map((item) =>
+          isNewImageItem(item) ? item.file.type : ((item as Image).mimeType ?? "image/"),
+        ),
+    [value, getPreviewUrl],
+  );
+
   const openLightbox = useCallback((index: number) => {
     setLightboxIndex(index);
     setLightboxOpen(true);
@@ -145,7 +181,7 @@ export function NoteImagesList({
 
   return (
     <>
-      <Group gap="sm" wrap="wrap" className="mb-2">
+      <Group gap="sm" wrap="wrap" className="my-2">
         {value.map((item, index) => {
           const src = getPreviewUrl(item);
           return (
@@ -158,7 +194,9 @@ export function NoteImagesList({
               pos="relative"
               className="group cursor-pointer"
             >
-              {src ? (
+              {src && isVideoItem(item) ? (
+                <VideoThumbnail src={src} onClick={() => openLightbox(index)} />
+              ) : src ? (
                 <MantineImage
                   src={src}
                   alt=""
@@ -199,6 +237,7 @@ export function NoteImagesList({
         opened={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
         images={lightboxUrls}
+        mimeTypes={lightboxMimeTypes}
         initialIndex={lightboxIndex}
       />
     </>

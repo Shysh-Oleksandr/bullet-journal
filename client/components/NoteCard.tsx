@@ -67,13 +67,24 @@ function NoteCardComponent({ note, preview }: NoteCardProps) {
         <div className="relative bg-zinc-100 dark:bg-zinc-800">
           {note.images.length === 1 ? (
             <div className="relative h-32 w-full">
-              <Image
-                src={note.images[0].url}
-                alt=""
-                fill
-                sizes="100vw"
-                className="object-cover"
-              />
+              {note.images[0].mimeType?.startsWith("video/") ? (
+                <video
+                  src={note.images[0].url}
+                  muted
+                  playsInline
+                  preload="metadata"
+                  onLoadedMetadata={(e) => { e.currentTarget.currentTime = 0.001; }}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              ) : (
+                <Image
+                  src={note.images[0].url}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  className="object-cover"
+                />
+              )}
             </div>
           ) : (
             <div
@@ -87,7 +98,18 @@ function NoteCardComponent({ note, preview }: NoteCardProps) {
                   key={img._id}
                   className={`relative w-full h-[150px] bg-zinc-100 dark:bg-zinc-800 ${i === 2 ? "hidden md:block" : ""}`}
                 >
-                  <Image src={img.url} alt="" fill className="object-cover" />
+                  {img.mimeType?.startsWith("video/") ? (
+                    <video
+                      src={img.url}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      onLoadedMetadata={(e) => { e.currentTarget.currentTime = 0.001; }}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  ) : (
+                    <Image src={img.url} alt="" fill className="object-cover" />
+                  )}
                 </div>
               ))}
             </div>

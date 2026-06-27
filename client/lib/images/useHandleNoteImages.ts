@@ -41,10 +41,11 @@ export function useHandleNoteImages() {
       const newFiles = currentImages.filter(isNewImageItem).map((item) => item.file);
       let uploadedImages: Image[] = [];
       if (newFiles.length) {
-        const urls = await uploadImages(newFiles);
+        const { urls, mimeTypes } = await uploadImages(newFiles);
         const noteId = savedNote?._id;
         uploadedImages = await createImagesBulk({
           urls,
+          mimeTypes,
           ...(noteId && { noteId }),
         });
       }

@@ -6,6 +6,9 @@ export class Image extends Document {
   @Prop({ required: true })
   url: string;
 
+  @Prop()
+  mimeType?: string;
+
   @Prop({ type: SchemaTypes.ObjectId, ref: 'Note' })
   noteId: Types.ObjectId;
 

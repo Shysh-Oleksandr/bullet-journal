@@ -6,18 +6,24 @@ import type { Image } from "@/lib/notes/types";
 
 export const imagesQueryKey = ["images"] as const;
 
-/** Upload files to S3 via API; returns public URLs. */
-export async function uploadImages(files: File[]): Promise<string[]> {
+export interface UploadedMedia {
+  urls: string[];
+  mimeTypes: string[];
+}
+
+/** Upload files to S3 via API; returns public URLs and their MIME types. */
+export async function uploadImages(files: File[]): Promise<UploadedMedia> {
   const formData = new FormData();
   files.forEach((file) => formData.append("files", file));
-  const { data } = await client.post<{ urls: string[] }>("/images/upload", formData, {
+  const { data } = await client.post<UploadedMedia>("/images/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
-  return data.urls;
+  return data;
 }
 
 export interface CreateImagesBulkBody {
   urls: string[];
+  mimeTypes?: string[];
   noteId?: string;
 }
 

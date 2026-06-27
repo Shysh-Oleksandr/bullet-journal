@@ -10,6 +10,7 @@ export interface CustomLabel {
 export interface Image {
   _id: string;
   url: string;
+  mimeType?: string;
   author: string;
   noteId?: string;
 }

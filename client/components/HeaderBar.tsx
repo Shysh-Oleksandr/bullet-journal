@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -11,7 +12,7 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import Image from "next/image";
-import { LogOut, Plus } from "lucide-react";
+import { Download, LogOut, Plus } from "lucide-react";
 
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { useAuthStore } from "@/lib/auth/store";
@@ -20,6 +21,16 @@ export function HeaderBar() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const [showInstall, setShowInstall] = useState(false);
+
+  useEffect(() => {
+    const standalone = window.matchMedia("(display-mode: standalone)").matches;
+    if (!standalone) setShowInstall(true);
+  }, []);
+
+  const handleInstall = () => {
+    (document.querySelector("pwa-install") as any)?.showDialog(true);
+  };
 
   const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (pathname === "/") {
@@ -53,6 +64,15 @@ export function HeaderBar() {
             </Text>
           </Link>
           <Group gap="sm">
+            {showInstall && (
+              <button
+                onClick={handleInstall}
+                className="p-2 rounded-md transition-colors hover:bg-gray-100 dark:hover:bg-(--mantine-color-dark-5)"
+                aria-label="Install app"
+              >
+                <Download size={24} />
+              </button>
+            )}
             {user && (
               <>
                 <Link

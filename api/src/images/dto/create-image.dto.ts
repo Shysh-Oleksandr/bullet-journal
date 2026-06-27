@@ -16,6 +16,10 @@ export class CreateMultipleImagesDto {
   @IsUrl(undefined, { each: true })
   urls: string[];
 
+  @IsString({ each: true })
+  @IsOptional()
+  mimeTypes?: string[];
+
   @IsMongoId()
   @IsOptional()
   noteId?: Types.ObjectId;

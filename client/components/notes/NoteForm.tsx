@@ -499,13 +499,13 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
               <Plus />
             </Button>
           </Group>
-
-          <NoteImagesList
-            value={currentImages}
-            onChange={setCurrentImages}
-            disabled={isSaving}
-          />
         </div>
+
+        <NoteImagesList
+          value={currentImages}
+          onChange={setCurrentImages}
+          disabled={isSaving}
+        />
 
         <BlockNoteEditor
           initialHtml={

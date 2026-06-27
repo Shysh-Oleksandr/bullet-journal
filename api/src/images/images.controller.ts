@@ -24,7 +24,7 @@ import { UpdateImageDto } from './dto/update-image.dto';
 import { ImagesService } from './images.service';
 import { S3UploadService } from './s3-upload.service';
 
-const IMAGE_MIME = /^image\//;
+const MEDIA_MIME = /^(image|video)\//;
 
 @Controller('images')
 @UseGuards(JwtAuthGuard)
@@ -52,7 +52,7 @@ export class ImagesController {
   }
 
   @Post('upload')
-  @UseInterceptors(FilesInterceptor('files', 10))
+  @UseInterceptors(FilesInterceptor('files', 10, { limits: { fileSize: 500 * 1024 * 1024 } }))
   async upload(
     @UploadedFiles() files: Express.Multer.File[],
     @Req() req: RequestWithUser,
@@ -62,8 +62,9 @@ export class ImagesController {
     }
     const userId = req.user.userId;
     const urls: string[] = [];
+    const mimeTypes: string[] = [];
     for (const file of files) {
-      if (!file.mimetype || !IMAGE_MIME.test(file.mimetype)) {
+      if (!file.mimetype || !MEDIA_MIME.test(file.mimetype)) {
         throw new BadRequestException(`Invalid file type: ${file.originalname}`);
       }
       const url = await this.s3UploadService.uploadImage(
@@ -72,8 +73,9 @@ export class ImagesController {
         file.mimetype,
       );
       urls.push(url);
+      mimeTypes.push(file.mimetype);
     }
-    return { urls };
+    return { urls, mimeTypes };
   }
 
   @Post('bulk')

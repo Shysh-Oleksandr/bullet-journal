@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 
 import { AuthInit } from "@/components/AuthInit";
 import { HeaderBar } from "@/components/HeaderBar";
+import { PwaInstall } from "@/components/PwaInstall";
 import { UnauthorizedInterceptor } from "@/components/UnauthorizedInterceptor";
 import { queryClient } from "@/lib/queryClient";
 
@@ -14,6 +15,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       <DatesProvider settings={{ firstDayOfWeek: 1 }}>
         <UnauthorizedInterceptor>
           <AuthInit />
+          <PwaInstall />
           <HeaderBar />
           {children}
         </UnauthorizedInterceptor>

@@ -7,8 +7,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 export interface ImageLightboxProps {
   opened: boolean;
   onClose: () => void;
-  /** All image URLs in order (carousel order). */
+  /** All media URLs in order (carousel order). */
   images: string[];
+  /** MIME types parallel to `images` — used to decide image vs video rendering. */
+  mimeTypes?: string[];
   /** Index of the image to show when opening. */
   initialIndex: number;
 }
@@ -17,6 +19,7 @@ export function ImageLightbox({
   opened,
   onClose,
   images,
+  mimeTypes,
   initialIndex,
 }: ImageLightboxProps) {
   const n = images.length;
@@ -57,6 +60,8 @@ export function ImageLightbox({
   const currentSrc = images[currentIndex];
   if (!currentSrc) return null;
 
+  const isVideo = mimeTypes?.[currentIndex]?.startsWith("video/") ?? false;
+
   return (
     <Modal
       opened={opened}
@@ -74,13 +79,25 @@ export function ImageLightbox({
         style={{ minHeight: "80vh" }}
         onClick={onClose}
       >
-        <img
-          src={currentSrc}
-          alt=""
-          className="max-h-[85vh] max-w-[85vw] cursor-default object-contain rounded-xl"
-          draggable={false}
-          onClick={(e) => e.stopPropagation()}
-        />
+        {isVideo ? (
+          <video
+            key={currentSrc}
+            src={currentSrc}
+            controls
+            autoPlay
+            playsInline
+            className="max-h-[85vh] max-w-[85vw] rounded-xl cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <img
+            src={currentSrc}
+            alt=""
+            className="max-h-[85vh] max-w-[85vw] cursor-default object-contain rounded-xl"
+            draggable={false}
+            onClick={(e) => e.stopPropagation()}
+          />
+        )}
 
         {n > 1 && (
           <>
