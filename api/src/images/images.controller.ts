@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -67,13 +68,26 @@ export class ImagesController {
       if (!file.mimetype || !MEDIA_MIME.test(file.mimetype)) {
         throw new BadRequestException(`Invalid file type: ${file.originalname}`);
       }
-      const url = await this.s3UploadService.uploadImage(
-        userId,
-        file.buffer,
-        file.mimetype,
-      );
-      urls.push(url);
-      mimeTypes.push(file.mimetype);
+      try {
+        const url = await this.s3UploadService.uploadImage(
+          userId,
+          file.buffer,
+          file.mimetype,
+        );
+        urls.push(url);
+        mimeTypes.push(file.mimetype);
+      } catch (err) {
+        console.error('S3 upload failed', {
+          filename: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          error: err?.message,
+          code: err?.Code ?? err?.code,
+        });
+        throw new InternalServerErrorException(
+          `S3 upload failed for ${file.originalname} (${file.mimetype}, ${file.size}B): ${err?.message}`,
+        );
+      }
     }
     return { urls, mimeTypes };
   }
