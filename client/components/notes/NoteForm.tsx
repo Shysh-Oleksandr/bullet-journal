@@ -190,53 +190,60 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
   }, [typeLabels, categoryLabels]);
 
   const handleSave = useCallback(async () => {
-    const state = formStateRef.current;
-    const startDateTs = state.startDate || Date.now();
-    const basePayload = {
-      title: extractTitleFromEditorHtml(state.content),
-      content: state.content || undefined,
-      startDate: startDateTs,
-      color: state.color || undefined,
-      rating: state.rating,
-      isStarred: state.isStarred,
-      type: state.typeId,
-      category: state.categoryIds,
-    };
-    const imagesToSave = state.currentImages;
+    setIsSaving(true);
+    try {
+      const state = formStateRef.current;
+      const startDateTs = state.startDate || Date.now();
+      const basePayload = {
+        title: extractTitleFromEditorHtml(state.content),
+        content: state.content || undefined,
+        startDate: startDateTs,
+        color: state.color || undefined,
+        rating: state.rating,
+        isStarred: state.isStarred,
+        type: state.typeId,
+        category: state.categoryIds,
+      };
+      const imagesToSave = state.currentImages;
 
-    if (mode === "create") {
-      try {
-        const note = await createMutation.mutateAsync({
-          ...basePayload,
-          images: [],
-        });
-        const newImages = await handleNoteImages(imagesToSave, note);
-        if (newImages.length) {
+      if (mode === "create") {
+        try {
+          const note = await createMutation.mutateAsync({
+            ...basePayload,
+            images: [],
+          });
+          const newImages = await handleNoteImages(imagesToSave, note);
+          if (newImages.length) {
+            await updateMutation.mutateAsync({
+              id: note._id,
+              ...basePayload,
+              images: newImages.map((i) => i._id),
+            });
+          }
+          router.replace(`/notes/${note._id}`);
+        } catch (err) {
+          console.error("Failed to create note", err);
+          alert("Failed to save note. Please try again.");
+        }
+        return;
+      }
+
+      if (initialNote?._id) {
+        try {
+          const newImages = await handleNoteImages(imagesToSave, initialNote);
           await updateMutation.mutateAsync({
-            id: note._id,
+            id: initialNote._id,
             ...basePayload,
             images: newImages.map((i) => i._id),
           });
+          router.refresh();
+        } catch (err) {
+          console.error("Failed to update note", err);
+          alert("Failed to save note. Please try again.");
         }
-        router.replace(`/notes/${note._id}`);
-      } catch (err) {
-        console.error("Failed to create note", err);
       }
-      return;
-    }
-
-    if (initialNote?._id) {
-      try {
-        const newImages = await handleNoteImages(imagesToSave, initialNote);
-        await updateMutation.mutateAsync({
-          id: initialNote._id,
-          ...basePayload,
-          images: newImages.map((i) => i._id),
-        });
-        router.refresh();
-      } catch (err) {
-        console.error("Failed to update note", err);
-      }
+    } finally {
+      setIsSaving(false);
     }
   }, [
     mode,
@@ -264,7 +271,7 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
     }
   }, [mode]);
 
-  const isSaving = createMutation.isPending || updateMutation.isPending;
+  const [isSaving, setIsSaving] = useState(false);
   const isDeleting = deleteMutation.isPending;
 
   const [debouncedContent] = useDebouncedValue(content, 400);

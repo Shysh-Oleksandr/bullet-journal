@@ -15,9 +15,7 @@ export interface UploadedMedia {
 export async function uploadImages(files: File[]): Promise<UploadedMedia> {
   const formData = new FormData();
   files.forEach((file) => formData.append("files", file));
-  const { data } = await client.post<UploadedMedia>("/images/upload", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  const { data } = await client.post<UploadedMedia>("/images/upload", formData);
   return data;
 }
 
