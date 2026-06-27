@@ -18,16 +18,22 @@ export class S3UploadService {
     this.region = region;
     this.imageBaseUrl = process.env.S3_IMAGE_BASE_URL;
 
+    console.log('[S3UploadService] init:', {
+      region,
+      bucket: this.bucket,
+      hasAccessKeyId: !!accessKeyId,
+      hasSecretAccessKey: !!secretAccessKey,
+    });
+
+    if (!accessKeyId || !secretAccessKey) {
+      throw new Error(
+        'AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be set',
+      );
+    }
+
     this.s3 = new S3Client({
       region,
-      ...(accessKeyId && secretAccessKey
-        ? {
-            credentials: {
-              accessKeyId,
-              secretAccessKey,
-            },
-          }
-        : {}),
+      credentials: { accessKeyId, secretAccessKey },
     });
   }
 

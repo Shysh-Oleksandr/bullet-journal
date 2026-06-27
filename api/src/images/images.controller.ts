@@ -53,7 +53,7 @@ export class ImagesController {
   }
 
   @Post('upload')
-  @UseInterceptors(FilesInterceptor('files', 10, { limits: { fileSize: 500 * 1024 * 1024 } }))
+  @UseInterceptors(FilesInterceptor('files', 5, { limits: { fileSize: 500 * 1024 * 1024 } }))
   async upload(
     @UploadedFiles() files: Express.Multer.File[],
     @Req() req: RequestWithUser,

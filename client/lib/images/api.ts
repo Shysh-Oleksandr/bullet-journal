@@ -11,12 +11,23 @@ export interface UploadedMedia {
   mimeTypes: string[];
 }
 
-/** Upload files to S3 via API; returns public URLs and their MIME types. */
+const UPLOAD_BATCH_SIZE = 5;
+
+/** Upload files to S3 via API in sequential batches; returns public URLs and their MIME types. */
 export async function uploadImages(files: File[]): Promise<UploadedMedia> {
-  const formData = new FormData();
-  files.forEach((file) => formData.append("files", file));
-  const { data } = await client.post<UploadedMedia>("/images/upload", formData);
-  return data;
+  const urls: string[] = [];
+  const mimeTypes: string[] = [];
+
+  for (let i = 0; i < files.length; i += UPLOAD_BATCH_SIZE) {
+    const batch = files.slice(i, i + UPLOAD_BATCH_SIZE);
+    const formData = new FormData();
+    batch.forEach((file) => formData.append("files", file));
+    const { data } = await client.post<UploadedMedia>("/images/upload", formData);
+    urls.push(...data.urls);
+    mimeTypes.push(...data.mimeTypes);
+  }
+
+  return { urls, mimeTypes };
 }
 
 export interface CreateImagesBulkBody {
