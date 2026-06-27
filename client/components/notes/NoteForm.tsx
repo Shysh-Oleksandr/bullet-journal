@@ -223,7 +223,8 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
           router.replace(`/notes/${note._id}`);
         } catch (err) {
           console.error("Failed to create note", err);
-          alert("Failed to save note. Please try again.");
+          const detail = (err as any)?.response?.data?.message ?? (err as any)?.response?.data ?? (err instanceof Error ? err.message : String(err));
+          alert(`Failed to save note: ${JSON.stringify(detail)}`);
         }
         return;
       }
@@ -239,7 +240,8 @@ export function NoteForm({ mode, initialNote }: NoteFormProps) {
           router.refresh();
         } catch (err) {
           console.error("Failed to update note", err);
-          alert("Failed to save note. Please try again.");
+          const detail = (err as any)?.response?.data?.message ?? (err as any)?.response?.data ?? (err instanceof Error ? err.message : String(err));
+          alert(`Failed to save note: ${JSON.stringify(detail)}`);
         }
       }
     } finally {
