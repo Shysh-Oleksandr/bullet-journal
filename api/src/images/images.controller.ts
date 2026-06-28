@@ -10,11 +10,12 @@ import {
   Post,
   Put,
   Req,
+  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RequestWithUser } from '../common/types';
 import {
@@ -90,6 +91,23 @@ export class ImagesController {
       }
     }
     return { urls, mimeTypes };
+  }
+
+  @Post('upload-thumbnail')
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }))
+  async uploadThumbnail(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('videoUrl') videoUrl: string,
+    @Req() req: RequestWithUser,
+  ) {
+    if (!file) throw new BadRequestException('No file provided');
+    if (!videoUrl) throw new BadRequestException('videoUrl is required');
+    try {
+      await this.s3UploadService.uploadThumbnailForVideo(videoUrl, req.user.userId, file.buffer);
+      return { ok: true };
+    } catch (err) {
+      throw new BadRequestException(err?.message ?? 'Failed to upload thumbnail');
+    }
   }
 
   @Post('bulk')

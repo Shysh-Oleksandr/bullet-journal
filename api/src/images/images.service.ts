@@ -108,6 +108,12 @@ export class ImagesService {
         } catch (err) {
           console.error('Failed to delete image from S3:', url, err);
         }
+        // Also delete the video thumbnail if one was generated (no-op if key doesn't exist)
+        try {
+          await this.s3UploadService.deleteByUrl(url + '_thumb');
+        } catch {
+          // ignore
+        }
       }
     }
 

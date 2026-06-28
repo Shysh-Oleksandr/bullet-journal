@@ -40,7 +40,7 @@ export class S3UploadService {
   /**
    * Extract S3 key from a full image URL (our URLs end with userId/uuid).
    */
-  private keyFromUrl(url: string): string | null {
+  keyFromUrl(url: string): string | null {
     try {
       const u = new URL(url);
       const path = u.pathname.replace(/^\//, '');
@@ -84,5 +84,29 @@ export class S3UploadService {
       return `${base}/${key}`;
     }
     return `https://${this.bucket}.s3.${this.region}.amazonaws.com/${key}`;
+  }
+
+  /**
+   * Upload a JPEG thumbnail for an already-uploaded video.
+   * The thumbnail is stored at {videoKey}_thumb.
+   * Throws if videoUrl does not belong to userId.
+   */
+  async uploadThumbnailForVideo(
+    videoUrl: string,
+    userId: string,
+    buffer: Buffer,
+  ): Promise<void> {
+    const key = this.keyFromUrl(videoUrl);
+    if (!key || !key.startsWith(`${userId}/`)) {
+      throw new Error('Invalid videoUrl for this user');
+    }
+    await this.s3.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: `${key}_thumb`,
+        Body: buffer,
+        ContentType: 'image/jpeg',
+      }),
+    );
   }
 }

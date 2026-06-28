@@ -4,7 +4,7 @@ import { Loader } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import { NoteForm } from "@/components/notes/NoteForm";
+import { NoteCreate } from "@/components/journal/NoteCreate";
 import { useAuthStore } from "@/lib/auth/store";
 
 export default function CreateNotePage() {
@@ -26,5 +26,5 @@ export default function CreateNotePage() {
     );
   }
 
-  return <NoteForm mode="create" />;
+  return <NoteCreate />;
 }

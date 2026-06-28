@@ -2,13 +2,13 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Bullet Journal",
-    short_name: "Bullet Journal",
-    description: "Journaling and note-taking PWA",
+    name: "The Journal",
+    short_name: "The Journal",
+    description: "A warm, personal journaling PWA",
     start_url: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#000000",
+    background_color: "#1b1714",
+    theme_color: "#1b1714",
     icons: [
       {
         src: "/icon-192x192.png",

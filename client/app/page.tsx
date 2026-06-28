@@ -1,22 +1,8 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  Container,
-  Group,
-  Loader,
-  MultiSelect,
-  RangeSlider,
-  Stack,
-  Switch,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
-import { useDebouncedValue, useLocalStorage } from "@mantine/hooks";
-import Link from "next/link";
+import { Loader } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
+import { startOfMonth } from "date-fns";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Suspense,
@@ -27,15 +13,15 @@ import {
   useState,
 } from "react";
 
-import { NoteCard } from "@/components/NoteCard";
-import { NotesPagination } from "@/components/NotesPagination";
-import { useLabelsQuery } from "@/lib/custom-labels/api";
-import { useAuthStore } from "@/lib/auth/store";
-import { type NotesFilters, usePaginatedNotesQuery } from "@/lib/notes/api";
-import { ChevronDown, Plus, Search } from "lucide-react";
-import Image from "next/image";
+import { FilterBar } from "@/components/journal/FilterBar";
+import { Greeting } from "@/components/journal/Greeting";
+import { Timeline } from "@/components/journal/Timeline";
+import { Fab } from "@/components/journal/mobile/Fab";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
-import { cn } from "@/lib/utils";
+import { NotesPagination } from "@/components/NotesPagination";
+import { useAuthStore } from "@/lib/auth/store";
+import { useLabelsQuery } from "@/lib/custom-labels/api";
+import { type NotesFilters, usePaginatedNotesQuery } from "@/lib/notes/api";
 
 function dateToStartOfDay(value: string): number | undefined {
   if (!value) return undefined;
@@ -136,13 +122,6 @@ function HomePageContent() {
   const [isStarred, setIsStarred] = useState(initial.isStarred);
   const [withImages, setWithImages] = useState(initial.withImages);
 
-  const [isFiltersOpen, setIsFiltersOpen] = useLocalStorage({
-    key: "isFiltersOpen",
-    defaultValue: false,
-  });
-  const [filtersTransitionEnabled, setFiltersTransitionEnabled] =
-    useState(false);
-
   const [debouncedSearch] = useDebouncedValue(search, 400);
   const [debouncedRatingRange] = useDebouncedValue(ratingRange, 300);
 
@@ -220,10 +199,7 @@ function HomePageContent() {
       ...(dateFrom != null && { dateFrom }),
       ...(dateTo != null && { dateTo }),
       ...(debouncedRatingRange[0] > 1 || debouncedRatingRange[1] < 10
-        ? {
-            ratingMin: debouncedRatingRange[0],
-            ratingMax: debouncedRatingRange[1],
-          }
+        ? { ratingMin: debouncedRatingRange[0], ratingMax: debouncedRatingRange[1] }
         : {}),
       ...(isStarred && { isStarred: true }),
       ...(withImages && { withImages: true }),
@@ -241,6 +217,16 @@ function HomePageContent() {
   const { data, isLoading: isNotesLoading } = usePaginatedNotesQuery(page, {
     enabled: !!user,
     filters,
+  });
+
+  // "This month" count — extra lightweight query (frontend-only; streak is not derivable).
+  const monthFilter = useMemo<NotesFilters>(
+    () => ({ dateFrom: startOfMonth(new Date()).getTime() }),
+    [],
+  );
+  const { data: monthData } = usePaginatedNotesQuery(1, {
+    enabled: !!user,
+    filters: monthFilter,
   });
 
   const notes = data?.data ?? [];
@@ -272,6 +258,15 @@ function HomePageContent() {
     setPage(1);
   }, []);
 
+  const activeCount =
+    (search.trim() ? 1 : 0) +
+    typeIds.length +
+    categoryIds.length +
+    (dateRange[0] || dateRange[1] ? 1 : 0) +
+    (ratingRange[0] > 1 || ratingRange[1] < 10 ? 1 : 0) +
+    (isStarred ? 1 : 0) +
+    (withImages ? 1 : 0);
+
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, debouncedRatingRange]);
@@ -279,217 +274,102 @@ function HomePageContent() {
   if (!authChecked) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader size="lg" />
+        <Loader size="lg" color="amber" />
       </div>
     );
   }
 
   if (user) {
     return (
-      <div className="min-h-screen py-4 sm:py-6">
-        <Container size="md">
-          <div className="sm:mb-4 mb-3 flex flex-wrap items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white">
-              Hello, {user.name}!
-            </h1>
-            <div className="items-center gap-2 hidden sm:flex">
-              <Link
-                href="/notes/new"
-                className="rounded-lg border border-zinc-300 bg-white flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
-              >
-                <Plus size={18} />
-                New note
-              </Link>
-            </div>
-          </div>
+      <div className="min-h-screen pb-24 sm:pb-8 pt-5 sm:pt-7">
+        <div className="mx-auto w-full max-w-[900px] px-5 sm:px-6">
+          <Greeting
+            name={user.name}
+            total={totalNotes}
+            thisMonth={monthData?.total ?? null}
+          />
 
-          <div className="flex items-center justify-between mb-1">
-            <Text size="sm" fw={500} c="dimmed">
-              Filters
-            </Text>
-            <Button
-              size="xs"
-              variant="light"
-              onClick={() => {
-                setFiltersTransitionEnabled(true);
-                setIsFiltersOpen(!isFiltersOpen);
-              }}
-            >
-              <ChevronDown
-                size={16}
-                className={cn(
-                  "transition-transform duration-300",
-                  isFiltersOpen ? "rotate-180" : "",
-                )}
-              />
-            </Button>
-          </div>
-          <div
-            className={cn(
-              "overflow-hidden",
-              filtersTransitionEnabled &&
-                "transition-[max-height,margin] sm:duration-300 duration-500 ease-in-out",
-              isFiltersOpen ? "sm:max-h-[200px] max-h-[370px] mb-4" : "max-h-0 mb-0",
-            )}
-          >
-            <Box className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-3 dark:border-zinc-700 dark:bg-zinc-800/50 w-full">
-              <Group
-                align="flex-end"
-                wrap="wrap"
-                gap="xs"
-                className="mb-1 w-full"
-              >
-                <TextInput
-                  placeholder="Search title"
-                  leftSection={<Search size={14} />}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  size="md"
-                  flex={1}
-                  className="min-w-[200px] md:min-w-[200px] flex-1"
-                />
-                <MultiSelect
-                  placeholder="Type"
-                  data={typeSelectData}
-                  value={typeIds}
-                  onChange={(v) => {
-                    setTypeIds(v);
-                    setPage(1);
-                  }}
-                  size="md"
-                  clearable
-                  searchable
-                  nothingFoundMessage="No type found"
-                  className="w-[153px] sm:w-[220px] one-line-input"
-                />
-                <MultiSelect
-                  placeholder="Category"
-                  data={categorySelectData}
-                  value={categoryIds}
-                  onChange={(v) => {
-                    setCategoryIds(v);
-                    setPage(1);
-                  }}
-                  size="md"
-                  clearable
-                  searchable
-                  nothingFoundMessage="No category found"
-                  className="w-[153px] sm:w-[220px] one-line-input"
-                />
-                <Group align="center" gap="xs">
-                  <DatePickerInput
-                    type="range"
-                    placeholder="Start date – End date"
-                    value={dateRange}
-                    onChange={(v: [string | null, string | null]) => {
-                      setDateRange(v);
-                      setPage(1);
-                    }}
-                    size="md"
-                    className="w-[200px] min-w-0"
-                  />
-                </Group>
-              </Group>
-              <Group align="end" wrap="wrap" gap="sm">
-                <Box className="w-full min-w-0 sm:w-[180px]">
-                  <Text size="xs" c="dimmed" mb={4}>
-                    Rating {ratingRange[0]}–{ratingRange[1]}
-                  </Text>
-                  <RangeSlider
-                    min={1}
-                    max={10}
-                    minRange={0}
-                    step={1}
-                    value={ratingRange}
-                    onChange={setRatingRange}
-                    size="md"
-                    className="mt-1"
-                  />
-                </Box>
-                <Group gap="md" align="end">
-                  <Switch
-                    size="md"
-                    label="Starred"
-                    checked={isStarred}
-                    onChange={(e) => {
-                      setIsStarred(e.currentTarget.checked);
-                      setPage(1);
-                    }}
-                  />
-                  <Switch
-                    size="md"
-                    label="With images"
-                    checked={withImages}
-                    onChange={(e) => {
-                      setWithImages(e.currentTarget.checked);
-                      setPage(1);
-                    }}
-                  />
-                </Group>
-                {filters != null && (
-                  <Text
-                    size="xs"
-                    c="blue"
-                    className="cursor-pointer hover:underline!"
-                    onClick={clearFilters}
-                  >
-                    Clear filters
-                  </Text>
-                )}
-              </Group>
-            </Box>
-          </div>
-
-          <Text size="sm" c="dimmed" mb={4}>
-            <b>{totalNotes}</b> notes found
-          </Text>
+          <FilterBar
+            search={search}
+            setSearch={setSearch}
+            typeIds={typeIds}
+            setTypeIds={(v) => {
+              setTypeIds(v);
+              setPage(1);
+            }}
+            categoryIds={categoryIds}
+            setCategoryIds={(v) => {
+              setCategoryIds(v);
+              setPage(1);
+            }}
+            dateRange={dateRange}
+            setDateRange={(v) => {
+              setDateRange(v);
+              setPage(1);
+            }}
+            ratingRange={ratingRange}
+            setRatingRange={setRatingRange}
+            isStarred={isStarred}
+            setIsStarred={(v) => {
+              setIsStarred(v);
+              setPage(1);
+            }}
+            withImages={withImages}
+            setWithImages={(v) => {
+              setWithImages(v);
+              setPage(1);
+            }}
+            typeSelectData={typeSelectData}
+            categorySelectData={categorySelectData}
+            activeCount={activeCount}
+            onClear={clearFilters}
+          />
 
           <section aria-label="Notes">
             {isNotesLoading ? (
-              <div className="flex justify-center items-center h-full">
-                <Loader size="lg" />
+              <div className="flex h-40 items-center justify-center">
+                <Loader size="lg" color="amber" />
               </div>
             ) : notes.length === 0 ? (
-              <Text py="xl" ta="center" c="dimmed">
-                {filters ? "No notes match the filters." : "No notes yet."}
-              </Text>
+              <p className="py-16 text-center font-mono text-[13px] text-faint">
+                {filters ? "No entries match these filters." : "No entries yet."}
+              </p>
             ) : (
               <>
-                <ul className="flex flex-col gap-4">
-                  {notes.map((note) => (
-                    <li key={note._id}>
-                      <NoteCard note={note} />
-                    </li>
-                  ))}
-                </ul>
-                <NotesPagination
-                  page={displayPage}
-                  totalPages={totalPages}
-                  onPageChange={setPage}
-                  isLoading={isNotesLoading}
-                />
+                <Timeline notes={notes} />
+                <div className="mt-8">
+                  <NotesPagination
+                    page={displayPage}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
+                    isLoading={isNotesLoading}
+                  />
+                </div>
               </>
             )}
           </section>
-        </Container>
+        </div>
+
+        <Fab />
       </div>
     );
   }
 
   return (
-    <div className="flex h-full pt-24 flex-col items-center justify-center gap-6">
-      <Stack align="center" gap="md">
-        <Image
-          src="/icon-192x192.png"
-          alt="Bullet Journal"
-          width={80}
-          height={80}
-        />
-        <Title order={1} size="h1" fw={700}>
-          Bullet Journal
-        </Title>
-        <GoogleSignInButton />
-      </Stack>
+    <div className="flex min-h-[80vh] flex-col items-center justify-center gap-6 px-6">
+      <span
+        className="grid h-16 w-16 place-items-center rounded-[18px]"
+        style={{ background: "var(--accent-gradient)" }}
+      >
+        <span className="font-serif text-[30px] font-semibold text-[var(--on-accent)]">J</span>
+      </span>
+      <div className="text-center">
+        <h1 className="font-serif text-[32px] font-semibold tracking-[-0.015em] text-text">
+          The Journal
+        </h1>
+        <p className="mt-1 text-[14px] text-muted">A warm place for your days.</p>
+      </div>
+      <GoogleSignInButton />
     </div>
   );
 }
@@ -499,7 +379,7 @@ export default function HomePage() {
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center">
-          <Loader size="lg" />
+          <Loader size="lg" color="amber" />
         </div>
       }
     >

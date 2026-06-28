@@ -4,7 +4,7 @@ import { Container, Loader, Text } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { NoteForm } from "@/components/notes/NoteForm";
+import { NoteDetail } from "@/components/journal/NoteDetail";
 import { useAuthStore } from "@/lib/auth/store";
 import { useNoteQuery } from "@/lib/notes/api";
 
@@ -75,5 +75,5 @@ export default function NoteDetailsPage({
     );
   }
 
-  return <NoteForm mode="edit" initialNote={note} />;
+  return <NoteDetail note={note} />;
 }

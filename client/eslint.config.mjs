@@ -12,9 +12,13 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored design-handoff prototype runtime — not application source.
+    "design_handoff_journal_direction_d 2/**",
   ]),
-  rules: {
-    "react-hooks/set-state-in-effect": "off",
+  {
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+    },
   },
 ]);
 

@@ -4,7 +4,9 @@ import {
   createImagesBulk,
   deleteImagesBulk,
   uploadImages,
+  uploadVideoThumbnail,
 } from "@/lib/images/api";
+import { extractVideoThumbnail } from "@/lib/images/extractVideoThumbnail";
 import type { Image, Note } from "@/lib/notes/types";
 
 export type NoteImageItem = Image | { file: File };
@@ -42,6 +44,17 @@ export function useHandleNoteImages() {
       let uploadedImages: Image[] = [];
       if (newFiles.length) {
         const { urls, mimeTypes } = await uploadImages(newFiles);
+
+        // For each video, extract a thumbnail frame and upload it to {videoKey}_thumb.
+        // Errors are non-fatal — the video cover falls back to the preload approach.
+        await Promise.allSettled(
+          urls.map(async (url, i) => {
+            if (!mimeTypes[i]?.startsWith("video/")) return;
+            const thumb = await extractVideoThumbnail(newFiles[i]);
+            await uploadVideoThumbnail(url, thumb);
+          }),
+        );
+
         const noteId = savedNote?._id;
         uploadedImages = await createImagesBulk({
           urls,

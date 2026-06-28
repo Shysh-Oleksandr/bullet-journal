@@ -65,12 +65,12 @@ export function BlockNoteEditor({
   }, [editor, handleChange]);
 
   return (
-    <div className="rounded-md transition-shadow duration-200 focus-within:shadow-[0_0_0_2px_rgba(59,130,246,0.35),0_0_14px_rgba(59,130,246,0.2)] dark:focus-within:shadow-[0_0_0_2px_rgba(96,165,250,0.4),0_0_18px_rgba(59,130,246,0.25)]">
+    <div className="rounded-[14px] transition-shadow duration-200 focus-within:shadow-[0_0_0_2px_var(--accent-border),0_0_14px_var(--accent-soft)]">
       <BlockNoteView
         editor={editor}
         editable={editable}
         sideMenu={!isMobile}
-        className="rounded-md border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 [&_.bn-editor]:min-h-[300px] [&_.bn-editor]:py-1 [&_.bn-editor]:pr-3! [&_.bn-editor]:sm:pr-8! [&_.bn-editor]:pl-[27px]! [&_.bn-editor]:sm:pl-[54px]! focus-within:border-blue-500 dark:focus-within:border-blue-400"
+        className="rounded-[14px] [&>div]:rounded-[14px]! border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 [&_.bn-editor]:min-h-[400px] sm:[&_.bn-editor]:min-h-[500px] [&_.bn-editor]:py-1 [&_.bn-editor]:pr-3! [&_.bn-editor]:sm:pr-8! [&_.bn-editor]:pl-[27px]! [&_.bn-editor]:sm:pl-[54px]! focus-within:border-accent"
       >
         {isMobile && (
           <SideMenuController

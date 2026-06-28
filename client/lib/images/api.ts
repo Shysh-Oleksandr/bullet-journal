@@ -44,6 +44,14 @@ export async function createImagesBulk(
   return data.images;
 }
 
+/** Upload a JPEG thumbnail for an already-uploaded video, stored at {videoKey}_thumb in S3. */
+export async function uploadVideoThumbnail(videoUrl: string, thumbFile: File): Promise<void> {
+  const formData = new FormData();
+  formData.append("file", thumbFile);
+  formData.append("videoUrl", videoUrl);
+  await client.post("/images/upload-thumbnail", formData);
+}
+
 /** Delete image records by ID (and optionally from S3 on backend if implemented). */
 export async function deleteImagesBulk(imageIds: string[]): Promise<void> {
   if (!imageIds.length) return;

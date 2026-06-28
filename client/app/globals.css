@@ -1,36 +1,116 @@
 @import "tailwindcss";
 
-/* Tailwind dark: variant driven by Mantine's color scheme (set on html) */
-@custom-variant dark (&:where([data-mantine-color-scheme="dark"], [data-mantine-color-scheme="dark"] *));
-
+/* ------------------------------------------------------------------ */
+/* Direction D — "Warm Cozy Journal" design tokens (dark mode only)    */
+/* ------------------------------------------------------------------ */
 :root {
-  --background: var(--mantine-color-body);
-  --foreground: var(--mantine-color-text);
+  --bg: #1b1714;
+  --surface: #241f19;
+  --surface-2: #2c261f;
+  --line: #352f28;
+  --text: #ece3d4;
+  --muted: #a89c89;
+  --faint: #6f6557;
+  --accent: #d8a657;
+
+  --accent-gradient: linear-gradient(135deg, #e0b366, #cb9a3c);
+  --accent-soft: rgba(216, 166, 87, 0.14);
+  --accent-soft-strong: rgba(216, 166, 87, 0.18);
+  --accent-border: rgba(216, 166, 87, 0.4);
+  --on-accent: #1b1714;
+
+  --danger-text: #d98a72;
+  --danger-gradient: linear-gradient(135deg, #c25a48, #a8473a);
+
+  --shadow-card: 0 14px 44px rgba(0, 0, 0, 0.3);
+  --shadow-pop: 0 12px 30px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.5);
+
+  --background: var(--bg);
+  --foreground: var(--text);
 }
 
+/* Expose tokens to Tailwind v4 utilities (bg-surface, text-muted, border-line, text-accent, font-serif…) */
 @theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger-text);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --font-serif: var(--font-newsreader), Georgia, serif;
+  --font-sans: var(--font-hanken), system-ui, sans-serif;
+  --font-mono: var(--font-spline-mono), ui-monospace, monospace;
+}
+
+/* ------------------------------------------------------------------ */
+/* Map Mantine's dark palette to the warm ramp so every Mantine        */
+/* component (Select, popovers, DateTimePicker, Modal…) inherits it.   */
+/* ------------------------------------------------------------------ */
+:root,
+[data-mantine-color-scheme="dark"] {
+  --mantine-color-body: var(--bg);
+  --mantine-color-text: var(--text);
+  --mantine-color-dimmed: var(--muted);
+  --mantine-color-default: var(--surface);
+  --mantine-color-default-hover: var(--surface-2);
+  --mantine-color-default-border: var(--line);
+  --mantine-color-placeholder: var(--faint);
+
+  --mantine-color-dark-0: #ece3d4;
+  --mantine-color-dark-1: #cdc3b2;
+  --mantine-color-dark-2: #a89c89;
+  --mantine-color-dark-3: #6f6557;
+  --mantine-color-dark-4: #352f28;
+  --mantine-color-dark-5: #2c261f;
+  --mantine-color-dark-6: #241f19;
+  --mantine-color-dark-7: #1b1714;
+  --mantine-color-dark-8: #161310;
+  --mantine-color-dark-9: #100d0b;
+}
+
+html,
+body {
+  background-color: var(--bg);
 }
 
 body {
-  /* Use Mantine theme so body follows light/dark switch */
-  color: var(--mantine-color-text);
-  font-family: var(--mantine-font-family), Arial, Helvetica, sans-serif;
+  color: var(--text);
+  font-family: var(--font-hanken), system-ui, Arial, sans-serif;
 }
 
-[data-mantine-color-scheme="light"] .bn-editor {
-  background-color: #fff !important;
-  color: #161515 !important;
+/* ------------------------------------------------------------------ */
+/* BlockNote editor — warm dark surface to match cards                 */
+/* ------------------------------------------------------------------ */
+.bn-container,
+.bn-editor {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
 }
 
-[data-mantine-color-scheme="light"] .bn-container {
-  border-color: #eee !important;
-  background-color: #fff !important;
+/* Newsreader for the editor's first heading (the note title) */
+.bn-editor h1,
+.bn-editor h2 {
+  font-family: var(--font-newsreader), Georgia, serif !important;
+  letter-spacing: -0.01em;
 }
 
 .one-line-input .mantine-Input-input {
   height: 30px !important;
+}
+
+/* Hide scrollbars on horizontally-scrolling pill rows */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
