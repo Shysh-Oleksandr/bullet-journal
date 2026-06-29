@@ -82,7 +82,7 @@ const theme = createTheme({
 });
 
 export const metadata: Metadata = {
-  title: "The Journal",
+  title: "Organix",
   description: "A warm, personal journaling PWA",
 };
 

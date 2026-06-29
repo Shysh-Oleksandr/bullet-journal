@@ -20,7 +20,7 @@ export interface PaginatedNotesResponse {
   totalPages: number;
 }
 
-const NOTES_PER_PAGE = 20;
+const NOTES_PER_PAGE = 12;
 
 export function useNotesQuery(options?: { enabled?: boolean }) {
   return useQuery({
@@ -57,6 +57,29 @@ export interface NotesFilters {
   ratingMax?: number;
   isStarred?: boolean;
   withImages?: boolean;
+}
+
+export const notesCountQueryKey = (dateFrom?: number, dateTo?: number) =>
+  ["notes", "count", { dateFrom: dateFrom ?? null, dateTo: dateTo ?? null }] as const;
+
+export function useNotesCountQuery(options?: {
+  enabled?: boolean;
+  dateFrom?: number;
+  dateTo?: number;
+}) {
+  const { dateFrom, dateTo } = options ?? {};
+  return useQuery({
+    queryKey: notesCountQueryKey(dateFrom, dateTo),
+    queryFn: async () => {
+      const params: Record<string, number> = {};
+      if (dateFrom != null) params.dateFrom = dateFrom;
+      if (dateTo != null) params.dateTo = dateTo;
+      const { data } = await client.get<{ count: number }>("/notes/count", { params });
+      return data.count;
+    },
+    enabled: options?.enabled ?? true,
+    refetchOnMount: true,
+  });
 }
 
 export const paginatedNotesQueryKey = (
@@ -102,6 +125,7 @@ export function usePaginatedNotesQuery(
       return data;
     },
     enabled: options?.enabled ?? true,
+    refetchOnMount: true,
   });
 }
 
@@ -114,7 +138,6 @@ export function useCreateNoteMutation() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["notes"] });
-      await queryClient.refetchQueries({ queryKey: ["notes"] });
     },
   });
 }
@@ -131,7 +154,6 @@ export function useUpdateNoteMutation() {
     },
     onSuccess: async (updatedNote) => {
       await queryClient.invalidateQueries({ queryKey: ["notes"] });
-      await queryClient.refetchQueries({ queryKey: ["notes"] });
       if (updatedNote?._id) {
         queryClient.invalidateQueries({ queryKey: noteQueryKey(updatedNote._id) });
       }
@@ -147,7 +169,6 @@ export function useDeleteNoteMutation() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["notes"] });
-      await queryClient.refetchQueries({ queryKey: ["notes"] });
     },
   });
 }

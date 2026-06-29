@@ -17,6 +17,7 @@ import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RequestWithUser } from '../common/types';
+import { CountNotesDto } from './dto/count-notes.dto';
 import { PaginationFiltersDto } from './dto/pagination-filters.dto';
 
 @Controller('notes')
@@ -97,6 +98,19 @@ export class NotesController {
       console.error(error);
       throw new BadRequestException('Failed to fetch paginated notes');
     }
+  }
+
+  @Get('count')
+  async count(
+    @Req() req: RequestWithUser,
+    @Query() dto: CountNotesDto,
+  ) {
+    const count = await this.notesService.count(
+      req.user.userId,
+      dto.dateFrom,
+      dto.dateTo,
+    );
+    return { count };
   }
 
   @Get(':id')

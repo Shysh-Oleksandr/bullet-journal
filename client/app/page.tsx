@@ -21,7 +21,8 @@ import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { NotesPagination } from "@/components/NotesPagination";
 import { useAuthStore } from "@/lib/auth/store";
 import { useLabelsQuery } from "@/lib/custom-labels/api";
-import { type NotesFilters, usePaginatedNotesQuery } from "@/lib/notes/api";
+import { type NotesFilters, useNotesCountQuery, usePaginatedNotesQuery } from "@/lib/notes/api";
+import Image from "next/image";
 
 function dateToStartOfDay(value: string): number | undefined {
   if (!value) return undefined;
@@ -104,28 +105,23 @@ function HomePageContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const initial = useMemo(
-    () => parseFiltersFromParams(searchParams),
-    [searchParams],
-  );
-
-  const [page, setPage] = useState(initial.page);
-  const [search, setSearch] = useState(initial.search);
-  const [typeIds, setTypeIds] = useState<string[]>(initial.typeIds);
-  const [categoryIds, setCategoryIds] = useState<string[]>(initial.categoryIds);
+  const [page, setPage] = useState(() => parseFiltersFromParams(searchParams).page);
+  const [search, setSearch] = useState(() => parseFiltersFromParams(searchParams).search);
+  const [typeIds, setTypeIds] = useState<string[]>(() => parseFiltersFromParams(searchParams).typeIds);
+  const [categoryIds, setCategoryIds] = useState<string[]>(() => parseFiltersFromParams(searchParams).categoryIds);
   const [dateRange, setDateRange] = useState<[string | null, string | null]>(
-    initial.dateRange,
+    () => parseFiltersFromParams(searchParams).dateRange,
   );
   const [ratingRange, setRatingRange] = useState<[number, number]>(
-    initial.ratingRange,
+    () => parseFiltersFromParams(searchParams).ratingRange,
   );
-  const [isStarred, setIsStarred] = useState(initial.isStarred);
-  const [withImages, setWithImages] = useState(initial.withImages);
+  const [isStarred, setIsStarred] = useState(() => parseFiltersFromParams(searchParams).isStarred);
+  const [withImages, setWithImages] = useState(() => parseFiltersFromParams(searchParams).withImages);
 
   const [debouncedSearch] = useDebouncedValue(search, 400);
   const [debouncedRatingRange] = useDebouncedValue(ratingRange, 300);
 
-  const lastPushedQueryRef = useRef<string>("");
+  const lastPushedQueryRef = useRef<string>(searchParams.toString());
 
   // Sync state from URL when searchParams change (e.g. back/forward), but not when we just pushed
   useEffect(() => {
@@ -149,29 +145,25 @@ function HomePageContent() {
       typeIds,
       categoryIds,
       dateRange,
-      ratingRange,
+      ratingRange: debouncedRatingRange,
       isStarred,
       withImages,
       page,
     });
-    const current = searchParams.toString();
     const next = query.slice(1); // remove "?"
-    if (next !== current) {
+    if (next !== lastPushedQueryRef.current) {
       lastPushedQueryRef.current = next;
       router.replace(pathname + query, { scroll: false });
-    } else {
-      lastPushedQueryRef.current = current;
     }
   }, [
     pathname,
     router,
-    searchParams,
     page,
     search,
     typeIds,
     categoryIds,
     dateRange,
-    ratingRange,
+    debouncedRatingRange,
     isStarred,
     withImages,
   ]);
@@ -199,7 +191,10 @@ function HomePageContent() {
       ...(dateFrom != null && { dateFrom }),
       ...(dateTo != null && { dateTo }),
       ...(debouncedRatingRange[0] > 1 || debouncedRatingRange[1] < 10
-        ? { ratingMin: debouncedRatingRange[0], ratingMax: debouncedRatingRange[1] }
+        ? {
+            ratingMin: debouncedRatingRange[0],
+            ratingMax: debouncedRatingRange[1],
+          }
         : {}),
       ...(isStarred && { isStarred: true }),
       ...(withImages && { withImages: true }),
@@ -219,14 +214,10 @@ function HomePageContent() {
     filters,
   });
 
-  // "This month" count — extra lightweight query (frontend-only; streak is not derivable).
-  const monthFilter = useMemo<NotesFilters>(
-    () => ({ dateFrom: startOfMonth(new Date()).getTime() }),
-    [],
-  );
-  const { data: monthData } = usePaginatedNotesQuery(1, {
+  const monthStart = useMemo(() => startOfMonth(new Date()).getTime(), []);
+  const { data: thisMonthCount } = useNotesCountQuery({
     enabled: !!user,
-    filters: monthFilter,
+    dateFrom: monthStart,
   });
 
   const notes = data?.data ?? [];
@@ -286,7 +277,7 @@ function HomePageContent() {
           <Greeting
             name={user.name}
             total={totalNotes}
-            thisMonth={monthData?.total ?? null}
+            thisMonth={thisMonthCount ?? null}
           />
 
           <FilterBar
@@ -332,7 +323,9 @@ function HomePageContent() {
               </div>
             ) : notes.length === 0 ? (
               <p className="py-16 text-center font-mono text-[13px] text-faint">
-                {filters ? "No entries match these filters." : "No entries yet."}
+                {filters
+                  ? "No entries match these filters."
+                  : "No entries yet."}
               </p>
             ) : (
               <>
@@ -357,17 +350,20 @@ function HomePageContent() {
 
   return (
     <div className="flex min-h-[80vh] flex-col items-center justify-center gap-6 px-6">
-      <span
-        className="grid h-16 w-16 place-items-center rounded-[18px]"
-        style={{ background: "var(--accent-gradient)" }}
-      >
-        <span className="font-serif text-[30px] font-semibold text-[var(--on-accent)]">J</span>
-      </span>
+      <Image
+        src="/icon-192x192.png"
+        alt="Organix"
+        width={192}
+        height={192}
+        className="w-16 h-16"
+      />
       <div className="text-center">
         <h1 className="font-serif text-[32px] font-semibold tracking-[-0.015em] text-text">
-          The Journal
+          Organix
         </h1>
-        <p className="mt-1 text-[14px] text-muted">A warm place for your days.</p>
+        <p className="mt-1 text-[14px] text-muted">
+          A warm place for your days.
+        </p>
       </div>
       <GoogleSignInButton />
     </div>

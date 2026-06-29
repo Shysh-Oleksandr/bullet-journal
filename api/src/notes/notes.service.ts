@@ -194,6 +194,28 @@ export class NotesService {
     return !!result;
   }
 
+  async count(
+    authorId: string,
+    dateFrom?: number,
+    dateTo?: number,
+  ): Promise<number> {
+    const query: Record<string, unknown> = {
+      author: new Types.ObjectId(authorId),
+    };
+
+    if (dateFrom != null || dateTo != null) {
+      query.startDate = {};
+      if (dateFrom != null) {
+        (query.startDate as Record<string, number>).$gte = dateFrom;
+      }
+      if (dateTo != null) {
+        (query.startDate as Record<string, number>).$lte = dateTo;
+      }
+    }
+
+    return this.noteModel.countDocuments(query).exec();
+  }
+
   async findAllPaginated(
     authorId: string,
     page: number = 1,

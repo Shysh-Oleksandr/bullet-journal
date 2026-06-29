@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "The Journal",
-    short_name: "The Journal",
+    name: "Organix",
+    short_name: "Organix",
     description: "A warm, personal journaling PWA",
     start_url: "/",
     display: "standalone",
