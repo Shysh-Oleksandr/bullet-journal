@@ -7,5 +7,11 @@ export function PwaInstall() {
     import("@khmyznikov/pwa-install");
   }, []);
 
-  return <pwa-install manifest-url="/manifest.webmanifest" />;
+  return (
+    <pwa-install
+      manifest-url="/manifest.webmanifest"
+      manual-apple="true"
+      manual-chrome="true"
+    />
+  );
 }
